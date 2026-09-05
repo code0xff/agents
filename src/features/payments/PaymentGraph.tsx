@@ -294,7 +294,7 @@ export function PaymentGraph({ payments, compact = false }: { payments: Payment[
     <div className="relative">
       <svg ref={ref}
         style={{ touchAction: touchMap ? 'none' : 'pan-y' }}
-        className={`map-fade h-[300px] w-full cursor-grab active:cursor-grabbing sm:h-[440px] lg:h-[520px] ${touchMap ? 'ring-1 ring-ink-600 ring-inset' : ''}`}>
+        className={`map-fade h-[300px] w-full cursor-grab active:cursor-grabbing sm:h-[440px] lg:h-[520px] ${touchMap ? 'ring-2 ring-ink-300 ring-inset' : ''}`}>
         <g className="scene">
           <g className="links" />
           <g className="nodes" />
@@ -318,7 +318,11 @@ function Controls({ onIn, onOut, onReset, touchMap, onToggleTouch }: {
       <button type="button" onClick={onToggleTouch} aria-pressed={touchMap}
         aria-label={t(touchMap ? 'zoom.touchOff' : 'zoom.touchOn')}
         title={t(touchMap ? 'zoom.touchOff' : 'zoom.touchOn')}
-        className={`${cls} sm:hidden ${touchMap ? 'border-ink-500 text-ink-50' : ''}`}>
+        className={`grid h-7 w-7 place-items-center rounded-md border backdrop-blur transition focus-visible:outline-none sm:hidden ${
+          touchMap
+            ? 'border-ink-100 bg-ink-100 text-ink-950'
+            : 'border-ink-800 bg-ink-950/80 text-ink-300 hover:border-ink-600 hover:text-ink-100'
+        }`}>
         <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden>
           <path d="M8 2v6M5.4 3.6v4.4M10.6 3.6v4.4M3 6.4v3.1a4.5 4.5 0 0 0 4.5 4.5h.6a4.4 4.4 0 0 0 4.4-4.4V5.6"
             stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />

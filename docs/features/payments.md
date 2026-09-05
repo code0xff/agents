@@ -44,7 +44,9 @@ the target node pulses. A recent-payments list sits beside the graph.
   Zoom and pan controls sit in the corner of the canvas; the wheel zooms and dragging pans. Reset
   recentres and hands the camera back to the follower.
 
-  Touch is claimed explicitly through a hand button shown only on small screens. Until it is pressed
+  Touch is claimed explicitly through a hand button shown only on small screens. The button inverts to
+  a filled state while it holds the gesture; a brighter border alone was not readable in a monotone
+  palette, and the map gains a matching inset ring. Until it is pressed
   the map ignores touch entirely and the page scrolls as usual; once pressed the SVG switches to
   `touch-action: none` and one finger pans while a pinch zooms. Filtering to two fingers instead does
   not work: d3-zoom never registers the first touch, so no pinch can form, and `touch-action: pan-y`

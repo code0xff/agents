@@ -73,6 +73,10 @@ A view onto something larger should not advertise its frame. The flow map bounds
 ellipse and fades its own edges, so the panel border is the only straight line and the graph reads as
 a window rather than a diagram drawn to fit a box.
 
+## Toggle state
+A control that holds a mode inverts: filled background, background-coloured glyph. Shifting a border
+or text one step brighter is invisible when every step is a shade of grey.
+
 ## Motion and correctness
 Geometry and visibility are set directly, never only through a transition. A transition that never
 runs leaves the element at its initial value, so animating in from `opacity: 0` or `r: 0` can render
