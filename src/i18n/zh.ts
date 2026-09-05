@@ -118,6 +118,11 @@ export const zh: Dict = {
   'ins.topFacilitator': '最高 facilitator',
   'ins.topChainLabel': '最高链',
   'ins.usdcShare': 'USDC 占比',
+  'zoom.in': '放大',
+  'zoom.out': '缩小',
+  'zoom.reset': '重置视图',
+  'zoom.hint': '拖动平移，滚动缩放',
+  'zoom.hintTouch': '双指平移与缩放',
   'theme.dark': '深色',
   'theme.light': '浅色',
 }

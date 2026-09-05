@@ -116,6 +116,11 @@ export const en = {
   'ins.topFacilitator': 'Top facilitator',
   'ins.topChainLabel': 'Top chain',
   'ins.usdcShare': 'USDC share',
+  'zoom.in': 'Zoom in',
+  'zoom.out': 'Zoom out',
+  'zoom.reset': 'Reset view',
+  'zoom.hint': 'Drag to pan, scroll to zoom',
+  'zoom.hintTouch': 'Two fingers to pan and zoom',
   'theme.dark': 'dark',
   'theme.light': 'light',
 }

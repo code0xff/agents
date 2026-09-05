@@ -118,6 +118,11 @@ export const ja: Dict = {
   'ins.topFacilitator': '最多 facilitator',
   'ins.topChainLabel': '最多チェーン',
   'ins.usdcShare': 'USDC 比率',
+  'zoom.in': '拡大',
+  'zoom.out': '縮小',
+  'zoom.reset': '表示をリセット',
+  'zoom.hint': 'ドラッグで移動、スクロールで拡大',
+  'zoom.hintTouch': '2 本指で移動と拡大',
   'theme.dark': 'ダーク',
   'theme.light': 'ライト',
 }

@@ -22,7 +22,9 @@ the target node pulses. A recent-payments list sits beside the graph.
 - `PaymentGraph.tsx`: D3 force on a canvas 1.9x the panel, viewed through a camera. The layout is
   allowed to spread instead of being packed into the visible rectangle; the camera eases toward the
   centroid of the newest settlements and yields to the reader for 9s after any pan, zoom or drag.
-  Touch gestures are left to the page on mobile so the graph does not trap scrolling.
+  Zoom and pan controls sit in the corner of the canvas; the wheel zooms and dragging pans. On touch,
+  one finger keeps scrolling the page and two fingers drive the map, so the graph never traps
+  scrolling. Reset recentres and hands the camera back to the follower.
   Particle plus ring pulse per payment, draggable nodes.
 - `PaymentsPanel.tsx`: window stats, top senders, recent list.
 - Not yet applied: Bazaar payTo map (`public/snapshots/bazaar-cdp.payto.json`) to name payTo nodes.

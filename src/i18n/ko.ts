@@ -118,6 +118,11 @@ export const ko: Dict = {
   'ins.topFacilitator': '최다 facilitator',
   'ins.topChainLabel': '최다 체인',
   'ins.usdcShare': 'USDC 비중',
+  'zoom.in': '확대',
+  'zoom.out': '축소',
+  'zoom.reset': '보기 초기화',
+  'zoom.hint': '끌어서 이동, 스크롤로 확대',
+  'zoom.hintTouch': '두 손가락으로 이동과 확대',
   'theme.dark': '다크',
   'theme.light': '라이트',
 }

@@ -1,5 +1,6 @@
 import * as d3 from 'd3'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useT } from '../../i18n'
 import type { Translate } from '../../i18n'
 import { short } from '../../lib/format'
 import { facilitatorLabel, type Payment } from './usePayments'
@@ -61,9 +62,12 @@ export function PaymentGraph({ payments, counts, t, compact = false }: {
       .filter((event: Event) => {
         // Dragging a node must not also drag the camera.
         if ((event.target as Element).closest?.('g.n')) return false
-        // On a phone the graph sits inside a scrolling page, so touch gestures belong to
-        // the page; the camera follows activity on its own there.
-        if (compactRef.current && event.type.startsWith('touch')) return false
+        // The graph sits inside a scrolling page. One finger has to keep scrolling the
+        // page, so touch only drives the map once a second finger is down.
+        if (event.type.startsWith('touch')) {
+          const touches = (event as TouchEvent).touches
+          return touches ? touches.length >= 2 : false
+        }
         return true
       })
       .on('start', (event) => { if (event.sourceEvent) userMovedAt.current = Date.now() })
@@ -71,6 +75,24 @@ export function PaymentGraph({ payments, counts, t, compact = false }: {
     zoomRef.current = zoom
     svg.call(zoom)
     return () => { svg.on('.zoom', null) }
+  }, [])
+
+  const nudgeZoom = useCallback((factor: number) => {
+    const el = ref.current, zoom = zoomRef.current
+    if (!el || !zoom) return
+    userMovedAt.current = Date.now()
+    d3.select(el).transition().duration(220).call(zoom.scaleBy, factor)
+  }, [])
+
+  const resetView = useCallback(() => {
+    const el = ref.current, zoom = zoomRef.current
+    if (!el || !zoom) return
+    const { width, height } = el.getBoundingClientRect()
+    const W = width * CANVAS_SCALE, H = height * CANVAS_SCALE
+    // Reset also hands the camera back to the follower.
+    userMovedAt.current = 0
+    d3.select(el).transition().duration(400)
+      .call(zoom.transform, d3.zoomIdentity.translate((width - W) / 2, (height - H) / 2))
   }, [])
 
   // Nodes, links and layout, on the enlarged canvas.
@@ -248,13 +270,41 @@ export function PaymentGraph({ payments, counts, t, compact = false }: {
   }, [])
 
   return (
-    <svg ref={ref} className="h-[300px] w-full touch-pan-y sm:h-[440px] sm:cursor-grab sm:active:cursor-grabbing lg:h-[520px]">
-      <g className="scene">
-        <g className="links" />
-        <g className="nodes" />
-        <g className="fx" />
-      </g>
-    </svg>
+    <div className="relative">
+      <svg ref={ref} className="h-[300px] w-full cursor-grab touch-pan-y active:cursor-grabbing sm:h-[440px] lg:h-[520px]">
+        <g className="scene">
+          <g className="links" />
+          <g className="nodes" />
+          <g className="fx" />
+        </g>
+      </svg>
+      <Controls onIn={() => nudgeZoom(1.45)} onOut={() => nudgeZoom(1 / 1.45)} onReset={resetView} />
+    </div>
+  )
+}
+
+function Controls({ onIn, onOut, onReset }: { onIn: () => void; onOut: () => void; onReset: () => void }) {
+  const { t } = useT()
+  const cls = 'grid h-7 w-7 place-items-center rounded-md border border-ink-800 bg-ink-950/80 text-ink-300 backdrop-blur transition hover:border-ink-600 hover:text-ink-100 focus-visible:border-ink-500 focus-visible:outline-none'
+  return (
+    <div className="absolute top-3 right-3 flex flex-col gap-1.5">
+      <button type="button" onClick={onIn} aria-label={t('zoom.in')} title={t('zoom.in')} className={cls}>
+        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden>
+          <path d="M8 3.5v9M3.5 8h9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      </button>
+      <button type="button" onClick={onOut} aria-label={t('zoom.out')} title={t('zoom.out')} className={cls}>
+        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden>
+          <path d="M3.5 8h9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      </button>
+      <button type="button" onClick={onReset} aria-label={t('zoom.reset')} title={t('zoom.reset')} className={cls}>
+        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden>
+          <rect x="3.2" y="3.2" width="9.6" height="9.6" rx="1.4" stroke="currentColor" strokeWidth="1.4" />
+          <circle cx="8" cy="8" r="1.6" fill="currentColor" />
+        </svg>
+      </button>
+    </div>
   )
 }
 

@@ -44,6 +44,8 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
             <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-ink-50" />{t('pay.legend.facilitator')}</span>
             <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-ink-300" />{t('pay.legend.service')}</span>
             <span><i className="mr-1 inline-block h-2 w-2 rounded-full border border-ink-400 bg-ink-600" />{t('pay.legend.payer')}</span>
+            <span className="ml-auto hidden text-ink-600 sm:inline">{t('zoom.hint')}</span>
+            <span className="ml-auto text-ink-600 sm:hidden">{t('zoom.hintTouch')}</span>
           </div>
           {error && <p className="absolute top-2 right-4 left-4 truncate font-mono text-[10px] text-ink-400">{t('pay.rpcError', { message: error })}</p>}
         </div>
