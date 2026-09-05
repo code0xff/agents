@@ -4,6 +4,9 @@ on:
   push:
     branches: [dev]
   workflow_dispatch:
+  # Called by the snapshot workflow: pushes made with GITHUB_TOKEN do not
+  # trigger other workflows, so the snapshot job invokes this one directly.
+  workflow_call:
 
 permissions:
   contents: read
@@ -19,6 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Always publish the tip of dev, not the SHA that triggered the run,
+          # so a snapshot commit made moments earlier is included.
+          ref: dev
       - uses: actions/setup-node@v4
         with:
           node-version: 22

@@ -16,6 +16,8 @@ jobs:
   snapshot:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,11 +25,27 @@ jobs:
           node-version: 22
       - run: node scripts/snapshot.mjs
       - name: Commit snapshots
+        id: commit
         run: |
           git config user.name "snapshot-bot"
           git config user.email "snapshot-bot@users.noreply.github.com"
           git add public/snapshots data/snapshot-state
-          git diff --cached --quiet && echo "no changes" && exit 0
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "no changes"
+            exit 0
+          fi
           git commit -m "chore: refresh data snapshots"
           git pull --rebase origin dev
           git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+  # A GITHUB_TOKEN push does not trigger the push-based deploy, so call it here.
+  deploy:
+    needs: snapshot
+    if: needs.snapshot.outputs.changed == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy.yml
