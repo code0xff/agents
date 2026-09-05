@@ -38,14 +38,14 @@ export function PaymentsPanel() {
         <Stat label={t('pay.stat.facilitators')} value={stats.facs} />
       </div>
       <div className="grid md:grid-cols-[1fr_300px]">
-        <div className="relative">
-          <PaymentGraph payments={payments} counts={senderCounts} t={t} />
-          <div className="pointer-events-none absolute bottom-2 left-4 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] text-ink-500">
+        <div className="relative flex flex-col">
+          <PaymentGraph payments={payments} counts={senderCounts} t={t} compact={isMobile} />
+          <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-ink-800 px-4 py-2 font-mono text-[10px] text-ink-500">
             <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-ink-50" />{t('pay.legend.facilitator')}</span>
             <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-ink-300" />{t('pay.legend.service')}</span>
             <span><i className="mr-1 inline-block h-2 w-2 rounded-full border border-ink-400 bg-ink-600" />{t('pay.legend.payer')}</span>
           </div>
-          {error && <p className="absolute top-2 left-4 right-4 truncate font-mono text-[10px] text-ink-400">{t('pay.rpcError', { message: error })}</p>}
+          {error && <p className="absolute top-2 right-4 left-4 truncate font-mono text-[10px] text-ink-400">{t('pay.rpcError', { message: error })}</p>}
         </div>
         <div className="border-t border-ink-800 md:border-t-0 md:border-l">
           <div className="border-b border-ink-800 px-4 py-2 font-mono text-[10px] tracking-[0.25em] text-ink-500 uppercase">{t('pay.topSenders')}</div>

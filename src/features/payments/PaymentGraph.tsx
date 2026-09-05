@@ -7,9 +7,12 @@ import { facilitatorLabel, type Payment } from './usePayments'
 interface Node extends d3.SimulationNodeDatum { id: string; kind: 'facilitator' | 'payer' | 'payTo'; label: string; weight: number }
 interface Link extends d3.SimulationLinkDatum<Node> { id: string; source: string | Node; target: string | Node; weight: number }
 
-const WINDOW = 120 // number of recent payments kept in the graph
+// Recent payments kept in the graph. A small phone canvas cannot hold the desktop
+// window legibly, so it keeps fewer.
+const WINDOW_DESKTOP = 120
+const WINDOW_MOBILE = 40
 
-export function PaymentGraph({ payments, counts, t }: { payments: Payment[]; counts: Record<string, number>; t: Translate }) {
+export function PaymentGraph({ payments, counts, t, compact = false }: { payments: Payment[]; counts: Record<string, number>; t: Translate; compact?: boolean }) {
   const ref = useRef<SVGSVGElement>(null)
   const [size, setSize] = useState({ w: 0, h: 0 })
   const sim = useRef<d3.Simulation<Node, Link> | null>(null)
@@ -17,7 +20,7 @@ export function PaymentGraph({ payments, counts, t }: { payments: Payment[]; cou
   const linksRef = useRef<Map<string, Link>>(new Map())
   const lastKey = useRef<string | null>(null)
 
-  const recent = useMemo(() => payments.slice(0, WINDOW), [payments])
+  const recent = useMemo(() => payments.slice(0, compact ? WINDOW_MOBILE : WINDOW_DESKTOP), [payments, compact])
 
   // Keep the layout centered when the viewport or panel width changes.
   useEffect(() => {
@@ -89,7 +92,10 @@ export function PaymentGraph({ payments, counts, t }: { payments: Payment[]; cou
       .attr('fill', (d) => d.kind === 'facilitator' ? 'var(--ink-50)' : d.kind === 'payTo' ? 'var(--ink-300)' : 'var(--ink-600)')
       .attr('stroke', (d) => d.kind === 'payer' ? 'var(--ink-400)' : 'none').attr('stroke-width', 1)
       .transition().duration(500).attr('r', r)
-    nodeAll.select('text').text((d) => d.kind === 'facilitator' ? d.label : d.kind === 'payTo' && d.weight >= 3 ? d.label : '')
+    const minFacWeight = compact ? 6 : 0
+    nodeAll.select('text').text((d) =>
+      d.kind === 'facilitator' ? (d.weight >= minFacWeight ? d.label : '')
+        : d.kind === 'payTo' && !compact && d.weight >= 3 ? d.label : '')
       .attr('fill', (d) => d.kind === 'facilitator' ? 'var(--ink-50)' : 'var(--ink-300)')
     nodeAll.call(d3.drag<SVGGElement, Node>()
       .on('start', (ev, d) => { if (!ev.active) s.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y })
@@ -98,11 +104,18 @@ export function PaymentGraph({ payments, counts, t }: { payments: Payment[]; cou
     nodeAll.select('title').remove()
     nodeAll.append('title').text((d) => `${d.kind} ${d.id}`)
 
+    // Keep every node inside the canvas; labels sit above a node, so the top needs more room.
+    const clamp = (d: Node) => {
+      const pad = r(d) + 4
+      d.x = Math.max(pad, Math.min(width - pad, d.x ?? width / 2))
+      d.y = Math.max(pad + 12, Math.min(height - pad, d.y ?? height / 2))
+    }
     s.on('tick', () => {
+      for (const n of N) clamp(n)
       linkAll.attr('x1', (d) => (d.source as Node).x!).attr('y1', (d) => (d.source as Node).y!).attr('x2', (d) => (d.target as Node).x!).attr('y2', (d) => (d.target as Node).y!)
       nodeAll.attr('transform', (d) => `translate(${d.x},${d.y})`)
     })
-  }, [recent, counts, t, size])
+  }, [recent, counts, t, size, compact])
 
   // Emit a particle along the edges for every new payment
   useEffect(() => {
@@ -127,7 +140,7 @@ export function PaymentGraph({ payments, counts, t }: { payments: Payment[]; cou
   }, [payments])
 
   return (
-    <svg ref={ref} className="h-[300px] w-full touch-pan-y sm:h-[380px] lg:h-[420px]">
+    <svg ref={ref} className="h-[280px] w-full touch-pan-y sm:h-[380px] lg:h-[420px]">
       <g className="root"><g className="links" /><g className="nodes" /></g>
       <g className="fx" />
     </svg>
