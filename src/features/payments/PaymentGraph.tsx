@@ -1,14 +1,15 @@
 import * as d3 from 'd3'
 import { useEffect, useMemo, useRef } from 'react'
+import type { Translate } from '../../i18n'
 import { short } from '../../lib/format'
 import { facilitatorLabel, type Payment } from './usePayments'
 
 interface Node extends d3.SimulationNodeDatum { id: string; kind: 'facilitator' | 'payer' | 'payTo'; label: string; weight: number }
 interface Link extends d3.SimulationLinkDatum<Node> { id: string; source: string | Node; target: string | Node; weight: number }
 
-const WINDOW = 120 // 그래프에 유지할 최근 결제 수
+const WINDOW = 120 // number of recent payments kept in the graph
 
-export function PaymentGraph({ payments, counts }: { payments: Payment[]; counts: Record<string, number> }) {
+export function PaymentGraph({ payments, counts, t }: { payments: Payment[]; counts: Record<string, number>; t: Translate }) {
   const ref = useRef<SVGSVGElement>(null)
   const sim = useRef<d3.Simulation<Node, Link> | null>(null)
   const nodesRef = useRef<Map<string, Node>>(new Map())
@@ -17,7 +18,7 @@ export function PaymentGraph({ payments, counts }: { payments: Payment[]; counts
 
   const recent = useMemo(() => payments.slice(0, WINDOW), [payments])
 
-  // 노드/엣지 동기화
+  // Sync nodes/edges with the recent payments window
   useEffect(() => {
     const svg = d3.select(ref.current!)
     const { width, height } = ref.current!.getBoundingClientRect()
@@ -30,7 +31,7 @@ export function PaymentGraph({ payments, counts }: { payments: Payment[]; counts
     }
     const upL = (a: string, b: string) => { const id = `${a}>${b}`; let l = links.get(id); if (!l) { l = { id, source: a, target: b, weight: 0 }; links.set(id, l) } l.weight++; keepL.add(id) }
     for (const p of recent) {
-      const fl = facilitatorLabel(p, counts) ?? short(p.facilitator)
+      const fl = facilitatorLabel(p, counts, t) ?? short(p.facilitator)
       up(p.facilitator, 'facilitator', fl); up(p.payer, 'payer', short(p.payer)); up(p.payTo, 'payTo', short(p.payTo))
       upL(p.payer, p.facilitator); upL(p.facilitator, p.payTo)
     }
@@ -88,9 +89,9 @@ export function PaymentGraph({ payments, counts }: { payments: Payment[]; counts
       linkAll.attr('x1', (d) => (d.source as Node).x!).attr('y1', (d) => (d.source as Node).y!).attr('x2', (d) => (d.target as Node).x!).attr('y2', (d) => (d.target as Node).y!)
       nodeAll.attr('transform', (d) => `translate(${d.x},${d.y})`)
     })
-  }, [recent, counts])
+  }, [recent, counts, t])
 
-  // 새 결제마다 파티클
+  // Emit a particle along the edges for every new payment
   useEffect(() => {
     const p = payments[0]
     if (!p || p.key === lastKey.current) return

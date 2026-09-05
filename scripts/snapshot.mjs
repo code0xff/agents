@@ -1,10 +1,10 @@
-// CI에서 실행: CORS로 브라우저에서 직접 못 읽는 소스를 정적 JSON으로 저장한다 (docs/research/marketplaces.md).
-// 사용: node scripts/snapshot.mjs  → public/snapshots/*.json
+// Runs in CI: saves sources the browser cannot read directly (CORS) as static JSON (see docs/research/marketplaces.md).
+// Usage: node scripts/snapshot.mjs  -> public/snapshots/*.json
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
 const OUT = 'public/snapshots'
-const STATE = 'data/snapshot-state' // diff용 전체 키 목록 (배포 안 됨, 커밋됨)
+const STATE = 'data/snapshot-state' // full key list for diffing (committed, not deployed)
 const DAY = 86_400_000
 await fs.mkdir(OUT, { recursive: true }); await fs.mkdir(STATE, { recursive: true })
 
@@ -27,14 +27,14 @@ async function write(name, items, extra = {}) {
   for (const it of items) it.addedAt = oldKeys.get(it.key) ?? (old ? now : it.updated ?? now)
   items.sort((a, b) => (b.addedAt ?? '').localeCompare(a.addedAt ?? ''))
   const added24h = items.filter((i) => Date.now() - new Date(i.addedAt).getTime() < DAY).length
-  // 브라우저가 읽을 파일은 작게: 최근 300건만. 전체 키/추가시각은 .full.json에 보관해 다음 diff에 사용.
+  // Keep the browser-facing file small: latest 300 items only. Full keys/addedAt go to the state dir for the next diff.
   await fs.writeFile(path.join(STATE, `${name}.json`), JSON.stringify({ items: items.map((i) => ({ key: i.key, addedAt: i.addedAt })) }))
   const doc = { generatedAt: now, total: items.length, added24h, ...extra, items: items.slice(0, 300) }
   await fs.writeFile(path.join(OUT, `${name}.json`), JSON.stringify(doc))
   console.log(name, items.length, 'items,', added24h, 'new in 24h')
 }
 
-// 1) Bazaar 계열 (x402 discovery/resources, 페이지네이션 100)
+// 1) Bazaar-style sources (x402 discovery/resources, paginated by 100)
 async function bazaar(name, base) {
   const items = []; let offset = 0, total = Infinity
   while (offset < total) {
@@ -54,7 +54,7 @@ async function bazaar(name, base) {
   await write(name, items, { networks })
 }
 
-// 2) agentscan 신규 에이전트
+// 2) agentscan newest agents
 async function agentscan() {
   const j = await getJson('https://agentscan.info/api/agents?page=1&page_size=100')
   const stats = await getJson('https://agentscan.info/api/stats').catch(() => null)

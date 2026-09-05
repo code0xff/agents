@@ -21,7 +21,7 @@ export const useOcaiStats = () => useQuery<OcaiStats>({
   staleTime: 30 * 60_000,
 })
 
-/** CI 스냅샷 (public/snapshots/*.json). 없으면 null */
+/** CI snapshot (public/snapshots/*.json). Null when the file is missing. */
 export interface Snapshot { generatedAt: string; total: number; added24h?: number; items: SnapshotItem[]; networks?: Record<string, number>; stats?: { total: number; active: number; networks: number } | null }
 export interface SnapshotItem { name: string; url?: string; network?: string; price?: string; updated?: string; addedAt?: string }
 export const useSnapshot = (name: string | undefined) => useQuery<Snapshot | null>({

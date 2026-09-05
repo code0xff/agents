@@ -1,39 +1,43 @@
-# 아키텍처
+# Architecture
 
-## 디렉토리
+## Directory layout
 
 ```
 src/
-  main.tsx              # 진입, QueryClientProvider
-  App.tsx               # 레이아웃 셸
-  index.css             # Tailwind + @theme 토큰
-  components/           # 공용 UI (Panel, Badge, AnimatedNumber ...)
-  lib/                  # chains.ts(viem 클라이언트), format.ts, 공통 fetch 유틸
-  data/                 # 정적 데이터: marketplaces.json, facilitators.json, chains.ts
+  main.tsx              # entry, QueryClientProvider, I18nProvider
+  App.tsx               # layout shell, theme + locale toggles
+  index.css             # Tailwind + @theme tokens
+  i18n/                 # locale dictionaries and useT() hook
+  components/           # shared UI (Panel, Stat, ThemeToggle, LocaleSwitch ...)
+  lib/                  # clients.ts (viem clients), format.ts, theme.ts
+  data/                 # static data: marketplaces.json, facilitators.json, chains.ts
   features/
-    marketplaces/       # 기능 1
-    registry/           # 기능 2
-    payments/           # 기능 3
-docs/                   # 문서
-public/404.html         # GH Pages SPA fallback
-public/snapshots/       # CI가 생성하는 스냅샷 JSON (브라우저에서 fetch)
-data/snapshot-state/    # 스냅샷 diff용 상태 (배포 제외)
-scripts/snapshot.mjs    # 스냅샷 수집기
+    marketplaces/       # feature 1
+    registry/           # feature 2
+    payments/           # feature 3
+docs/                   # documentation
+public/404.html         # GitHub Pages SPA fallback
+public/snapshots/       # CI-generated snapshot JSON (fetched by the browser)
+data/snapshot-state/    # diff state for snapshots (committed, not deployed)
+scripts/snapshot.mjs    # snapshot collector
 ```
 
-## 데이터 흐름
+## Data flow
 
-브라우저 → (viem) 공개 RPC `getLogs` / `readContract`
-브라우저 → (fetch) 공개 REST API (CORS 허용된 것만)
-정적 JSON (`src/data/`) → 빌드에 포함
+Browser → (viem) public RPC `getLogs` / `getBlock`
+Browser → (fetch) public REST APIs (only those with CORS enabled)
+Static JSON (`src/data/`) → bundled at build time
+Snapshot JSON (`public/snapshots/`) → produced by CI, fetched at runtime
 
-모든 원격 호출은 TanStack Query로 감싼다. 폴링 간격은 기능 문서에 정의.
+All remote calls are wrapped in TanStack Query or a polling hook. Polling intervals are defined per
+feature doc.
 
-## 상태
+## State
 
-서버 상태: TanStack Query. UI 상태: React 로컬 상태. 전역 스토어 도입은 필요할 때만.
+Server state: TanStack Query / polling hooks. UI state: React local state. Theme and locale: small
+hooks backed by `localStorage`. No global store unless needed.
 
-## 체인 클라이언트
+## Chain clients
 
-`src/lib/chains.ts`에서 체인별 viem `PublicClient`를 생성. RPC URL은 `VITE_RPC_*` 환경변수,
-기본값은 공개 엔드포인트. 여러 RPC를 fallback으로 묶는다.
+`src/lib/clients.ts` creates one viem `PublicClient` per chain from `src/data/chains.ts`. RPC URLs
+come from `VITE_RPC_*` env vars with public defaults, combined with `fallback()`.

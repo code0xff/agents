@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ── Design tokens: monotone / futuristic ─────────────────────────── */
-/* 명도 스케일 변수. 테마에 따라 :root(dark) / .light 에서 뒤집힌다. */
+/* Luminance scale variables. Flipped between :root (dark) and .light. */
 :root {
   color-scheme: dark;
   --ink-950: #050505;
@@ -72,7 +72,7 @@ body {
   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-/* 그리드 배경: 미래지향 톤 */
+/* Grid background: futuristic tone */
 .bg-grid {
   background-image:
     linear-gradient(to right, var(--grid-line) 1px, transparent 1px),

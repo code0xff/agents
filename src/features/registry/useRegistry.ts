@@ -40,7 +40,7 @@ async function fetchRange(chain: ChainKey, from: bigint, to: bigint): Promise<Re
   return out
 }
 
-/** 블록 타임스탬프를 로그에 붙인다 (초기 로드 시 상대시간 정확도용, 최근 N개만) */
+/** Attach block timestamps to logs (accurate relative time on initial load; only the most recent N). */
 async function stampTimes(chain: ChainKey, evs: RegistryEvent[], limit = 12) {
   const client = getClient(chain)
   const blocks = [...new Set(evs.slice(0, limit).map((e) => e.block))]
@@ -71,7 +71,7 @@ export function useRegistry(chains: ChainKey[]) {
       return { events, heads: { ...s.heads, ...heads }, errors: { ...s.errors, ...errors }, loading: false }
     })
 
-  // 초기 로드
+  // Initial load
   const initial = useQuery({
     queryKey: ['registry-initial', chains],
     queryFn: async () => {
@@ -94,7 +94,7 @@ export function useRegistry(chains: ChainKey[]) {
     staleTime: Infinity,
   })
 
-  // 폴링
+  // Polling
   useEffect(() => {
     if (!initial.data) return
     let stop = false

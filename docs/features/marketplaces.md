@@ -1,26 +1,28 @@
-# 기능 1: Agent Marketplace 디렉토리
+# Feature 1: Agent marketplace directory
 
-## 목표
-존재하는 에이전트 마켓플레이스를 한눈에 보여주고, 각각의 URL과 **현재 활동 데이터**를 제공.
+## Goal
+Show the existing agent marketplaces at a glance with their URL and **current activity data**.
 
-## 최소 범위
-이름, 설명, URL, 체인/프로토콜(x402, ERC-8004, MCP 등), 상태(live/beta)
+## Minimum scope
+Name, description, URL, chain/protocol (x402, ERC-8004, MCP, ...), status (live/beta)
 
-## 확장 범위 (리서치로 가능 여부 확인 — AGENTS.md 대전제 3)
-- 신규 에이전트 추가 피드
-- 등록 에이전트 수, 거래/호출 수 등 지표
-- 카테고리 분포
-- 온체인 이벤트로 얻을 수 있으면 실시간, 아니면 정적 스냅샷
+## Extended scope (verified in research — ground rule 3)
+- Feed of newly added agents/resources
+- Registered agent counts, transaction/call counts
+- Category distribution
+- Live when on-chain events are available, otherwise a static snapshot
 
-## 데이터
-`src/data/marketplaces.json` 정적 기본 + 마켓플레이스별 `fetcher`
+## Data
+`src/data/marketplaces.json` static base + per-marketplace aggregates/snapshots
 
-## UI / 모션
-카드 그리드, stagger 진입, 호버 시 명도 상승. 활동 지표는 카운트업.
+## UI / motion
+Card grid, staggered entry, luminance lift on hover. Activity metrics count up.
 
-## 리서치
-`docs/research/marketplaces.md` (작성 전)
+## Research
+`docs/research/marketplaces.md`
 
-## 구현 (2026-09-05)
-- `src/features/marketplaces/MarketplacesPanel.tsx`: 정적 카드 + 상단 집계(agenteconomy, OCAI) + 스냅샷 카드(리소스 수, 24h 신규, 최근 추가 3건) + 스파크라인.
-- 훅: `useAggregates.ts` (`useAgentEconomy`, `useOcaiStats`, `useSnapshot`).
+## Implementation (2026-09-05)
+- `src/features/marketplaces/MarketplacesPanel.tsx`: static cards + top aggregates (agenteconomy, OCAI)
+  + snapshot cards (resource count, 24h additions, three most recent additions) + sparklines.
+- Hooks: `useAggregates.ts` (`useAgentEconomy`, `useOcaiStats`, `useSnapshot`).
+- Card copy comes from i18n keys `mp.card.<id>.*`.

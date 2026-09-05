@@ -3,6 +3,7 @@ import { decodeFunctionData, formatUnits, parseAbi, type Hex } from 'viem'
 import { USDC_BASE } from '../../data/chains'
 import facilitators from '../../data/facilitators.json'
 import { getClient } from '../../lib/clients'
+import type { Translate } from '../../i18n'
 
 const ABI = parseAbi([
   'function transferWithAuthorization(address from, address to, uint256 value, uint256 validAfter, uint256 validBefore, bytes32 nonce, uint8 v, bytes32 r, bytes32 s)',
@@ -52,7 +53,7 @@ export function usePayments() {
       const found: Payment[] = []
       const nums: bigint[] = []
       for (let b = from; b <= to; b++) nums.push(b)
-      // 4개씩 병렬
+      // Fetch four blocks in parallel
       for (let i = 0; i < nums.length; i += 4) {
         const chunk = nums.slice(i, i + 4)
         const blocks = await Promise.all(chunk.map((n) => client.getBlock({ blockNumber: n, includeTransactions: true })))
@@ -101,5 +102,5 @@ export function usePayments() {
   return state
 }
 
-export const facilitatorLabel = (p: Payment, counts: Record<string, number>) =>
-  p.facilitatorName ?? ((counts[p.facilitator] ?? 0) >= UNLABELED_PROMOTE ? `Unlabeled ${p.facilitator.slice(2, 6)}` : null)
+export const facilitatorLabel = (p: Payment, counts: Record<string, number>, t: Translate) =>
+  p.facilitatorName ?? ((counts[p.facilitator] ?? 0) >= UNLABELED_PROMOTE ? t('pay.unlabeled', { id: p.facilitator.slice(2, 6) }) : null)

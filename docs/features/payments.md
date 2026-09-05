@@ -1,22 +1,25 @@
-# 기능 3: Facilitator 기준 x402 결제 흐름 그래프
+# Feature 3: Facilitator-centric x402 payment flow graph
 
-## 목표
-메이저 facilitator를 중심으로 실제 에이전트 결제가 일어나는 모습을 그래프(노드-엣지)로 시각화.
+## Goal
+Visualize real agent payments as a node-edge graph centered on major facilitators.
 
-## 데이터
-- facilitator 주소 목록 (리서치)
-- USDC `Transfer` 이벤트 중 facilitator 관련 트랜잭션, 또는 facilitator 공개 API
-- payer → facilitator → resource server 흐름 재구성
+## Data
+- Facilitator address list (research)
+- USDC EIP-3009 calls sent by facilitators (block scan on Base)
+- Reconstruct payer → facilitator → resource server flows
 
-## UI / 모션
-D3 force graph. facilitator 중앙 노드, 결제 발생 시 엣지 따라 파티클 이동, 노드 명도 펄스.
-최근 결제 목록을 사이드에 병행 표시.
+## UI / motion
+D3 force graph. Facilitators as central nodes; on each payment a particle travels along the edges and
+the target node pulses. A recent-payments list sits beside the graph.
 
-## 리서치
-`docs/research/payments.md` (작성 전) — facilitator 목록/주소, 온체인 식별 방법, 공개 API 존재 여부
+## Research
+`docs/research/payments.md` — facilitator list/addresses, on-chain detection, public API availability
 
-## 구현 (2026-09-05)
-- `usePayments.ts`: Base 최신 40블록 백필 후 10s 폴링, 블록 full-tx에서 USDC EIP-3009 호출 디코드. facilitator 라벨은 `facilitators.json`, 미라벨은 3건 이상이면 `Unlabeled xxxx`.
-- `PaymentGraph.tsx`: D3 force, 최근 120건 유지, 결제마다 payer→facilitator→payTo 파티클 + 링 펄스. 드래그 가능.
-- `PaymentsPanel.tsx`: 윈도우 통계, top senders, 최근 목록.
-- 미적용: Bazaar payTo 매핑(`public/snapshots/bazaar-cdp.payto.json`)으로 수취 노드 이름 표시 — 다음 단계.
+## Implementation (2026-09-05)
+- `usePayments.ts`: backfill the latest 40 Base blocks, then poll every 10s; decode USDC EIP-3009 calls
+  from full-transaction blocks. Facilitator labels from `facilitators.json`; unlabeled senders with
+  3+ payments become `Unlabeled xxxx` nodes.
+- `PaymentGraph.tsx`: D3 force, keeps the latest 120 payments, particle + ring pulse per payment,
+  draggable nodes.
+- `PaymentsPanel.tsx`: window stats, top senders, recent list.
+- Not yet applied: Bazaar payTo map (`public/snapshots/bazaar-cdp.payto.json`) to name payTo nodes.

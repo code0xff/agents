@@ -1,7 +1,9 @@
 import { motion } from 'motion/react'
+import { useT } from '../i18n'
 import type { Theme } from '../lib/theme'
 
 export function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
+  const { t } = useT()
   const dark = theme === 'dark'
   return (
     <button onClick={onToggle} aria-label="Toggle theme"
@@ -10,7 +12,7 @@ export function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () =>
         <motion.span layout transition={{ type: 'spring', stiffness: 500, damping: 30 }}
           className={`absolute top-0.5 h-3 w-3 rounded-full bg-ink-100 ${dark ? 'left-0.5' : 'left-[18px]'}`} />
       </span>
-      {dark ? 'dark' : 'light'}
+      {dark ? t('theme.dark') : t('theme.light')}
     </button>
   )
 }

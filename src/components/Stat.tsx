@@ -1,11 +1,14 @@
 import { animate, motion, useMotionValue, useTransform } from 'motion/react'
 import { useEffect } from 'react'
+import { useT } from '../i18n'
+import { num } from '../lib/format'
 
 export function Stat({ label, value, format, sub }: {
   label: string; value: number | null | undefined; format?: (n: number) => string; sub?: string
 }) {
+  const { tag } = useT()
   const mv = useMotionValue(0)
-  const text = useTransform(mv, (v) => (format ? format(v) : Math.round(v).toLocaleString()))
+  const text = useTransform(mv, (v) => (format ? format(v) : num(Math.round(v), tag)))
   useEffect(() => {
     if (value == null) return
     const c = animate(mv, value, { duration: 1.4, ease: [0.22, 1, 0.36, 1] })

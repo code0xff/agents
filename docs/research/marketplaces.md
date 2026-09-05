@@ -1,45 +1,48 @@
-# Agent Marketplace 리서치
+# Agent marketplace research
 
-날짜: 2026-09-05
+Date: 2026-09-05
 
-## 목표
-마켓플레이스 목록 + URL을 넘어, 각 플랫폼에서 **신규 에이전트/서비스 추가와 활동 지표를 긁어올 수 있는지** 확인한다.
+## Goal
+Go beyond a list of marketplaces + URLs: verify for each platform **whether new agents/services and
+activity metrics can be pulled**.
 
-## 후보와 수집 가능 데이터
-| 마켓플레이스 | URL | 유형 | 브라우저 직접 | 긁어올 수 있는 것 | 판정 |
+## Candidates and available data
+| Marketplace | URL | Type | Direct from browser | What can be pulled | Verdict |
 |---|---|---|---|---|---|
-| x402 Bazaar (Coinbase CDP) | `https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources` | x402 서비스 디스커버리 | CORS 차단 | 16,161개 유료 API/MCP 리소스, `lastUpdated`로 신규 감지, 가격·네트워크·payTo | **CI 스냅샷** (핵심) |
-| PayAI Bazaar | `https://facilitator.payai.network/discovery/resources` | 동상 | 차단 | PayAI 등록 리소스(Avalanche 등) | CI 스냅샷 |
-| ERC-8004 Identity Registry | 온체인 (Base/Eth/BNB) | 에이전트 레지스트리 | **OK** (RPC) | 신규 등록 실시간 | 실시간 (`registry.md`) |
-| agentscan.info | `https://agentscan.info/api/agents?page_size=N`, `/api/activities`, `/api/stats` | 8004 탐색기 | 차단 | 22네트워크 541k 에이전트, 신규순 정렬, 이름/스킬/평판, 활동 피드 | CI 스냅샷 |
-| RNWY | `https://rnwy.com/api/agents` | 8004 트러스트 인덱스 | 차단 | 12체인 신규 등록, 스코어, MCP/A2A 엔드포인트 | CI 스냅샷(보조) |
-| On-Chain Agent Intel | `https://api.onchainagentintel.io/v1/public/*` | 8004 인덱스 (Base/Eth) | **OK** | stats, top MCP/OpenAPI/most-recent 리더보드, 체인별 ready 에이전트 | 실시간 |
-| agenteconomy.to | `https://dashboard.agenteconomy.to/data.json` | 집계 대시보드 | **OK** | x402·8004·Olas·Virtuals ACP·Tempo MPP 총계/일별 | 실시간(집계) |
-| Virtuals ACP | `https://app.virtuals.io`, `acpx.virtuals.io` (facilitator) | 에이전트 커머스 | 미확인 | 일별 memo 수는 agenteconomy에 있음 (12.3M 누적) | 링크 + 집계 |
-| Olas Mech Marketplace | `https://olas.network/mech-marketplace` | 에이전트 간 작업 시장 (Gnosis 주력) | 미확인 | 주간 tx는 agenteconomy에 있음 (19.2M 누적) | 링크 + 집계 |
-| 8004scan (AltLayer) | `https://8004scan.io` | 탐색기 | API 없음(404) | — | 링크만 |
-| Quicknode ERC-8004 Explorer | `https://erc-8004.quicknode.com` | 탐색기 | API 없음 | — | 링크만 |
-| Agent Arena | `https://agentarena.site` | 서비스 카탈로그 | API 없음 | — | 링크만 |
-| 2s | `https://2s.io` | 570+ x402 엔드포인트 | API 없음 | — | 링크만 |
-| ClawHub | `https://clawhub.com` | OpenClaw 스킬 레지스트리(오프체인) | 미확인 | 3,000+ 스킬 | 링크만(범위 밖) |
-| Moltbook | `https://moltbook.com` | 에이전트 소셜(Meta 인수) | 미확인 | — | 링크만(범위 밖) |
-| 8k4 Protocol | — | — | 410 Gone | 서비스 종료 | 제외 |
+| x402 Bazaar (Coinbase CDP) | `https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources` | x402 service discovery | CORS blocked | 16,161 paid API/MCP resources, new items via `lastUpdated`, price/network/payTo | **CI snapshot** (core) |
+| PayAI Bazaar | `https://facilitator.payai.network/discovery/resources` | same | blocked | PayAI-registered resources (Avalanche etc.) | CI snapshot |
+| ERC-8004 Identity Registry | on-chain (Base/Eth/BNB) | agent registry | **OK** (RPC) | live new registrations | live (`registry.md`) |
+| agentscan.info | `https://agentscan.info/api/agents?page_size=N`, `/api/activities`, `/api/stats` | 8004 explorer | blocked | 22 networks, 541k agents, newest-first, name/skills/reputation, activity feed | CI snapshot |
+| RNWY | `https://rnwy.com/api/agents` | 8004 trust index | blocked | 12-chain new registrations, scores, MCP/A2A endpoints | CI snapshot (secondary) |
+| On-Chain Agent Intel | `https://api.onchainagentintel.io/v1/public/*` | 8004 index (Base/Eth) | **OK** | stats, top MCP/OpenAPI/most-recent leaderboards, per-chain ready agents | live |
+| agenteconomy.to | `https://dashboard.agenteconomy.to/data.json` | aggregate dashboard | **OK** | x402 · 8004 · Olas · Virtuals ACP · Tempo MPP totals/daily | live (aggregate) |
+| Virtuals ACP | `https://app.virtuals.io`, `acpx.virtuals.io` (facilitator) | agent commerce | not checked | daily memo counts available in agenteconomy (12.3M cumulative) | link + aggregate |
+| Olas Mech Marketplace | `https://olas.network/mech-marketplace` | agent-to-agent task market (Gnosis) | not checked | weekly txs available in agenteconomy (19.2M cumulative) | link + aggregate |
+| 8004scan (AltLayer) | `https://8004scan.io` | explorer | no API (404) | — | link only |
+| Quicknode ERC-8004 Explorer | `https://erc-8004.quicknode.com` | explorer | no API | — | link only |
+| Agent Arena | `https://agentarena.site` | service catalog | no API | — | link only |
+| 2s | `https://2s.io` | 570+ x402 endpoints | no API | — | link only |
+| ClawHub | `https://clawhub.com` | OpenClaw skill registry (off-chain) | not checked | 3,000+ skills | link only (out of scope) |
+| Moltbook | `https://moltbook.com` | agent social network (acquired by Meta) | not checked | — | link only (out of scope) |
+| 8k4 Protocol | — | — | 410 Gone | service retired | excluded |
 
-## 응답 샘플 (요약)
+## Response samples (summary)
 - CDP Bazaar: `{items:[{accepts:[{network:"eip155:8453",payTo,amount,asset}],resource,type:"http"|"mcp",lastUpdated,x402Version:2}],pagination:{limit,offset,total:16161}}`
 - agentscan `/api/agents`: `{items:[{name,address,description,network_id,token_id,owner_address,reputation_score,skills[],created_at}],total,page,page_size}`
 - onchainagentintel `/v1/public/stats`: `{agents_indexed:25708,mcp_agents,openapi_agents,chains_breakdown:{base,eth}}`
 
-## 결론 / 채택
-1. 마켓플레이스 카드는 `src/data/marketplaces.json` 정적 목록(이름, URL, 유형, 체인, 프로토콜, 수집 방식 배지).
-2. **CI 스냅샷 파이프라인**: GitHub Actions 스케줄(6시간)로 아래를 fetch → `public/snapshots/*.json` 커밋 → Pages 재배포. 백엔드 없이 CORS 차단 소스를 우회한다.
-   - `bazaar-cdp.json`: 전체 페이지네이션(100씩, 429 백오프) → resource, payTo, network, price, lastUpdated
+## Conclusion / adopted
+1. Marketplace cards come from the static `src/data/marketplaces.json` (name, URL, type, chains,
+   protocols, feed-type badge).
+2. **CI snapshot pipeline**: a GitHub Actions schedule (6h) fetches the sources below →
+   `public/snapshots/*.json` → commit → Pages redeploy. Works around CORS without a backend.
+   - `bazaar-cdp.json`: full pagination (100 per page, 429 backoff) → resource, payTo, network, price, lastUpdated
    - `bazaar-payai.json`
-   - `agentscan-newest.json`: 신규순 200건 + `/api/stats`
-   - 각 스냅샷 diff로 "신규 추가" 피드 생성 (이전 스냅샷과 비교, `addedAt` 기록)
-3. 브라우저 실시간: 8004 온체인 이벤트, onchainagentintel, agenteconomy.
-4. 카드에 표시할 활동 지표: 리소스 수, 최근 24h 신규, 체인 분포, (있으면) 누적 tx.
+   - `agentscan.json`: newest 100 + `/api/stats`
+   - Diff against the previous snapshot to produce a "newly added" feed (`addedAt`)
+3. Live in the browser: 8004 on-chain events, onchainagentintel, agenteconomy.
+4. Card metrics: resource count, last-24h additions, chain distribution, cumulative txs where available.
 
-## 미해결
-- CDP Bazaar rate limit(429) 실측 — 16k건/100 = 162 요청, CI에서 백오프로 처리.
-- Virtuals/Olas 자체 공개 API 존재 여부는 2차 리서치.
+## Open questions
+- CDP Bazaar rate limit (429): 16k items / 100 = 162 requests; handled with backoff in CI.
+- Whether Virtuals/Olas expose public APIs is a second-round research item.

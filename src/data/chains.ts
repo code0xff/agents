@@ -8,7 +8,7 @@ export interface ChainConfig {
   short: string
   chain: Chain
   rpcs: string[]
-  /** eth_getLogs 최대 블록 범위 (실측, docs/research/registry.md) */
+  /** Max eth_getLogs block range (measured, see docs/research/registry.md) */
   logRange: bigint
   explorer: string
 }

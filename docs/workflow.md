@@ -1,44 +1,47 @@
-# 개발 절차
+# Development process
 
-모든 기능은 아래 순서를 따른다. 리서치 없이 구현으로 넘어가지 않는다.
+Every feature follows these steps. Never skip research and go straight to implementation.
 
-## 1. 리서치 (`docs/research/<feature>.md`)
+## 1. Research (`docs/research/<feature>.md`)
 
-- 데이터가 어디에 있는가: 온체인(컨트랙트/이벤트), 공개 API, 정적 페이지, RSS
-- 브라우저에서 직접 접근 가능한가: CORS 허용 여부, 인증 필요 여부, rate limit
-- 실제 응답 샘플을 확보한다 (curl / 브라우저 콘솔). 문서에 붙인다.
-- 마켓플레이스의 경우 추가 확인:
-  - 신규 에이전트 등록/추가 이벤트를 얻을 수 있는가
-  - 거래·결제·호출 수 등 활동 지표가 있는가
-  - 카테고리, 평판, 소유자, 가격 정보가 있는가
-  - 온체인이라면 어떤 컨트랙트·체인인가
-- 접근 불가한 경우 대안(프록시 없는 공개 미러, 정적 스냅샷 JSON을 리포에 커밋, CI로 주기 갱신)을 기록
+- Where the data lives: on-chain (contracts/events), public API, static page, RSS
+- Whether the browser can reach it directly: CORS, auth, rate limits
+- Capture real response samples (curl / browser console) and paste them into the doc
+- For marketplaces, additionally verify:
+  - Can new agent registrations/additions be obtained?
+  - Are there activity metrics (transactions, payments, call counts)?
+  - Are categories, reputation, owner, or pricing available?
+  - If on-chain, which contract and chain?
+- When direct access is impossible, record the alternative (a CORS-open public mirror, a static
+  snapshot committed to the repo, periodic refresh via CI)
 
-## 2. 설계
+## 2. Design
 
-- `docs/features/<feature>.md`에 데이터 모델, 컴포넌트 구성, 애니메이션 계획 기록
-- `docs/data-sources.md`에 새 소스 추가
+- Record the data model, component structure, and animation plan in `docs/features/<feature>.md`
+- Add new sources to `docs/data-sources.md`
 
-## 3. 구현
+## 3. Implement
 
-- `src/features/<feature>/` 아래에 격리
-- fetch 로직은 `api.ts`, 타입은 `types.ts`, UI는 컴포넌트
-- 실패 시 빈 상태/에러 상태 UI 필수 (공개 RPC는 자주 실패한다)
+- Isolate under `src/features/<feature>/`
+- Fetch logic in `api.ts`/hooks, types in `types.ts`, UI in components
+- Empty and error states are mandatory (public RPCs fail often)
+- All UI strings go through `src/i18n` (see `docs/i18n.md`)
 
-## 4. 검증
+## 4. Verify
 
-- `npm run build` 통과
-- `VITE_BASE`로 빌드해 `npm run preview`에서 서브 경로 동작 확인
+- `npm run build` passes
+- Build with `VITE_BASE` and check sub-path behavior with `npm run preview`
+- Check both light and dark themes and at least two locales
 
-## 리서치 문서 템플릿
+## Research doc template
 
 ```
-# <feature> 리서치
-날짜:
-## 목표
-## 후보 소스
-| 소스 | 유형 | 브라우저 직접 접근 | 인증 | 제공 데이터 | 비고 |
-## 응답 샘플
-## 결론 / 채택 소스
-## 미해결
+# <feature> research
+Date:
+## Goal
+## Candidate sources
+| Source | Type | Direct from browser | Auth | Data provided | Notes |
+## Response samples
+## Conclusion / adopted sources
+## Open questions
 ```
