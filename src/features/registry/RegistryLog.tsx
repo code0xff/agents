@@ -26,7 +26,6 @@ function Row({ e, t }: { e: RegistryEvent; t: Translate }) {
     <motion.li
       initial={{ opacity: 0, x: -12 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0 }}
       style={{ animation: 'flash 2.5s ease-out' }}
       transition={{ duration: 0.5 }}
       className="border-b border-ink-800/60 font-mono text-xs hover:bg-ink-800/30"
@@ -106,9 +105,10 @@ export function RegistryLog({ state }: { state: RegistryState }) {
           </li>
         )}
         {!loading && !allFailed && shown.length === 0 && <li className="px-5 py-8 text-center font-mono text-xs text-ink-500">{t('reg.empty')}</li>}
-        <AnimatePresence initial={false}>
-          {paged.items.map((e) => <Row key={e.key} e={e} t={t} />)}
-        </AnimatePresence>
+        {/* Deliberately not wrapped in AnimatePresence: on a page change the outgoing rows
+            would linger through their exit animation, so the list briefly holds twice the
+            page size. Rows still animate in on mount. */}
+        {paged.items.map((e) => <Row key={e.key} e={e} t={t} />)}
       </ul>
       <Pagination paged={paged} />
     </Panel>

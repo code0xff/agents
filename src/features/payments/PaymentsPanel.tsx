@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'motion/react'
+import { motion } from 'motion/react'
 import { useMemo } from 'react'
 import { Badge, LiveDot, Panel } from '../../components/Panel'
 import { Pagination, usePagination } from '../../components/Pagination'
@@ -60,11 +60,12 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
           </ul>
           <div className="px-4 py-2 font-mono text-[10px] tracking-[0.25em] text-ink-500 uppercase">{t('pay.recent')}</div>
           <ul className="font-mono text-[11px]">
-            <AnimatePresence initial={false}>
-              {paged.items.map((p) => {
+            {/* See RegistryLog: an exit animation here would double the row count on a
+                page change until it finished. */}
+            {paged.items.map((p) => {
                 const fl = facilitatorLabel(p, senderCounts, t)
                 return (
-                  <motion.li key={p.key} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}
+                  <motion.li key={p.key} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}
                     className="flex items-center gap-2 border-t border-ink-800/60 px-4 py-1.5">
                     <span className="w-6 shrink-0 text-ink-600">{timeAgo(p.ts)}</span>
                     <span className="shrink-0 text-ink-100 tabular-nums">{usd(p.usdc, 4, tag)}</span>
@@ -73,7 +74,6 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
                   </motion.li>
                 )
               })}
-            </AnimatePresence>
           </ul>
           <Pagination paged={paged} compact />
         </div>

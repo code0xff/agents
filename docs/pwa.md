@@ -44,3 +44,7 @@ inner scroll containers, so the page has a single scroll axis on touch devices.
 
 Because both lists update live, the current page is clamped when the list shrinks, and the registry
 panel shows a "N new" button while the reader is off page one so a shifting list stays explainable.
+
+Paginated rows are not wrapped in `AnimatePresence`. An exit animation keeps the outgoing rows mounted
+until it finishes, so a page change briefly rendered twice the page size before settling back. Rows
+still animate in on mount; only the exit was removed.
