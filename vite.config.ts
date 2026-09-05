@@ -69,7 +69,10 @@ export default defineConfig({
           {
             urlPattern: ({ url }) => url.hostname === 'fonts.googleapis.com',
             handler: 'StaleWhileRevalidate',
-            options: { cacheName: 'aeo-google-fonts-styles' },
+            options: {
+              cacheName: 'aeo-google-fonts-styles',
+              expiration: { maxEntries: 8, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
           },
           {
             urlPattern: ({ url }) => url.hostname === 'fonts.gstatic.com',

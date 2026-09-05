@@ -110,6 +110,10 @@ export const en = {
   'page.payments.lead': 'Every USDC settlement a facilitator submits on Base, as it lands.',
   'page.registry.lead': 'Agents registering on Base, Ethereum and BNB, as it happens.',
   'page.marketplaces.lead': 'Where agents and paid services are listed, and what each one exposes.',
+  'reg.allFailed': 'All chains failed to respond',
+  'page.label': 'Pagination',
+  'theme.toggle': 'Toggle colour theme',
+  'locale.label': 'Language',
   'theme.dark': 'dark',
   'theme.light': 'light',
 }

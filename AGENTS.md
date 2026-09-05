@@ -46,6 +46,7 @@ Vite 8 · React 19 · TypeScript · Tailwind v4 · motion · GSAP · Lenis · D3
 | `docs/features/payments.md` | Feature 3: facilitator-centric x402 payment flow graph |
 | `docs/features/*.md` "Implementation" section | Current implementation status and next steps per feature |
 | `scripts/snapshot.mjs` | CI snapshot collector (CORS-blocked sources → `public/snapshots/`) |
+| `docs/review-2026-09.md` | Code audit findings and what was fixed or deferred |
 | `docs/research/` | Pre-implementation research per feature (required). registry / payments / marketplaces done |
 
 ## Commands

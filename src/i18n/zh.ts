@@ -112,6 +112,10 @@ export const zh: Dict = {
   'page.payments.lead': '实时呈现 facilitator 在 Base 上提交的每一笔 USDC 结算。',
   'page.registry.lead': '实时呈现在 Base、Ethereum 与 BNB 上注册的代理。',
   'page.marketplaces.lead': '代理与付费服务的登记之处，以及各自公开的数据。',
+  'reg.allFailed': '所有链均无响应',
+  'page.label': '分页',
+  'theme.toggle': '切换配色主题',
+  'locale.label': '语言',
   'theme.dark': '深色',
   'theme.light': '浅色',
 }

@@ -112,6 +112,10 @@ export const ko: Dict = {
   'page.payments.lead': 'Base에서 facilitator가 제출하는 USDC 정산을 실시간으로.',
   'page.registry.lead': 'Base, Ethereum, BNB에 등록되는 에이전트를 실시간으로.',
   'page.marketplaces.lead': '에이전트와 유료 서비스가 등록되는 곳, 그리고 각각이 공개하는 데이터.',
+  'reg.allFailed': '모든 체인이 응답하지 않음',
+  'page.label': '페이지 이동',
+  'theme.toggle': '색상 테마 전환',
+  'locale.label': '언어',
   'theme.dark': '다크',
   'theme.light': '라이트',
 }

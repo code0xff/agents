@@ -49,7 +49,7 @@ export function Pagination<T>({ paged, compact = false }: { paged: Paged<T>; com
   if (total === 0) return null
   const btn = 'rounded border border-ink-800 px-2 py-1 font-mono text-[10px] text-ink-400 transition enabled:hover:border-ink-600 enabled:hover:text-ink-100 disabled:opacity-30'
   return (
-    <nav className="flex items-center justify-between gap-2 border-t border-ink-800 px-4 py-2" aria-label="Pagination">
+    <nav className="flex items-center justify-between gap-2 border-t border-ink-800 px-4 py-2" aria-label={t('page.label')}>
       <span className="font-mono text-[10px] text-ink-500 tabular-nums">
         {t('page.range', { from, to, total })}
       </span>
@@ -58,7 +58,7 @@ export function Pagination<T>({ paged, compact = false }: { paged: Paged<T>; com
           <button className={btn} onClick={() => setPage(1)} disabled={page === 1} aria-label={t('page.first')}>«</button>
         )}
         <button className={btn} onClick={prev} disabled={page === 1} aria-label={t('page.prev')}>‹</button>
-        <span className="px-1 font-mono text-[10px] text-ink-300 tabular-nums">{page}/{totalPages}</span>
+        <span aria-current="page" className="px-1 font-mono text-[10px] text-ink-300 tabular-nums">{page}/{totalPages}</span>
         <button className={btn} onClick={next} disabled={page === totalPages} aria-label={t('page.next')}>›</button>
         {!compact && (
           <button className={btn} onClick={() => setPage(totalPages)} disabled={page === totalPages} aria-label={t('page.last')}>»</button>

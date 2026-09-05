@@ -5,8 +5,12 @@
     <title>Agent Economy Observatory</title>
     <script>
       // Routing is hash based, so any 404 here is a genuinely unknown path.
-      // Send it to the app root and let the router pick the default view.
-      location.replace(location.pathname.split('/').slice(0, 2).join('/') + '/');
+      // Send it to the app root. With a root base there is no project segment to keep.
+      (function () {
+        var parts = location.pathname.split('/').filter(Boolean);
+        var root = parts.length > 1 ? '/' + parts[0] + '/' : '/';
+        location.replace(root);
+      })();
     </script>
   </head>
   <body></body>

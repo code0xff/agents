@@ -24,5 +24,3 @@ export function useTheme() {
   return { theme, toggle: () => setTheme((t) => (t === 'dark' ? 'light' : 'dark')) }
 }
 
-/** Token color for use outside CSS (e.g. D3 attrs). */
-export const ink = (n: 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 950) => `var(--ink-${n})`

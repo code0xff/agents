@@ -50,6 +50,15 @@ with its 7-day momentum and the shape of the series, and the `Concentration` pan
 activity actually sits (which facilitator settles most payments, which chain holds most agents).
 Raw feeds live on their own routes.
 
+## Controls
+Language is a native `select`: compact at any width, accessible for free, and it opens as the
+platform picker on touch. Theme is a single icon button that swaps a sun and moon glyph.
+
+## Motion and correctness
+Geometry and visibility are set directly, never only through a transition. A transition that never
+runs leaves the element at its initial value, so animating in from `opacity: 0` or `r: 0` can render
+a blank panel. Animate changes, but make the resting state correct without them.
+
 ## Component rules
 - `rounded-lg`/`rounded-xl`, 1px borders, no shadows (blurred panel background instead of glow)
 - Dense data uses mono font at small sizes (`text-xs`)

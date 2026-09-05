@@ -112,6 +112,10 @@ export const ja: Dict = {
   'page.payments.lead': 'Base 上で facilitator が送信する USDC 決済をリアルタイムで。',
   'page.registry.lead': 'Base、Ethereum、BNB に登録されるエージェントをリアルタイムで。',
   'page.marketplaces.lead': 'エージェントと有料サービスが掲載される場所と、各所が公開するデータ。',
+  'reg.allFailed': 'すべてのチェーンが応答しません',
+  'page.label': 'ページ送り',
+  'theme.toggle': 'カラーテーマの切り替え',
+  'locale.label': '言語',
   'theme.dark': 'ダーク',
   'theme.light': 'ライト',
 }

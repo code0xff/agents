@@ -5,7 +5,8 @@ export interface RegistryEvent {
   chain: ChainKey
   kind: 'registered' | 'uri'
   agentId: bigint
-  owner: `0x${string}`
+  /** Who emitted the event: the owner for a registration, the updater for a URI change. */
+  actor: `0x${string}`
   uri: string
   name?: string
   description?: string

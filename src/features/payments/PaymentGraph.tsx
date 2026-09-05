@@ -4,7 +4,11 @@ import type { Translate } from '../../i18n'
 import { short } from '../../lib/format'
 import { facilitatorLabel, type Payment } from './usePayments'
 
-interface Node extends d3.SimulationNodeDatum { id: string; kind: 'facilitator' | 'payer' | 'payTo'; label: string; weight: number }
+type Kind = 'facilitator' | 'payer' | 'payTo'
+/** Keyed by role as well as address: the same address can act in several roles at once,
+ *  and a single shared node would flip its colour, size and label between them. */
+interface Node extends d3.SimulationNodeDatum { id: string; addr: string; kind: Kind; label: string; weight: number }
+const nodeId = (kind: Kind, addr: string) => `${kind}:${addr}`
 interface Link extends d3.SimulationLinkDatum<Node> { id: string; source: string | Node; target: string | Node; weight: number }
 
 // Recent payments kept in the graph. A small phone canvas cannot hold the desktop
@@ -40,23 +44,33 @@ export function PaymentGraph({ payments, counts, t, compact = false }: { payment
     const { width, height } = ref.current!.getBoundingClientRect()
     const nodes = nodesRef.current, links = linksRef.current
     const keep = new Set<string>(), keepL = new Set<string>()
-    const up = (id: string, kind: Node['kind'], label: string) => {
+    const up = (kind: Kind, addr: string, label: string) => {
+      const id = nodeId(kind, addr)
       let n = nodes.get(id)
-      if (!n) { n = { id, kind, label, weight: 0, x: width / 2 + (Math.random() - 0.5) * 80, y: height / 2 + (Math.random() - 0.5) * 80 }; nodes.set(id, n) }
-      n.weight++; n.label = label; keep.add(id); return n
+      if (!n) { n = { id, addr, kind, label, weight: 0, x: width / 2 + (Math.random() - 0.5) * 80, y: height / 2 + (Math.random() - 0.5) * 80 }; nodes.set(id, n) }
+      n.label = label; keep.add(id); return n
     }
-    const upL = (a: string, b: string) => { const id = `${a}>${b}`; let l = links.get(id); if (!l) { l = { id, source: a, target: b, weight: 0 }; links.set(id, l) } l.weight++; keepL.add(id) }
+    const upL = (a: string, b: string) => { const id = `${a}>${b}`; if (!links.has(id)) links.set(id, { id, source: a, target: b, weight: 0 }); keepL.add(id) }
     // d3-force requires stable, mutable node objects across ticks, so the maps below are
     // updated in place rather than rebuilt. `recent` itself is only ever read.
     for (const p of recent) {
       const fl = facilitatorLabel(p, counts, t) ?? short(p.facilitator)
-      up(p.facilitator, 'facilitator', fl); up(p.payer, 'payer', short(p.payer)); up(p.payTo, 'payTo', short(p.payTo))
-      upL(p.payer, p.facilitator); upL(p.facilitator, p.payTo)
+      up('facilitator', p.facilitator, fl); up('payer', p.payer, short(p.payer)); up('payTo', p.payTo, short(p.payTo))
+      upL(nodeId('payer', p.payer), nodeId('facilitator', p.facilitator))
+      upL(nodeId('facilitator', p.facilitator), nodeId('payTo', p.payTo))
     }
     for (const id of nodes.keys()) if (!keep.has(id)) nodes.delete(id)
     for (const id of links.keys()) if (!keepL.has(id)) links.delete(id)
+    // Weights describe the current window only, so both maps reset before re-counting.
     for (const n of nodes.values()) n.weight = 0
-    for (const p of recent) { nodes.get(p.facilitator)!.weight += 3; nodes.get(p.payer)!.weight += 1; nodes.get(p.payTo)!.weight += 1 }
+    for (const l of links.values()) l.weight = 0
+    for (const p of recent) {
+      nodes.get(nodeId('facilitator', p.facilitator))!.weight += 3
+      nodes.get(nodeId('payer', p.payer))!.weight += 1
+      nodes.get(nodeId('payTo', p.payTo))!.weight += 1
+      links.get(`${nodeId('payer', p.payer)}>${nodeId('facilitator', p.facilitator)}`)!.weight += 1
+      links.get(`${nodeId('facilitator', p.facilitator)}>${nodeId('payTo', p.payTo)}`)!.weight += 1
+    }
     for (const n of nodes.values()) if (n.kind === 'facilitator') { n.fx = undefined; n.fy = undefined }
 
     const N = [...nodes.values()], L = [...links.values()]
@@ -77,23 +91,23 @@ export function PaymentGraph({ payments, counts, t, compact = false }: { payment
     s.alpha(0.6).restart()
 
     const g = svg.select<SVGGElement>('g.root')
+    // Geometry and visibility are set directly rather than through a transition: a transition
+    // that never runs (throttled tab, reduced motion) would leave the graph blank.
     const link = g.select('g.links').selectAll<SVGLineElement, Link>('line').data(L, (d) => d.id)
-    link.exit().transition().duration(400).attr('opacity', 0).remove()
-    const linkE = link.enter().append('line').attr('stroke', 'var(--ink-200)').attr('opacity', 0)
-    linkE.transition().duration(500).attr('opacity', 0.18)
+    link.exit().remove()
+    const linkE = link.enter().append('line').attr('stroke', 'var(--ink-200)').attr('opacity', 0.18)
     const linkAll = linkE.merge(link).attr('stroke-width', (d) => Math.min(3, 0.6 + d.weight * 0.3))
 
     const node = g.select('g.nodes').selectAll<SVGGElement, Node>('g.n').data(N, (d) => d.id)
-    node.exit().transition().duration(400).attr('opacity', 0).remove()
-    const nodeE = node.enter().append('g').attr('class', 'n').attr('opacity', 0)
-    nodeE.append('circle').attr('r', 0)
-    nodeE.append('text').attr('dy', -14).attr('text-anchor', 'middle').attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
-    nodeE.transition().duration(500).attr('opacity', 1)
+    node.exit().remove()
+    const nodeE = node.enter().append('g').attr('class', 'n').attr('opacity', 1)
+    nodeE.append('circle')
+    nodeE.append('text').attr('dy', -10).attr('text-anchor', 'middle').attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
     const nodeAll = nodeE.merge(node)
     nodeAll.select('circle')
       .attr('fill', (d) => d.kind === 'facilitator' ? 'var(--ink-50)' : d.kind === 'payTo' ? 'var(--ink-300)' : 'var(--ink-600)')
       .attr('stroke', (d) => d.kind === 'payer' ? 'var(--ink-400)' : 'none').attr('stroke-width', 1)
-      .transition().duration(500).attr('r', r)
+      .attr('r', r)
     const minFacWeight = compact ? 6 : 0
     nodeAll.select('text').text((d) =>
       d.kind === 'facilitator' ? (d.weight >= minFacWeight ? d.label : '')
@@ -104,7 +118,7 @@ export function PaymentGraph({ payments, counts, t, compact = false }: { payment
       .on('drag', (ev, d) => { d.fx = ev.x; d.fy = ev.y })
       .on('end', (ev, d) => { if (!ev.active) s.alphaTarget(0); d.fx = null; d.fy = null }))
     nodeAll.select('title').remove()
-    nodeAll.append('title').text((d) => `${d.kind} ${d.id}`)
+    nodeAll.append('title').text((d) => `${d.kind} ${d.addr}`)
 
     // Keep every node inside the canvas. Labels are centred on the node and sit above it,
     // so a labelled node needs half its label width horizontally and extra room on top.
@@ -142,9 +156,20 @@ export function PaymentGraph({ payments, counts, t, compact = false }: { payment
         g.append('circle').attr('r', 4).attr('fill', 'none').attr('stroke', 'var(--ink-50)').attr('cx', B.x!).attr('cy', B.y!).attr('opacity', 0)
           .transition().delay(delay + 700).duration(600).attr('r', 22).attr('opacity', 0.5).transition().duration(300).attr('opacity', 0).remove()
       }
-      hop(pay.payer, pay.facilitator, i * 250); hop(pay.facilitator, pay.payTo, i * 250 + 700)
+      const payer = nodeId('payer', pay.payer), fac = nodeId('facilitator', pay.facilitator), to = nodeId('payTo', pay.payTo)
+      hop(payer, fac, i * 250); hop(fac, to, i * 250 + 700)
     })
   }, [payments])
+
+  // Routes unmount this component, so the simulation timer and any running transitions
+  // must be torn down or they keep ticking against detached nodes.
+  useEffect(() => () => {
+    sim.current?.on('tick', null)
+    sim.current?.stop()
+    sim.current = null
+    const svg = ref.current
+    if (svg) d3.select(svg).selectAll('*').interrupt()
+  }, [])
 
   return (
     <svg ref={ref} className="h-[280px] w-full touch-pan-y sm:h-[380px] lg:h-[420px]">
@@ -154,4 +179,8 @@ export function PaymentGraph({ payments, counts, t, compact = false }: { payment
   )
 }
 
-const r = (d: Node) => d.kind === 'facilitator' ? 8 + Math.min(14, Math.sqrt(d.weight) * 2) : d.kind === 'payTo' ? 3 + Math.min(6, d.weight) : 2.5
+// Facilitator discs were large enough to crowd the canvas and hide the edges behind them.
+const r = (d: Node) =>
+  d.kind === 'facilitator' ? 4.5 + Math.min(7, Math.sqrt(d.weight) * 1.2)
+    : d.kind === 'payTo' ? 2.5 + Math.min(4, d.weight * 0.7)
+      : 2

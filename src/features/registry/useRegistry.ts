@@ -1,54 +1,44 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { CHAINS, IDENTITY_REGISTRY, type ChainKey } from '../../data/chains'
 import { getClient } from '../../lib/clients'
-import { parseAgentURI } from '../../lib/format'
+import { asString, errMessage, parseAgentURI } from '../../lib/format'
 import { REGISTERED, URI_UPDATED } from './abi'
 import type { RegistryEvent } from './types'
 
 const POLL_MS = 15_000
 const MAX_EVENTS = 200
 
-async function fetchRange(chain: ChainKey, from: bigint, to: bigint): Promise<RegistryEvent[]> {
+/** Approximate seconds per block, used to date events without spending an RPC call each. */
+const BLOCK_SECONDS: Record<ChainKey, number> = { base: 2, ethereum: 12, bnb: 3 }
+
+async function fetchRange(chain: ChainKey, from: bigint, to: bigint, head: bigint): Promise<RegistryEvent[]> {
   const client = getClient(chain)
   const [reg, uri] = await Promise.all([
     client.getLogs({ address: IDENTITY_REGISTRY, event: REGISTERED, fromBlock: from, toBlock: to }),
     client.getLogs({ address: IDENTITY_REGISTRY, event: URI_UPDATED, fromBlock: from, toBlock: to }),
   ])
-  const out: RegistryEvent[] = []
   const now = Date.now()
-  for (const l of reg) {
-    const meta = parseAgentURI(l.args.agentURI ?? '')
-    out.push({
-      key: `${chain}:${l.transactionHash}:${l.logIndex}`, chain, kind: 'registered',
-      agentId: l.args.agentId!, owner: l.args.owner!, uri: l.args.agentURI ?? '',
-      name: meta?.name as string | undefined, description: meta?.description as string | undefined,
-      x402: meta?.x402Support as boolean | undefined,
-      block: l.blockNumber, tx: l.transactionHash, ts: now,
-    })
-  }
-  for (const l of uri) {
-    const meta = parseAgentURI(l.args.newURI ?? '')
-    out.push({
-      key: `${chain}:${l.transactionHash}:${l.logIndex}`, chain, kind: 'uri',
-      agentId: l.args.agentId!, owner: l.args.updater!, uri: l.args.newURI ?? '',
-      name: meta?.name as string | undefined, description: meta?.description as string | undefined,
-      x402: meta?.x402Support as boolean | undefined,
-      block: l.blockNumber, tx: l.transactionHash, ts: now,
-    })
-  }
-  return out
-}
+  const secs = BLOCK_SECONDS[chain]
+  // Estimated from block distance rather than fetching each block: accurate enough for a
+  // relative-time column, and it keeps ordering sane for the whole initial range.
+  const estimate = (block: bigint) => now - Number(head - block) * secs * 1000
 
-/** Attach block timestamps to logs (accurate relative time on initial load; only the most recent N). */
-async function stampTimes(chain: ChainKey, evs: RegistryEvent[], limit = 12) {
-  const client = getClient(chain)
-  const blocks = [...new Set(evs.slice(0, limit).map((e) => e.block))]
-  const times = new Map<bigint, number>()
-  await Promise.all(blocks.map(async (b) => {
-    try { const blk = await client.getBlock({ blockNumber: b }); times.set(b, Number(blk.timestamp) * 1000) } catch { /* keep now */ }
-  }))
-  for (const e of evs) { const t = times.get(e.block); if (t) e.ts = t }
+  const out: RegistryEvent[] = []
+  const push = (
+    kind: RegistryEvent['kind'], agentId: bigint, actor: `0x${string}`, rawUri: string,
+    block: bigint, tx: `0x${string}`, logIndex: number,
+  ) => {
+    const meta = parseAgentURI(rawUri)
+    out.push({
+      key: `${chain}:${tx}:${logIndex}`, chain, kind, agentId, actor, uri: rawUri,
+      name: asString(meta?.name), description: asString(meta?.description),
+      x402: typeof meta?.x402Support === 'boolean' ? meta.x402Support : undefined,
+      block, tx, ts: estimate(block),
+    })
+  }
+  for (const l of reg) push('registered', l.args.agentId!, l.args.owner!, l.args.agentURI ?? '', l.blockNumber, l.transactionHash, l.logIndex)
+  for (const l of uri) push('uri', l.args.agentId!, l.args.updater!, l.args.newURI ?? '', l.blockNumber, l.transactionHash, l.logIndex)
+  return out
 }
 
 export interface RegistryState {
@@ -56,65 +46,67 @@ export interface RegistryState {
   heads: Partial<Record<ChainKey, bigint>>
   errors: Partial<Record<ChainKey, string>>
   loading: boolean
+  /** True when no chain has produced a successful read yet. */
+  allFailed: boolean
 }
 
 export function useRegistry(chains: readonly ChainKey[]) {
-  const qc = useQueryClient()
-  const cursors = useRef<Partial<Record<ChainKey, bigint>>>({})
-  const [state, setState] = useState<RegistryState>({ events: [], heads: {}, errors: {}, loading: true })
-
-  const merge = (incoming: RegistryEvent[], heads: Partial<Record<ChainKey, bigint>>, errors: Partial<Record<ChainKey, string>>) =>
-    setState((s) => {
-      const seen = new Set(s.events.map((e) => e.key))
-      const fresh = incoming.filter((e) => !seen.has(e.key))
-      const events = [...fresh, ...s.events].sort((a, b) => b.ts - a.ts || Number(b.block - a.block)).slice(0, MAX_EVENTS)
-      return { events, heads: { ...s.heads, ...heads }, errors: { ...s.errors, ...errors }, loading: false }
-    })
-
-  // Initial load
-  const initial = useQuery({
-    queryKey: ['registry-initial', chains],
-    queryFn: async () => {
-      const heads: Partial<Record<ChainKey, bigint>> = {}
-      const errors: Partial<Record<ChainKey, string>> = {}
-      const all: RegistryEvent[] = []
-      await Promise.all(chains.map(async (c) => {
-        try {
-          const client = getClient(c)
-          const head = await client.getBlockNumber()
-          const evs = await fetchRange(c, head - CHAINS[c].logRange, head)
-          evs.sort((a, b) => Number(b.block - a.block))
-          await stampTimes(c, evs)
-          all.push(...evs); heads[c] = head; cursors.current[c] = head
-        } catch (e) { errors[c] = (e as Error).message.split('\n')[0] }
-      }))
-      merge(all, heads, errors)
-      return true
-    },
-    staleTime: Infinity,
+  const [state, setState] = useState<Omit<RegistryState, 'allFailed'>>({
+    events: [], heads: {}, errors: {}, loading: true,
   })
 
-  // Polling
   useEffect(() => {
-    if (!initial.data) return
-    let stop = false
-    const tick = async () => {
-      await Promise.all(chains.map(async (c) => {
-        const from = cursors.current[c]
-        if (from == null) return
-        try {
-          const client = getClient(c)
-          const head = await client.getBlockNumber()
-          if (head <= from) return
-          const evs = await fetchRange(c, from + 1n, head)
-          cursors.current[c] = head
-          if (!stop) merge(evs, { [c]: head }, { [c]: undefined })
-        } catch (e) { if (!stop) merge([], {}, { [c]: (e as Error).message.split('\n')[0] }) }
-      }))
-    }
-    const id = setInterval(tick, POLL_MS)
-    return () => { stop = true; clearInterval(id) }
-  }, [initial.data, chains, qc])
+    let stopped = false
+    let running = false
+    // Null means this chain has not completed an initial read yet, so the next tick retries it.
+    const cursors: Partial<Record<ChainKey, bigint>> = {}
 
-  return state
+    const merge = (incoming: RegistryEvent[], heads: Partial<Record<ChainKey, bigint>>, errors: Partial<Record<ChainKey, string>>) =>
+      setState((s) => {
+        const seen = new Set(s.events.map((e) => e.key))
+        const fresh = incoming.filter((e) => !seen.has(e.key))
+        const events = [...fresh, ...s.events]
+          .sort((a, b) => b.ts - a.ts || Number(b.block - a.block))
+          .slice(0, MAX_EVENTS)
+        return { events, heads: { ...s.heads, ...heads }, errors: { ...s.errors, ...errors }, loading: false }
+      })
+
+    const tick = async () => {
+      if (running || stopped) return
+      running = true
+      try {
+        await Promise.all(chains.map(async (c) => {
+          const cfg = CHAINS[c]
+          try {
+            const client = getClient(c)
+            const head = await client.getBlockNumber()
+            const cursor = cursors[c]
+            // No cursor means either the first run or a previous failure: read a bounded
+            // initial window. Otherwise read forward, capped at this chain's log range.
+            const wanted = cursor === undefined ? head - cfg.logRange : cursor + 1n
+            const from = head - wanted > cfg.logRange ? head - cfg.logRange : wanted
+            if (from > head) { cursors[c] = head; return }
+            const evs = await fetchRange(c, from, head, head)
+            if (stopped) return
+            cursors[c] = head
+            merge(evs, { [c]: head }, { [c]: undefined })
+          } catch (e) {
+            if (!stopped) merge([], {}, { [c]: errMessage(e) })
+          }
+        }))
+      } finally {
+        running = false
+      }
+    }
+
+    void tick()
+    const id = setInterval(() => void tick(), POLL_MS)
+    return () => { stopped = true; clearInterval(id) }
+  }, [chains])
+
+  const allFailed = useMemo(
+    () => !state.loading && chains.length > 0 && chains.every((c) => state.errors[c] != null),
+    [state.loading, state.errors, chains],
+  )
+  return { ...state, allFailed }
 }

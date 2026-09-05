@@ -22,8 +22,12 @@ function Card({ m, i, ae, ocai, t, tag }: {
   const added = (n: number | undefined) => t('mp.metric.added', { n: n ?? 0 })
   if (m.feed === 'snapshot' && snap.data) {
     const isAgents = m.id === 'agentscan'
-    const total = isAgents && snap.data.stats ? snap.data.stats.total : snap.data.total
-    metric = { label: `${t(isAgents ? 'mp.metric.agentsIndexed' : 'mp.metric.resources')} · ${added(snap.data.added24h)}`, value: compact(total, tag) }
+    // For agentscan `total` is only this snapshot's page size, so the indexed total comes
+    // from its stats block or not at all.
+    const total = isAgents ? snap.data.stats?.total : snap.data.total
+    if (total != null) {
+      metric = { label: `${t(isAgents ? 'mp.metric.agentsIndexed' : 'mp.metric.resources')} · ${added(snap.data.added24h)}`, value: compact(total, tag) }
+    }
   }
   if (m.id === 'erc8004' && ae) metric = { label: t('mp.metric.registered'), value: compact(ae.erc8004Registry.totalAgents, tag), spark: ae.erc8004Registry.daily.map((d) => d.agents) }
   if (m.id === 'virtuals' && ae) metric = { label: t('mp.metric.memos'), value: compact(ae.virtualsAcp.totalMemos, tag), spark: ae.virtualsAcp.daily.map((d) => d.memos) }

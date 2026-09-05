@@ -29,9 +29,10 @@ function Row({ e, t }: { e: RegistryEvent; t: Translate }) {
       exit={{ opacity: 0 }}
       style={{ animation: 'flash 2.5s ease-out' }}
       transition={{ duration: 0.5 }}
-      className="cursor-pointer border-b border-ink-800/60 px-4 py-2.5 font-mono text-xs hover:bg-ink-800/30 sm:px-5"
-      onClick={() => setOpen((v) => !v)}
+      className="border-b border-ink-800/60 font-mono text-xs hover:bg-ink-800/30"
     >
+      <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open}
+        className="w-full cursor-pointer px-4 py-2.5 text-left sm:px-5">
       {/* Mobile stacks the row in two lines; from sm up it is a single line. */}
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 sm:flex-nowrap sm:gap-3">
         <span className="w-7 shrink-0 text-ink-500 tabular-nums">{timeAgo(e.ts)}</span>
@@ -43,15 +44,16 @@ function Row({ e, t }: { e: RegistryEvent; t: Translate }) {
         {e.x402 && <Badge dim>x402</Badge>}
         <a className="ml-auto shrink-0 text-ink-500 hover:text-ink-200"
           href={`${cfg.explorer}/tx/${e.tx}`} target="_blank" rel="noreferrer"
-          onClick={(ev) => ev.stopPropagation()}>{short(e.owner)}</a>
+          onClick={(ev) => ev.stopPropagation()}>{short(e.actor)}</a>
         <span className="w-full min-w-0 basis-full truncate text-ink-200 sm:order-none sm:w-auto sm:basis-auto sm:flex-1">
           {name ?? <span className="text-ink-600">{fallbackLabel(e, t)}</span>}
         </span>
       </div>
+      </button>
       <AnimatePresence>
         {open && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-            <p className="mt-2 text-[11px] leading-relaxed break-words text-ink-400 sm:pl-11">
+            <p className="px-4 pb-2 text-[11px] leading-relaxed break-words text-ink-400 sm:px-5 sm:pl-11">
               {e.description ?? t('reg.noDescription')}{' '}
               {e.uri.startsWith('http') && <a className="underline" href={e.uri} target="_blank" rel="noreferrer">{t('reg.metadataLink')} ↗</a>}
               <span className="block text-ink-600">{t('common.block')} {e.block.toString()}</span>
@@ -67,7 +69,7 @@ export function RegistryLog({ state }: { state: RegistryState }) {
   const { t } = useT()
   const isMobile = useIsMobile()
   const [chains, setChains] = useState<ChainKey[]>(ALL)
-  const { events, heads, errors, loading } = state
+  const { events, heads, errors, loading, allFailed } = state
   const shown = events.filter((e) => chains.includes(e.chain))
   const paged = usePagination(shown, isMobile ? 8 : 12)
 
@@ -85,18 +87,25 @@ export function RegistryLog({ state }: { state: RegistryState }) {
             </button>
           )}
           {ALL.map((c) => (
-            <button key={c} onClick={() => setChains((s) => s.includes(c) ? s.filter((x) => x !== c) : [...s, c])}
+            <button key={c} aria-pressed={chains.includes(c)}
+              onClick={() => setChains((s) => s.includes(c) ? s.filter((x) => x !== c) : [...s, c])}
               className={`rounded border px-2 py-0.5 font-mono text-[10px] tracking-wider transition ${chains.includes(c) ? 'border-ink-500 text-ink-100' : 'border-ink-800 text-ink-600'}`}
               title={errors[c] ?? (heads[c] ? `${t('common.block')} ${heads[c]}` : '')}>
               {CHAINS[c].short}{errors[c] ? ' !' : ''}
             </button>
           ))}
-          <LiveDot active={!loading} />
+          <LiveDot active={!loading && !allFailed} />
         </div>
       }>
       <ul>
         {loading && <li className="px-5 py-8 text-center font-mono text-xs text-ink-500">{t('reg.scanning')}</li>}
-        {!loading && shown.length === 0 && <li className="px-5 py-8 text-center font-mono text-xs text-ink-500">{t('reg.empty')}</li>}
+        {allFailed && (
+          <li className="px-5 py-8 text-center font-mono text-xs text-ink-400">
+            {t('reg.allFailed')}
+            <span className="mt-1 block text-ink-600">{Object.values(errors).filter(Boolean)[0]}</span>
+          </li>
+        )}
+        {!loading && !allFailed && shown.length === 0 && <li className="px-5 py-8 text-center font-mono text-xs text-ink-500">{t('reg.empty')}</li>}
         <AnimatePresence initial={false}>
           {paged.items.map((e) => <Row key={e.key} e={e} t={t} />)}
         </AnimatePresence>
