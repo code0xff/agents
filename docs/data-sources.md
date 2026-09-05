@@ -44,8 +44,14 @@ Snapshot files: `<name>.json` (latest 300 items + totals, for the browser), `<na
 
 ## Not read
 - Ethereum: 68k agents cumulatively but one registration in six hours, and 522 x402 payments ever.
-- Solana: 29.3% of x402 payments, but no chain-wide filter and a single CORS-open RPC.
-  See `research/solana-payments.md`.
+- Solana flow: no chain-wide filter and a single CORS-open RPC, so no payer-to-service graph.
+  A sampled rate, the aggregate share and the Bazaar service count are shown instead, in their own
+  block. See `research/solana-payments.md`.
+
+## Solana (sampled)
+| Source | Use |
+|---|---|
+| `https://solana-rpc.publicnode.com` `getSignaturesForAddress` | Observed settlement rate per known facilitator. Signatures only; transactions are never fetched |
 
 ## Constraints
 - Public RPC range limits as in the table above. Chunking + 15s polling.

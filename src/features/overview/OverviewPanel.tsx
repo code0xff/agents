@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { useT } from '../../i18n'
 import { compact, usd } from '../../lib/format'
 import { useAgentEconomy, useOcaiStats } from '../marketplaces/useAggregates'
-import { agentChainShares, facilitatorShares, trend } from './derive'
+import { agentChainShares, facilitatorShares, paymentChainShares, trend } from './derive'
 import { Concentration } from './Concentration'
 import { Signal } from './Signal'
 
@@ -19,6 +19,7 @@ export function OverviewPanel({ observedPerMin }: { observedPerMin: number | nul
   const agentTrend = useMemo(() => trend(agentSeries), [agentSeries])
   const facs = useMemo(() => facilitatorShares(d), [d])
   const chains = useMemo(() => agentChainShares(d), [d])
+  const payChains = useMemo(() => paymentChainShares(d), [d])
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6">
@@ -39,7 +40,7 @@ export function OverviewPanel({ observedPerMin }: { observedPerMin: number | nul
           sub={t('sig.observedSub')} />
       </motion.div>
 
-      <Concentration facilitators={facs} chains={chains} usdcPct={d?.x402.tokenSplit?.usdcSharePct}
+      <Concentration facilitators={facs} paymentChains={payChains} chains={chains} usdcPct={d?.x402.tokenSplit?.usdcSharePct}
         mcpAgents={ocai.data?.mcp_agents} />
     </div>
   )

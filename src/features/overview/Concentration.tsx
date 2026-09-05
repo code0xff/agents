@@ -47,8 +47,8 @@ function Fact({ label, value }: { label: string; value: string }) {
   )
 }
 
-export function Concentration({ facilitators, chains, usdcPct, mcpAgents }: {
-  facilitators: Share[]; chains: Share[]; usdcPct?: number; mcpAgents?: number
+export function Concentration({ facilitators, paymentChains, chains, usdcPct, mcpAgents }: {
+  facilitators: Share[]; paymentChains: Share[]; chains: Share[]; usdcPct?: number; mcpAgents?: number
 }) {
   const { t, tag } = useT()
   const topFac = facilitators.find((f) => f.name !== '__others__')
@@ -67,8 +67,10 @@ export function Concentration({ facilitators, chains, usdcPct, mcpAgents }: {
           {facts.map((f) => <Fact key={f.label} label={f.label} value={f.value} />)}
         </div>
       )}
-      <div className="grid divide-y divide-ink-800 md:grid-cols-2 md:divide-x md:divide-y-0">
+      <div className="grid divide-y divide-ink-800 md:grid-cols-3 md:divide-x md:divide-y-0">
         <Bars title={t('ins.facilitators')} rows={facilitators} unit="pct" tag={tag} />
+        {/* Which chains the headline payment total is actually made of. */}
+        <Bars title={t('ins.paymentChains')} rows={paymentChains} unit="pct" tag={tag} />
         <Bars title={t('ins.agentChains')} rows={chains} unit="count" tag={tag} />
       </div>
     </Panel>

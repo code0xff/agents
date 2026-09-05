@@ -35,3 +35,7 @@ export const facilitatorShares = (d: AgentEconomy | undefined) =>
 
 export const agentChainShares = (d: AgentEconomy | undefined) =>
   d ? shares(d.erc8004Registry.chains.map((c) => ({ name: c.name, value: c.agents })), 5) : []
+
+/** Which chains x402 payments actually run on. The headline total spans all of them. */
+export const paymentChainShares = (d: AgentEconomy | undefined) =>
+  d ? shares(d.x402.chains.map((c) => ({ name: c.name, value: c.txs })), 5) : []

@@ -82,7 +82,23 @@ worse deal than it looks:
    report a sample of a subset.
 2. **One RPC, no fallback.**
 
-Recommendation: not now. Revisit if a chain-wide filter appears (a shared program or a memo convention
+## What was built instead (2026-09-06)
+The conclusion above was reached against the wrong bar: it asked whether Solana could be read the way
+Base and Polygon are. Exposed as its own thing, with its limits stated, it is worth having, and three
+pieces were already within reach:
+
+- **Observed rate**, from `getSignaturesForAddress` only. Block times are all a rate needs, so the
+  transactions are never fetched: 6.6 KB a poll, about 0.8 MB an hour at 30s, against the 79 MB an
+  hour a full read would cost. Addresses that answer nothing on the first pass are dropped from the
+  rotation, so the eight inactive ones cost one request in total.
+- **Share and cumulative count**, from the agenteconomy aggregate already fetched for the overview.
+- **Services accepting Solana**, counted from the Bazaar snapshots already collected: 4,566 of them.
+
+It lives in its own block under the payments panel, never in the chain selector, the flow graph or the
+recent list, and it says on the face of it that it is a sample rather than a count. The flow graph is
+still not attempted, for the reasons below.
+
+Original recommendation, kept for the record: not now. Revisit if a chain-wide filter appears (a shared program or a memo convention
 that can be queried), or if a second CORS-open RPC shows up. If it is built anyway, it should be a
 separate panel labelled as a sample, not merged into the Base and Polygon flow.
 

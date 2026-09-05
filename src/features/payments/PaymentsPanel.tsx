@@ -9,6 +9,7 @@ import { short, timeAgo, usd } from '../../lib/format'
 import { useIsMobile } from '../../lib/useMediaQuery'
 import { PaymentGraph } from './PaymentGraph'
 import { facilitatorLabel, type PaymentsState } from './usePayments'
+import { SolanaStrip } from './SolanaStrip'
 
 export function PaymentsPanel({ state }: { state: PaymentsState }) {
   const { t, tag } = useT()
@@ -36,6 +37,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
   }
 
   return (
+    <div className="flex flex-col gap-4 sm:gap-6">
     <Panel eyebrow={t('pay.eyebrow')} title={t('pay.title')} delay={0.2}
       right={<div className="flex flex-wrap items-center gap-2">
         <div role="radiogroup" aria-label={t('pay.chain')} className="flex items-center gap-1">
@@ -122,5 +124,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
         </div>
       </div>
     </Panel>
+    <SolanaStrip />
+    </div>
   )
 }
