@@ -80,7 +80,7 @@ export const zh: Dict = {
   'pay.recent': '最近',
   'pay.waiting': '正在等待区块',
   'pay.rpcError': 'RPC: {message}',
-  'pay.unlabeled': '未标记 {id}',
+  'pay.unlabeled': '无名称 {id}',
 
   'page.range': '{total} 条中的 {from}-{to}',
   'page.first': '第一页',
@@ -144,6 +144,7 @@ export const zh: Dict = {
   'agent.source': '注册文件',
   'agent.close': '关闭',
   'agent.noDescription': '注册文件中没有描述。',
+  'pay.unlabeledHelp': '地址是明确的，但没有公开目录为其登记名称。',
   'theme.dark': '深色',
   'theme.light': '浅色',
 }

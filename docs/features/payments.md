@@ -48,5 +48,7 @@ Detection is exact: the facilitator is `tx.from` on the USDC call. Naming is the
 151 Base blocks on 2026-09-05, 209 settlements came from 28 distinct senders and **none** matched the
 58 Base addresses in `facilitators.json`. The public directory (facilitators.x402.watch) does not list
 them either, and BaseScan has no name tag for the busiest of them. Operators appear to rotate relayer
-addresses, and the public lists still carry addresses first seen in late 2025. `Unlabeled xxxx` is
-therefore an accurate statement about public knowledge, not a defect in the pipeline.
+addresses, and the public lists still carry addresses first seen in late 2025. The badge therefore states a fact about
+public knowledge, not a defect in the pipeline, and it says so on hover. It reads "Unnamed" rather
+than "Unverified": the address is certain, only its operator's name is missing. The Korean wording was
+"미확인", which reads as "unverified" and wrongly suggested the payment itself was in doubt.

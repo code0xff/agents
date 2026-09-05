@@ -32,9 +32,9 @@ export function LiveDot({ active = true }: { active?: boolean }) {
   )
 }
 
-export function Badge({ children, dim = false }: { children: ReactNode; dim?: boolean }) {
+export function Badge({ children, dim = false, title }: { children: ReactNode; dim?: boolean; title?: string }) {
   return (
-    <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] tracking-wider whitespace-nowrap uppercase ${dim ? 'border-ink-800 text-ink-500' : 'border-ink-700 text-ink-300'}`}>
+    <span title={title} className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] tracking-wider whitespace-nowrap uppercase ${dim ? 'border-ink-800 text-ink-500' : 'border-ink-700 text-ink-300'}`}>
       {children}
     </span>
   )

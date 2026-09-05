@@ -20,6 +20,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
   }), [payments])
   const top = useMemo(() => Object.entries(senderCounts).sort((a, b) => b[1] - a[1]).slice(0, 6), [senderCounts])
   const paged = usePagination(payments, isMobile ? 6 : 10)
+  const named = (addr: string) => payments.find((x) => x.facilitator === addr)?.facilitatorName != null
   const label = (addr: string) => {
     const p = payments.find((x) => x.facilitator === addr)
     return (p && facilitatorLabel(p, senderCounts, t)) ?? short(addr)
@@ -55,7 +56,9 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
             {top.length === 0 && <li className="py-2 text-ink-600">{t('pay.waiting')}</li>}
             {top.map(([addr, n]) => (
               <li key={addr} className="flex justify-between gap-2 py-0.5">
-                <a className="truncate text-ink-300 hover:text-ink-50" href={`https://basescan.org/address/${addr}`} target="_blank" rel="noreferrer">{label(addr)}</a>
+                <a className="truncate text-ink-300 hover:text-ink-50"
+                  title={named(addr) ? undefined : t('pay.unlabeledHelp')}
+                  href={`https://basescan.org/address/${addr}`} target="_blank" rel="noreferrer">{label(addr)}</a>
                 <span className="shrink-0 text-ink-500 tabular-nums">{n}</span>
               </li>
             ))}
@@ -72,7 +75,11 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
                     <span className="w-6 shrink-0 text-ink-600">{timeAgo(p.ts)}</span>
                     <span className="shrink-0 text-ink-100 tabular-nums">{usd(p.usdc, 4, tag)}</span>
                     <span className="hidden truncate text-ink-500 sm:inline md:hidden lg:inline">{short(p.payer, 3)}→{short(p.payTo, 3)}</span>
-                    <span className="ml-auto">{fl ? <Badge>{fl}</Badge> : <Badge dim>{short(p.facilitator, 3)}</Badge>}</span>
+                    <span className="ml-auto">
+                      {fl
+                        ? <Badge title={p.facilitatorName ? undefined : t('pay.unlabeledHelp')}>{fl}</Badge>
+                        : <Badge dim title={t('pay.unlabeledHelp')}>{short(p.facilitator, 3)}</Badge>}
+                    </span>
                   </motion.li>
                 )
               })}
