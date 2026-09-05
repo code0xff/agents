@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'motion/react'
+import { motion } from 'motion/react'
 import { useState } from 'react'
 import { Badge, LiveDot, Panel } from '../../components/Panel'
 import { Pagination, usePagination } from '../../components/Pagination'
@@ -7,6 +7,7 @@ import { useT, type Translate } from '../../i18n'
 import { short, timeAgo } from '../../lib/format'
 import { useIsMobile } from '../../lib/useMediaQuery'
 import type { RegistryState } from './useRegistry'
+import { AgentModal } from './AgentModal'
 import type { RegistryEvent } from './types'
 
 const ALL: ChainKey[] = ['base', 'ethereum', 'bnb']
@@ -18,10 +19,8 @@ function fallbackLabel(e: RegistryEvent, t: Translate) {
   return t('reg.unnamed')
 }
 
-function Row({ e, t }: { e: RegistryEvent; t: Translate }) {
+function Row({ e, t, onOpen }: { e: RegistryEvent; t: Translate; onOpen: () => void }) {
   const cfg = CHAINS[e.chain]
-  const [open, setOpen] = useState(false)
-  const name = e.name ?? null
   return (
     <motion.li
       initial={{ opacity: 0, x: -12 }}
@@ -30,36 +29,22 @@ function Row({ e, t }: { e: RegistryEvent; t: Translate }) {
       transition={{ duration: 0.5 }}
       className="border-b border-ink-800/60 font-mono text-xs hover:bg-ink-800/30"
     >
-      <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open}
-        className="w-full cursor-pointer px-4 py-2.5 text-left sm:px-5">
-      {/* Mobile stacks the row in two lines; from sm up it is a single line. */}
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 sm:flex-nowrap sm:gap-3">
-        <span className="w-7 shrink-0 text-ink-500 tabular-nums">{timeAgo(e.ts)}</span>
-        <Badge>{cfg.short}</Badge>
-        <span className={`shrink-0 ${e.kind === 'registered' ? 'text-ink-100' : 'text-ink-400'}`}>
-          {e.kind === 'registered' ? t('reg.register') : t('reg.seturi')}
+      <button type="button" onClick={onOpen} className="w-full cursor-pointer px-4 py-2.5 text-left sm:px-5">
+        {/* Mobile stacks the row in two lines; from sm up it is a single line. */}
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1 sm:flex-nowrap sm:gap-3">
+          <span className="w-7 shrink-0 text-ink-500 tabular-nums">{timeAgo(e.ts)}</span>
+          <Badge>{cfg.short}</Badge>
+          <span className={`shrink-0 ${e.kind === 'registered' ? 'text-ink-100' : 'text-ink-400'}`}>
+            {e.kind === 'registered' ? t('reg.register') : t('reg.seturi')}
+          </span>
+          <span className="shrink-0 text-ink-500">#{e.agentId.toString()}</span>
+          {e.x402 && <Badge dim>x402</Badge>}
+          <span className="ml-auto shrink-0 text-ink-500">{short(e.actor)}</span>
+          <span className="w-full min-w-0 basis-full truncate text-ink-200 sm:order-none sm:w-auto sm:basis-auto sm:flex-1">
+            {e.name ?? <span className="text-ink-600">{fallbackLabel(e, t)}</span>}
+          </span>
         </span>
-        <span className="shrink-0 text-ink-500">#{e.agentId.toString()}</span>
-        {e.x402 && <Badge dim>x402</Badge>}
-        <a className="ml-auto shrink-0 text-ink-500 hover:text-ink-200"
-          href={`${cfg.explorer}/tx/${e.tx}`} target="_blank" rel="noreferrer"
-          onClick={(ev) => ev.stopPropagation()}>{short(e.actor)}</a>
-        <span className="w-full min-w-0 basis-full truncate text-ink-200 sm:order-none sm:w-auto sm:basis-auto sm:flex-1">
-          {name ?? <span className="text-ink-600">{fallbackLabel(e, t)}</span>}
-        </span>
-      </div>
       </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-            <p className="px-4 pb-2 text-[11px] leading-relaxed break-words text-ink-400 sm:px-5 sm:pl-11">
-              {e.description ?? t('reg.noDescription')}{' '}
-              {e.uri.startsWith('http') && <a className="underline" href={e.uri} target="_blank" rel="noreferrer">{t('reg.metadataLink')} ↗</a>}
-              <span className="block text-ink-600">{t('common.block')} {e.block.toString()}</span>
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.li>
   )
 }
@@ -71,6 +56,7 @@ export function RegistryLog({ state }: { state: RegistryState }) {
   const { events, heads, errors, loading, allFailed } = state
   const shown = events.filter((e) => chains.includes(e.chain))
   const paged = usePagination(shown, isMobile ? 8 : 12)
+  const [open, setOpen] = useState<RegistryEvent | null>(null)
 
   // While the reader is off page 1, show what arrived so the shifting list is explainable.
   const newCount = paged.addedSinceLeaving
@@ -108,9 +94,10 @@ export function RegistryLog({ state }: { state: RegistryState }) {
         {/* Deliberately not wrapped in AnimatePresence: on a page change the outgoing rows
             would linger through their exit animation, so the list briefly holds twice the
             page size. Rows still animate in on mount. */}
-        {paged.items.map((e) => <Row key={e.key} e={e} t={t} />)}
+        {paged.items.map((e) => <Row key={e.key} e={e} t={t} onOpen={() => setOpen(e)} />)}
       </ul>
       <Pagination paged={paged} />
+      <AgentModal event={open} onClose={() => setOpen(null)} />
     </Panel>
   )
 }
