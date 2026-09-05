@@ -75,6 +75,22 @@ body {
   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
+/* Tailwind v4's preflight leaves buttons at the browser default cursor, so anything
+   clickable has to say so itself. Disabled controls show that they are inert instead. */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+a[href],
+select,
+summary,
+label[for] {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 /* Grid background: futuristic tone */
 .bg-grid {
   background-image:

@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Badge } from '../../components/Panel'
 import { CHAINS } from '../../data/chains'
 import { useT } from '../../i18n'
@@ -7,11 +8,18 @@ import { short, timeAgo } from '../../lib/format'
 import { fetchAgentMeta, type MetaFetch } from './meta'
 import type { RegistryEvent } from './types'
 
+/**
+ * Rendered into `document.body`. The panel that owns the log carries `backdrop-blur`, and a
+ * backdrop filter makes an element the containing block for its fixed-position descendants,
+ * so an in-place overlay was sized to the panel instead of the viewport and appeared far
+ * down the screen. The panel also clips its overflow.
+ */
 export function AgentModal({ event, onClose }: { event: RegistryEvent | null; onClose: () => void }) {
-  return (
+  return createPortal(
     <AnimatePresence>
       {event && <Dialog key={event.key} event={event} onClose={onClose} />}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   )
 }
 
@@ -47,14 +55,14 @@ function Dialog({ event, onClose }: { event: RegistryEvent; onClose: () => void 
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-ink-950/70 p-0 backdrop-blur-sm sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/70 p-3 backdrop-blur-sm sm:p-6"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
       onClick={onClose}
     >
       <motion.div
         role="dialog" aria-modal="true" aria-label={`${t('agent.title')} ${title}`}
-        className="max-h-[88vh] w-full max-w-2xl overflow-y-auto rounded-t-xl border border-ink-800 bg-ink-950 sm:rounded-xl"
-        initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 12, opacity: 0 }}
+        className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-xl border border-ink-800 bg-ink-950"
+        initial={{ y: 16, opacity: 0, scale: 0.98 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
         transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
         onClick={(e) => e.stopPropagation()}
       >

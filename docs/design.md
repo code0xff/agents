@@ -78,6 +78,17 @@ Geometry and visibility are set directly, never only through a transition. A tra
 runs leaves the element at its initial value, so animating in from `opacity: 0` or `r: 0` can render
 a blank panel. Animate changes, but make the resting state correct without them.
 
+## Overlays
+Dialogs render into `document.body` through a portal. A `backdrop-filter` makes an element the
+containing block for its fixed-position descendants, so an overlay rendered inside a blurred panel is
+sized to that panel rather than the viewport, and clipped by its overflow. On a phone this put the
+card halfway down the screen.
+
+## Cursors
+Tailwind v4's preflight leaves buttons at the browser default cursor. `src/index.css` restores
+`pointer` for buttons, links, selects and anything with a button role, and marks disabled controls
+`not-allowed`.
+
 ## Component rules
 Headline facts that sit side by side get their own outline. Run together as plain text they read as
 one sentence and the reader cannot tell where each fact ends; the `Fact` chip in `Concentration`
