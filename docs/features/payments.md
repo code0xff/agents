@@ -16,8 +16,16 @@ the target node pulses. A recent-payments list sits beside the graph.
 `docs/research/payments.md` — facilitator list/addresses, on-chain detection, public API availability
 
 ## Implementation (2026-09-05)
-- `usePayments.ts`: backfill the latest 40 Base blocks, then poll every 10s; decode USDC EIP-3009 calls
-  from full-transaction blocks. Facilitator labels from `facilitators.json`; unlabeled senders with
+- `usePayments.ts`: backfill the latest 150 Base blocks, then poll every 10s.
+  The scan reads `AuthorizationUsed` logs from USDC, which that token emits only from a successful
+  EIP-3009 call, so the log set is exactly the settlements: reverted authorisations never appear and
+  nothing else does. Only the transactions those logs name are then fetched, to read the submitting
+  facilitator and decode the amount and recipient. Timestamps are derived from block distance at 2s
+  per block rather than fetched.
+
+  The previous scan pulled every block in full to find them. Measured on Base: about 250 KB per block,
+  roughly 443 MB per hour of open tab, to keep a handful of transactions. The log-first scan measured
+  0.8 KB/s over a minute, and about 6 MB per hour for the whole dashboard including the registry. Facilitator labels from `facilitators.json`; unlabeled senders with
   3+ payments become `Unlabeled xxxx` nodes.
 - `PaymentGraph.tsx`: D3 force on a canvas 1.9x the panel, viewed through a camera. Nodes are bounded
   to an ellipse rather than the canvas rectangle, and the forces are tuned so the cluster settles well
@@ -38,6 +46,9 @@ the target node pulses. A recent-payments list sits beside the graph.
   Particle plus ring pulse per payment, draggable nodes.
   The simulation is reheated only when the set of nodes actually changes. Reheating on every poll
   rearranged the graph under the reader, including immediately after they panned.
+- Retention is bounded: 300 payments, 200 registry events, 120 nodes in the graph window. Blocks and
+  logs are scanned and discarded, never accumulated. Measured over 6.8 minutes the payment list held
+  at exactly 300 and the JS heap stayed flat around 16 MB.
 - `PaymentsPanel.tsx`: window stats, top senders, recent list. Every recent row is a real settlement,
   so it links to its transaction on BaseScan.
 - Not yet applied: Bazaar payTo map (`public/snapshots/bazaar-cdp.payto.json`) to name payTo nodes.
