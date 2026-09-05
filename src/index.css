@@ -80,6 +80,18 @@ body {
   background-size: 48px 48px;
 }
 
+/* The flow map is a window onto a larger canvas, so its edges dissolve instead of
+   being cut by a straight line. Two axis fades intersected, rather than a radial one,
+   keep the middle at full strength. */
+.map-fade {
+  --fade-x: linear-gradient(to right, transparent 0, black 7%, black 93%, transparent 100%);
+  --fade-y: linear-gradient(to bottom, transparent 0, black 9%, black 91%, transparent 100%);
+  -webkit-mask-image: var(--fade-x), var(--fade-y);
+  -webkit-mask-composite: source-in;
+  mask-image: var(--fade-x), var(--fade-y);
+  mask-composite: intersect;
+}
+
 @keyframes flash {
   from { background-color: var(--flash); }
   to { background-color: transparent; }

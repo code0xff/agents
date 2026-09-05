@@ -19,7 +19,10 @@ the target node pulses. A recent-payments list sits beside the graph.
 - `usePayments.ts`: backfill the latest 40 Base blocks, then poll every 10s; decode USDC EIP-3009 calls
   from full-transaction blocks. Facilitator labels from `facilitators.json`; unlabeled senders with
   3+ payments become `Unlabeled xxxx` nodes.
-- `PaymentGraph.tsx`: D3 force on a canvas 1.9x the panel, viewed through a camera. The layout is
+- `PaymentGraph.tsx`: D3 force on a canvas 1.9x the panel, viewed through a camera. Nodes are bounded
+  to an ellipse rather than the canvas rectangle, so the cluster never fills the corners and stops
+  reading as a box, and the SVG carries an edge mask (`.map-fade`) so the view dissolves at the panel
+  boundary instead of being cut by a straight line. The layout is
   allowed to spread instead of being packed into the visible rectangle; the camera eases toward the
   centroid of the newest settlements and yields to the reader for 9s after any pan, zoom or drag.
   Zoom and pan controls sit in the corner of the canvas; the wheel zooms and dragging pans. Reset

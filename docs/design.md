@@ -61,6 +61,11 @@ page shows through the menu items. It closes on navigation, on Escape, and on a 
 state is stored as the route it was opened on, so a route change closes it during render rather than
 through an effect.
 
+## Bounds
+A view onto something larger should not advertise its frame. The flow map bounds its layout to an
+ellipse and fades its own edges, so the panel border is the only straight line and the graph reads as
+a window rather than a diagram drawn to fit a box.
+
 ## Motion and correctness
 Geometry and visibility are set directly, never only through a transition. A transition that never
 runs leaves the element at its initial value, so animating in from `opacity: 0` or `r: 0` can render

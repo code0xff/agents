@@ -191,19 +191,22 @@ export function PaymentGraph({ payments, counts, t, compact = false }: {
     nodeAll.select('title').remove()
     nodeAll.append('title').text((d) => `${d.kind} ${d.addr}`)
 
-    // Nodes stay on the enlarged canvas rather than the visible rectangle, so the layout
-    // can breathe; the camera is what keeps the interesting part in view.
-    const labelled = new Set<string>()
-    nodeAll.select<SVGTextElement>('text').each(function (d) { if (this.textContent) labelled.add(d.id) })
-    const clamp = (d: Node) => {
-      const rad = r(d)
-      const half = labelled.has(d.id) ? Math.max(rad, (d.label.length * 5.4) / 2) : rad
-      const padX = Math.min(half + 6, W / 2)
-      d.x = Math.max(padX, Math.min(W - padX, d.x ?? W / 2))
-      d.y = Math.max(rad + 16, Math.min(H - rad - 6, d.y ?? H / 2))
+    // Bounded to an ellipse rather than the canvas rectangle. A rectangular bound lets the
+    // layout fill the corners, which reads as a box; an elliptical one keeps the cluster
+    // organic. The camera, not the bound, is what keeps the interesting part in view.
+    const cxC = W / 2, cyC = H / 2
+    const RX = W / 2 - 24, RY = H / 2 - 24
+    const contain = (d: Node) => {
+      const nx = ((d.x ?? cxC) - cxC) / RX
+      const ny = ((d.y ?? cyC) - cyC) / RY
+      const dist = Math.hypot(nx, ny)
+      if (dist > 1) {
+        d.x = cxC + (nx / dist) * RX
+        d.y = cyC + (ny / dist) * RY
+      }
     }
     s.on('tick', () => {
-      for (const n of N) clamp(n)
+      for (const n of N) contain(n)
       linkAll.attr('x1', (d) => (d.source as Node).x!).attr('y1', (d) => (d.source as Node).y!).attr('x2', (d) => (d.target as Node).x!).attr('y2', (d) => (d.target as Node).y!)
       nodeAll.attr('transform', (d) => `translate(${d.x},${d.y})`)
     })
@@ -279,7 +282,7 @@ export function PaymentGraph({ payments, counts, t, compact = false }: {
     <div className="relative">
       <svg ref={ref}
         style={{ touchAction: touchMap ? 'none' : 'pan-y' }}
-        className={`h-[300px] w-full cursor-grab active:cursor-grabbing sm:h-[440px] lg:h-[520px] ${touchMap ? 'ring-1 ring-ink-600 ring-inset' : ''}`}>
+        className={`map-fade h-[300px] w-full cursor-grab active:cursor-grabbing sm:h-[440px] lg:h-[520px] ${touchMap ? 'ring-1 ring-ink-600 ring-inset' : ''}`}>
         <g className="scene">
           <g className="links" />
           <g className="nodes" />
