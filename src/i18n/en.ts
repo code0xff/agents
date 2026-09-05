@@ -78,7 +78,6 @@ export const en = {
   'pay.recent': 'Recent',
   'pay.waiting': 'Waiting for blocks',
   'pay.rpcError': 'RPC: {message}',
-  'pay.unlabeled': 'Unnamed {id}',
 
   'page.range': '{from}-{to} of {total}',
   'page.first': 'First page',
@@ -143,6 +142,7 @@ export const en = {
   'agent.close': 'Close',
   'agent.noDescription': 'No description in the registration file.',
   'pay.unlabeledHelp': 'The address is known; no public directory lists a name for it.',
+  'pay.viewTx': 'View transaction on BaseScan',
   'theme.dark': 'dark',
   'theme.light': 'light',
 }

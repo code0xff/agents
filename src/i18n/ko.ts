@@ -80,7 +80,6 @@ export const ko: Dict = {
   'pay.recent': '최근',
   'pay.waiting': '블록 기다리는 중',
   'pay.rpcError': 'RPC: {message}',
-  'pay.unlabeled': '이름없음 {id}',
 
   'page.range': '{total}건 중 {from}-{to}',
   'page.first': '첫 페이지',
@@ -145,6 +144,7 @@ export const ko: Dict = {
   'agent.close': '닫기',
   'agent.noDescription': '등록 파일에 설명이 없습니다.',
   'pay.unlabeledHelp': '주소는 확인되지만, 이 주소의 이름을 등록한 공개 디렉터리가 없습니다.',
+  'pay.viewTx': 'BaseScan에서 트랜잭션 보기',
   'theme.dark': '다크',
   'theme.light': '라이트',
 }

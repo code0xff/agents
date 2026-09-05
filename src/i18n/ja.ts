@@ -80,7 +80,6 @@ export const ja: Dict = {
   'pay.recent': '最近',
   'pay.waiting': 'ブロックを待機中',
   'pay.rpcError': 'RPC: {message}',
-  'pay.unlabeled': '名称なし {id}',
 
   'page.range': '{total}件中 {from}-{to}',
   'page.first': '最初のページ',
@@ -145,6 +144,7 @@ export const ja: Dict = {
   'agent.close': '閉じる',
   'agent.noDescription': '登録ファイルに説明がありません。',
   'pay.unlabeledHelp': 'アドレスは判明していますが、名称を登録した公開ディレクトリがありません。',
+  'pay.viewTx': 'BaseScan でトランザクションを見る',
   'theme.dark': 'ダーク',
   'theme.light': 'ライト',
 }

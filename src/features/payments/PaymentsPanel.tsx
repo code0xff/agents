@@ -3,11 +3,15 @@ import { useMemo } from 'react'
 import { Badge, LiveDot, Panel } from '../../components/Panel'
 import { Pagination, usePagination } from '../../components/Pagination'
 import { Stat } from '../../components/Stat'
+import { CHAINS } from '../../data/chains'
 import { useT } from '../../i18n'
 import { short, timeAgo, usd } from '../../lib/format'
 import { useIsMobile } from '../../lib/useMediaQuery'
 import { PaymentGraph } from './PaymentGraph'
 import { facilitatorLabel, type PaymentsState } from './usePayments'
+
+/** Payments are read from Base only, so the explorer is fixed. */
+const BASE_EXPLORER = CHAINS.base.explorer
 
 export function PaymentsPanel({ state }: { state: PaymentsState }) {
   const { t, tag } = useT()
@@ -23,7 +27,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
   const named = (addr: string) => payments.find((x) => x.facilitator === addr)?.facilitatorName != null
   const label = (addr: string) => {
     const p = payments.find((x) => x.facilitator === addr)
-    return (p && facilitatorLabel(p, senderCounts, t)) ?? short(addr)
+    return (p && facilitatorLabel(p)) ?? short(addr)
   }
 
   return (
@@ -40,7 +44,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
       </div>
       <div className="grid md:grid-cols-[1fr_300px]">
         <div className="relative flex flex-col">
-          <PaymentGraph payments={payments} counts={senderCounts} t={t} compact={isMobile} />
+          <PaymentGraph payments={payments} compact={isMobile} />
           <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-ink-800 px-4 py-2 font-mono text-[10px] text-ink-500">
             <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-ink-50" />{t('pay.legend.facilitator')}</span>
             <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-ink-300" />{t('pay.legend.service')}</span>
@@ -58,7 +62,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
               <li key={addr} className="flex justify-between gap-2 py-0.5">
                 <a className="truncate text-ink-300 hover:text-ink-50"
                   title={named(addr) ? undefined : t('pay.unlabeledHelp')}
-                  href={`https://basescan.org/address/${addr}`} target="_blank" rel="noreferrer">{label(addr)}</a>
+                  href={`${BASE_EXPLORER}/address/${addr}`} target="_blank" rel="noreferrer">{label(addr)}</a>
                 <span className="shrink-0 text-ink-500 tabular-nums">{n}</span>
               </li>
             ))}
@@ -68,18 +72,23 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
             {/* See RegistryLog: an exit animation here would double the row count on a
                 page change until it finished. */}
             {paged.items.map((p) => {
-                const fl = facilitatorLabel(p, senderCounts, t)
+                const named = p.facilitatorName != null
                 return (
                   <motion.li key={p.key} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}
-                    className="flex items-center gap-2 border-t border-ink-800/60 px-4 py-1.5">
-                    <span className="w-6 shrink-0 text-ink-600">{timeAgo(p.ts)}</span>
-                    <span className="shrink-0 text-ink-100 tabular-nums">{usd(p.usdc, 4, tag)}</span>
-                    <span className="hidden truncate text-ink-500 sm:inline md:hidden lg:inline">{short(p.payer, 3)}→{short(p.payTo, 3)}</span>
-                    <span className="ml-auto">
-                      {fl
-                        ? <Badge title={p.facilitatorName ? undefined : t('pay.unlabeledHelp')}>{fl}</Badge>
-                        : <Badge dim title={t('pay.unlabeledHelp')}>{short(p.facilitator, 3)}</Badge>}
-                    </span>
+                    className="border-t border-ink-800/60">
+                    {/* Every row is a real settlement, so it opens on the explorer. */}
+                    <a href={`${BASE_EXPLORER}/tx/${p.tx}`} target="_blank" rel="noreferrer noopener"
+                      title={t('pay.viewTx')}
+                      className="flex items-center gap-2 px-4 py-1.5 transition-colors hover:bg-ink-800/40">
+                      <span className="w-6 shrink-0 text-ink-600">{timeAgo(p.ts)}</span>
+                      <span className="shrink-0 text-ink-100 tabular-nums">{usd(p.usdc, 4, tag)}</span>
+                      <span className="hidden truncate text-ink-500 sm:inline md:hidden lg:inline">{short(p.payer, 3)}→{short(p.payTo, 3)}</span>
+                      <span className="ml-auto">
+                        <Badge dim={!named} title={named ? undefined : t('pay.unlabeledHelp')}>
+                          {facilitatorLabel(p)}
+                        </Badge>
+                      </span>
+                    </a>
                   </motion.li>
                 )
               })}

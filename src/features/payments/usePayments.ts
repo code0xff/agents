@@ -3,8 +3,7 @@ import { decodeFunctionData, formatUnits, parseAbi, parseAbiItem, type Hex } fro
 import { USDC_BASE } from '../../data/chains'
 import facilitators from '../../data/facilitators.json'
 import { getClient } from '../../lib/clients'
-import { errMessage } from '../../lib/format'
-import type { Translate } from '../../i18n'
+import { errMessage, short } from '../../lib/format'
 
 const ABI = parseAbi([
   'function transferWithAuthorization(address from, address to, uint256 value, uint256 validAfter, uint256 validBefore, bytes32 nonce, uint8 v, bytes32 r, bytes32 s)',
@@ -47,7 +46,6 @@ const BACKFILL = 40n
 const MAX_CATCHUP = 60n
 const CHUNK = 4n
 const MAX = 300
-const UNLABELED_PROMOTE = 3
 
 interface Scan { found: Payment[]; scanned: number }
 
@@ -156,5 +154,9 @@ export function paymentsPerMinute(s: PaymentsState): number | null {
   return s.payments.length / minutes
 }
 
-export const facilitatorLabel = (p: Payment, counts: Record<string, number>, t: Translate) =>
-  p.facilitatorName ?? ((counts[p.facilitator] ?? 0) >= UNLABELED_PROMOTE ? t('pay.unlabeled', { id: p.facilitator.slice(2, 6) }) : null)
+/**
+ * A facilitator's name when a public directory lists one, otherwise the address itself.
+ * Labelling every unknown sender "Unnamed" repeated a word on every row and said nothing;
+ * the address alone already shows that no name was found.
+ */
+export const facilitatorLabel = (p: Payment) => p.facilitatorName ?? short(p.facilitator)

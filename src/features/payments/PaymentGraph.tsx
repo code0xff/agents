@@ -1,7 +1,6 @@
 import * as d3 from 'd3'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useT } from '../../i18n'
-import type { Translate } from '../../i18n'
 import { short } from '../../lib/format'
 import { facilitatorLabel, type Payment } from './usePayments'
 
@@ -22,9 +21,7 @@ const CANVAS_SCALE = 1.9
 const USER_CONTROL_MS = 9_000
 const FOLLOW_MS = 1_400
 
-export function PaymentGraph({ payments, counts, t, compact = false }: {
-  payments: Payment[]; counts: Record<string, number>; t: Translate; compact?: boolean
-}) {
+export function PaymentGraph({ payments, compact = false }: { payments: Payment[]; compact?: boolean }) {
   const ref = useRef<SVGSVGElement>(null)
   const [size, setSize] = useState({ w: 0, h: 0 })
   const sim = useRef<d3.Simulation<Node, Link> | null>(null)
@@ -125,7 +122,7 @@ export function PaymentGraph({ payments, counts, t, compact = false }: {
     // d3-force requires stable, mutable node objects across ticks, so the maps below are
     // updated in place rather than rebuilt. `recent` itself is only ever read.
     for (const p of recent) {
-      const fl = facilitatorLabel(p, counts, t) ?? short(p.facilitator)
+      const fl = facilitatorLabel(p)
       up('facilitator', p.facilitator, fl); up('payer', p.payer, short(p.payer)); up('payTo', p.payTo, short(p.payTo))
       upL(nodeId('payer', p.payer), nodeId('facilitator', p.facilitator))
       upL(nodeId('facilitator', p.facilitator), nodeId('payTo', p.payTo))
@@ -230,7 +227,7 @@ export function PaymentGraph({ payments, counts, t, compact = false }: {
       svg.property('__framed', true)
       svg.call(zoom.transform, d3.zoomIdentity.translate((width - W) / 2, (height - H) / 2))
     }
-  }, [recent, counts, t, size, compact])
+  }, [recent, size, compact])
 
   // The camera drifts toward wherever the newest settlements are, unless the reader
   // has just taken control.
