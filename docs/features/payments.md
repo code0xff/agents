@@ -16,7 +16,14 @@ the target node pulses. A recent-payments list sits beside the graph.
 `docs/research/payments.md` — facilitator list/addresses, on-chain detection, public API availability
 
 ## Implementation (2026-09-05)
-- `usePayments.ts`: backfill the latest 150 Base blocks, then poll every 10s.
+- `usePayments.ts`: scans Base and Polygon. Backfill is 150 blocks on Base and 40 on Polygon, which
+  settles about four times per block, then both poll every 10s. A scan reads at most 60 transactions,
+  so a wide window cannot fetch more than the retained list can hold.
+
+  Polygon was added after measuring a 10 minute window on both chains: Base 268 settlements at $106,
+  Polygon 972 at $277. Polygon is currently the busier chain, and 971 of its 972 settlements matched a
+  named facilitator against 0 of 268 on Base, so it is what puts real operator names on the graph.
+  Cost with both chains, measured over 8.7 minutes: 24 MB/hour and a heap that levels off near 42 MB.
   The scan reads `AuthorizationUsed` logs from USDC, which that token emits only from a successful
   EIP-3009 call, so the log set is exactly the settlements: reverted authorisations never appear and
   nothing else does. Only the transactions those logs name are then fetched, to read the submitting

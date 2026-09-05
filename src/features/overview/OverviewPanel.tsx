@@ -7,9 +7,7 @@ import { agentChainShares, facilitatorShares, trend } from './derive'
 import { Concentration } from './Concentration'
 import { Signal } from './Signal'
 
-export function OverviewPanel({ observedPerMin, blocksScanned }: {
-  observedPerMin: number | null; blocksScanned: number
-}) {
+export function OverviewPanel({ observedPerMin }: { observedPerMin: number | null }) {
   const { t, tag } = useT()
   const ae = useAgentEconomy()
   const ocai = useOcaiStats()
@@ -38,7 +36,7 @@ export function OverviewPanel({ observedPerMin, blocksScanned }: {
           sub={d ? t('mp.stat.chains', { n: d.erc8004Registry.chainsTracked }) : undefined} />
         <Signal label={t('sig.observed')} value={observedPerMin} live
           format={(n) => t('sig.perMin', { n: n.toFixed(1) })}
-          sub={blocksScanned ? t('sig.window', { n: blocksScanned }) : undefined} />
+          sub={t('sig.observedSub')} />
       </motion.div>
 
       <Concentration facilitators={facs} chains={chains} usdcPct={d?.x402.tokenSplit?.usdcSharePct}

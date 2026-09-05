@@ -96,6 +96,6 @@ function Page({ route, payments, registry, perMin }: {
     case 'payments': return <PaymentsPanel state={payments} />
     case 'registry': return <RegistryLog state={registry} />
     case 'marketplaces': return <MarketplacesPanel />
-    default: return <OverviewPanel observedPerMin={perMin} blocksScanned={payments.blocksScanned} />
+    default: return <OverviewPanel observedPerMin={perMin} />
   }
 }

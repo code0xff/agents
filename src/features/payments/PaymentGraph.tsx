@@ -7,8 +7,9 @@ import { facilitatorLabel, type Payment } from './usePayments'
 type Kind = 'facilitator' | 'payer' | 'payTo'
 /** Keyed by role as well as address: the same address can act in several roles at once,
  *  and a single shared node would flip its colour, size and label between them. */
-interface Node extends d3.SimulationNodeDatum { id: string; addr: string; kind: Kind; label: string; weight: number }
-const nodeId = (kind: Kind, addr: string) => `${kind}:${addr}`
+interface Node extends d3.SimulationNodeDatum { id: string; addr: string; chain: string; kind: Kind; label: string; weight: number }
+/** Chain is part of the identity: the same address on two chains is two actors. */
+const nodeId = (chain: string, kind: Kind, addr: string) => `${chain}:${kind}:${addr}`
 interface Link extends d3.SimulationLinkDatum<Node> { id: string; source: string | Node; target: string | Node; weight: number }
 
 const WINDOW_DESKTOP = 120
@@ -111,10 +112,10 @@ export function PaymentGraph({ payments, compact = false }: { payments: Payment[
 
     const nodes = nodesRef.current, links = linksRef.current
     const keep = new Set<string>(), keepL = new Set<string>()
-    const up = (kind: Kind, addr: string, label: string) => {
-      const id = nodeId(kind, addr)
+    const up = (chain: string, kind: Kind, addr: string, label: string) => {
+      const id = nodeId(chain, kind, addr)
       let n = nodes.get(id)
-      if (!n) { n = { id, addr, kind, label, weight: 0, x: W / 2 + (Math.random() - 0.5) * 160, y: H / 2 + (Math.random() - 0.5) * 160 }; nodes.set(id, n) }
+      if (!n) { n = { id, addr, chain, kind, label, weight: 0, x: W / 2 + (Math.random() - 0.5) * 160, y: H / 2 + (Math.random() - 0.5) * 160 }; nodes.set(id, n) }
       n.label = label; keep.add(id); return n
     }
     const upL = (a: string, b: string) => { const id = `${a}>${b}`; if (!links.has(id)) links.set(id, { id, source: a, target: b, weight: 0 }); keepL.add(id) }
@@ -123,9 +124,11 @@ export function PaymentGraph({ payments, compact = false }: { payments: Payment[
     // updated in place rather than rebuilt. `recent` itself is only ever read.
     for (const p of recent) {
       const fl = facilitatorLabel(p)
-      up('facilitator', p.facilitator, fl); up('payer', p.payer, short(p.payer)); up('payTo', p.payTo, short(p.payTo))
-      upL(nodeId('payer', p.payer), nodeId('facilitator', p.facilitator))
-      upL(nodeId('facilitator', p.facilitator), nodeId('payTo', p.payTo))
+      up(p.chain, 'facilitator', p.facilitator, fl)
+      up(p.chain, 'payer', p.payer, short(p.payer))
+      up(p.chain, 'payTo', p.payTo, short(p.payTo))
+      upL(nodeId(p.chain, 'payer', p.payer), nodeId(p.chain, 'facilitator', p.facilitator))
+      upL(nodeId(p.chain, 'facilitator', p.facilitator), nodeId(p.chain, 'payTo', p.payTo))
     }
     for (const id of nodes.keys()) if (!keep.has(id)) nodes.delete(id)
     for (const id of links.keys()) if (!keepL.has(id)) links.delete(id)
@@ -133,11 +136,11 @@ export function PaymentGraph({ payments, compact = false }: { payments: Payment[
     for (const n of nodes.values()) n.weight = 0
     for (const l of links.values()) l.weight = 0
     for (const p of recent) {
-      nodes.get(nodeId('facilitator', p.facilitator))!.weight += 3
-      nodes.get(nodeId('payer', p.payer))!.weight += 1
-      nodes.get(nodeId('payTo', p.payTo))!.weight += 1
-      links.get(`${nodeId('payer', p.payer)}>${nodeId('facilitator', p.facilitator)}`)!.weight += 1
-      links.get(`${nodeId('facilitator', p.facilitator)}>${nodeId('payTo', p.payTo)}`)!.weight += 1
+      nodes.get(nodeId(p.chain, 'facilitator', p.facilitator))!.weight += 3
+      nodes.get(nodeId(p.chain, 'payer', p.payer))!.weight += 1
+      nodes.get(nodeId(p.chain, 'payTo', p.payTo))!.weight += 1
+      links.get(`${nodeId(p.chain, 'payer', p.payer)}>${nodeId(p.chain, 'facilitator', p.facilitator)}`)!.weight += 1
+      links.get(`${nodeId(p.chain, 'facilitator', p.facilitator)}>${nodeId(p.chain, 'payTo', p.payTo)}`)!.weight += 1
     }
 
     const N = [...nodes.values()], L = [...links.values()]
@@ -199,7 +202,7 @@ export function PaymentGraph({ payments, compact = false }: { payments: Payment[
       .on('drag', (ev, d) => { d.fx = ev.x; d.fy = ev.y })
       .on('end', (ev, d) => { if (!ev.active) s.alphaTarget(0); d.fx = null; d.fy = null }))
     nodeAll.select('title').remove()
-    nodeAll.append('title').text((d) => `${d.kind} ${d.addr}`)
+    nodeAll.append('title').text((d) => `${d.chain} ${d.kind} ${d.addr}`)
 
     // Bounded to an ellipse rather than the canvas rectangle. A rectangular bound lets the
     // layout fill the corners, which reads as a box; an elliptical one keeps the cluster
@@ -242,8 +245,8 @@ export function PaymentGraph({ payments, compact = false }: { payments: Payment[
     const focus = payments.slice(0, 6)
     const pts: Node[] = []
     for (const p of focus) {
-      const f = nodesRef.current.get(nodeId('facilitator', p.facilitator))
-      const to = nodesRef.current.get(nodeId('payTo', p.payTo))
+      const f = nodesRef.current.get(nodeId(p.chain, 'facilitator', p.facilitator))
+      const to = nodesRef.current.get(nodeId(p.chain, 'payTo', p.payTo))
       if (f?.x != null) pts.push(f)
       if (to?.x != null) pts.push(to)
     }
@@ -273,7 +276,7 @@ export function PaymentGraph({ payments, compact = false }: { payments: Payment[
         g.append('circle').attr('r', 4).attr('fill', 'none').attr('stroke', 'var(--ink-50)').attr('cx', B.x!).attr('cy', B.y!).attr('opacity', 0)
           .transition().delay(delay + 700).duration(600).attr('r', 22).attr('opacity', 0.5).transition().duration(300).attr('opacity', 0).remove()
       }
-      const payer = nodeId('payer', pay.payer), fac = nodeId('facilitator', pay.facilitator), to = nodeId('payTo', pay.payTo)
+      const payer = nodeId(pay.chain, 'payer', pay.payer), fac = nodeId(pay.chain, 'facilitator', pay.facilitator), to = nodeId(pay.chain, 'payTo', pay.payTo)
       hop(payer, fac, i * 250); hop(fac, to, i * 250 + 700)
     })
   }, [payments])

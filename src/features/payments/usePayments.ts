@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { decodeFunctionData, formatUnits, parseAbi, parseAbiItem, type Hex } from 'viem'
-import { USDC_BASE } from '../../data/chains'
+import { PAYMENT_CHAINS, PAYMENT_CHAIN_KEYS, type PaymentChainKey } from '../../data/chains'
 import facilitators from '../../data/facilitators.json'
 import { getClient } from '../../lib/clients'
 import { errMessage, short } from '../../lib/format'
@@ -19,11 +19,16 @@ const ABI = parseAbi([
  */
 const AUTHORIZATION_USED = parseAbiItem('event AuthorizationUsed(address indexed authorizer, bytes32 indexed nonce)')
 
-export const FACILITATOR_BY_ADDR: Record<string, string> = {}
-for (const f of facilitators) for (const a of f.networks.base ?? []) FACILITATOR_BY_ADDR[a.toLowerCase()] = f.name
+/** Facilitator names per chain; the same operator uses different addresses on each. */
+const FACILITATOR_BY_ADDR: Record<PaymentChainKey, Record<string, string>> = { base: {}, polygon: {} }
+for (const f of facilitators) {
+  for (const a of f.networks.base ?? []) FACILITATOR_BY_ADDR.base[a.toLowerCase()] = f.name
+  for (const a of (f.networks as { polygon?: string[] }).polygon ?? []) FACILITATOR_BY_ADDR.polygon[a.toLowerCase()] = f.name
+}
 
 export interface Payment {
   key: string
+  chain: PaymentChainKey
   block: bigint
   tx: Hex
   facilitator: string
@@ -38,45 +43,45 @@ export interface Payment {
 
 export interface PaymentsState {
   payments: Payment[]
-  head: bigint | null
+  heads: Partial<Record<PaymentChainKey, bigint>>
   blocksScanned: number
-  error: string | null
+  errors: Partial<Record<PaymentChainKey, string>>
   /** Derived from the retained window, so it never counts evicted rows. */
   senderCounts: Record<string, number>
 }
 
 const POLL_MS = 10_000
-const BACKFILL = 150n
-/**
- * Cap for a single catch-up so a backgrounded tab cannot ask for an unbounded range. Reading
- * logs rather than blocks makes a wide window cheap, so this is generous.
- */
-const MAX_CATCHUP = 600n
 const MAX = 300
+/** Transactions per round trip. Each response is about 1 KB. */
+const TX_CHUNK = 8
+/**
+ * Upper bound on transactions read in one scan. Polygon settles roughly four times per block,
+ * so an untrimmed backfill would fetch far more than the retained window can hold.
+ */
+const MAX_TX_PER_SCAN = 60
 
 interface Scan { found: Payment[]; scanned: number }
 
-/** Base produces a block every 2s, so a timestamp can be derived instead of fetched. */
-const BLOCK_MS = 2_000
-/** Transactions per round trip. Each response is about 1 KB. */
-const TX_CHUNK = 6
-
-async function scanRange(from: bigint, to: bigint, head: bigint, aborted: () => boolean): Promise<Scan> {
-  const client = getClient('base')
+async function scanRange(
+  key: PaymentChainKey, from: bigint, to: bigint, head: bigint, aborted: () => boolean,
+): Promise<Scan> {
+  const cfg = PAYMENT_CHAINS[key]
+  const client = getClient(key)
   const scanned = Number(to - from + 1n)
-  const logs = await client.getLogs({ address: USDC_BASE, event: AUTHORIZATION_USED, fromBlock: from, toBlock: to })
+  const logs = await client.getLogs({ address: cfg.usdc, event: AUTHORIZATION_USED, fromBlock: from, toBlock: to })
   if (aborted() || logs.length === 0) return { found: [], scanned }
 
-  // One settlement can only come from one transaction, but a transaction may settle several.
-  const byHash = new Map<Hex, { block: bigint; authorizer: string }>()
-  for (const l of logs) {
-    if (!byHash.has(l.transactionHash)) {
-      byHash.set(l.transactionHash, { block: l.blockNumber, authorizer: String(l.args.authorizer).toLowerCase() })
-    }
+  // One transaction may settle several authorisations, so collapse by hash, newest first,
+  // and read only as many as the retained window can use.
+  const byHash = new Map<Hex, bigint>()
+  for (let i = logs.length - 1; i >= 0; i--) {
+    const l = logs[i]
+    if (!byHash.has(l.transactionHash)) byHash.set(l.transactionHash, l.blockNumber)
+    if (byHash.size >= MAX_TX_PER_SCAN) break
   }
 
   const nowAtHead = Date.now()
-  const stamp = (block: bigint) => nowAtHead - Number(head - block) * BLOCK_MS
+  const stamp = (block: bigint) => nowAtHead - Number(head - block) * cfg.blockSeconds * 1000
 
   const found: Payment[] = []
   const hashes = [...byHash.keys()]
@@ -91,15 +96,16 @@ async function scanRange(from: bigint, to: bigint, head: bigint, aborted: () => 
       // its amount and recipient are not recoverable from the calldata, so it is left out.
       try { decoded = decodeFunctionData({ abi: ABI, data: tx.input }) } catch { continue }
       const units = decoded.args[2] as bigint
-      const meta = byHash.get(tx.hash)!
+      const block = byHash.get(tx.hash)!
+      const from = tx.from.toLowerCase()
       found.push({
-        key: tx.hash, block: meta.block, tx: tx.hash,
-        facilitator: tx.from.toLowerCase(),
-        facilitatorName: FACILITATOR_BY_ADDR[tx.from.toLowerCase()] ?? null,
+        key: `${key}:${tx.hash}`, chain: key, block, tx: tx.hash,
+        facilitator: from,
+        facilitatorName: FACILITATOR_BY_ADDR[key][from] ?? null,
         payer: String(decoded.args[0]).toLowerCase(),
         payTo: String(decoded.args[1]).toLowerCase(),
         units, usdc: Number(formatUnits(units, 6)),
-        ts: stamp(meta.block),
+        ts: stamp(block),
       })
     }
   }
@@ -108,38 +114,46 @@ async function scanRange(from: bigint, to: bigint, head: bigint, aborted: () => 
 
 export function usePayments() {
   const [state, setState] = useState<Omit<PaymentsState, 'senderCounts'>>({
-    payments: [], head: null, blocksScanned: 0, error: null,
+    payments: [], heads: {}, blocksScanned: 0, errors: {},
   })
 
   useEffect(() => {
     let stopped = false
     let running = false
-    let cursor: bigint | null = null
-    const client = getClient('base')
+    const cursors: Partial<Record<PaymentChainKey, bigint>> = {}
 
     const tick = async () => {
       // Single flight: a slow scan must not overlap the next interval.
       if (running || stopped) return
       running = true
       try {
-        const head = await client.getBlockNumber()
-        const wanted = cursor === null ? head - BACKFILL : cursor + 1n
-        // Bounded catch-up: skip ahead rather than replaying a long gap.
-        const from = head - wanted > MAX_CATCHUP ? head - MAX_CATCHUP : wanted
-        if (from > head) { cursor = head; return }
-        const { found, scanned } = await scanRange(from, head, head, () => stopped)
-        if (stopped) return
-        cursor = head
-        setState((s) => {
-          const seen = new Set(s.payments.map((p) => p.key))
-          const fresh = found.filter((p) => !seen.has(p.key))
-          return {
-            payments: [...fresh, ...s.payments].sort((a, b) => b.ts - a.ts).slice(0, MAX),
-            head, blocksScanned: s.blocksScanned + scanned, error: null,
+        await Promise.all(PAYMENT_CHAIN_KEYS.map(async (key) => {
+          const cfg = PAYMENT_CHAINS[key]
+          try {
+            const client = getClient(key)
+            const head = await client.getBlockNumber()
+            const cursor = cursors[key]
+            const wanted = cursor === undefined ? head - cfg.backfill : cursor + 1n
+            // Bounded catch-up: skip ahead rather than replaying a long gap.
+            const from = head - wanted > cfg.maxCatchup ? head - cfg.maxCatchup : wanted
+            if (from > head) { cursors[key] = head; return }
+            const { found, scanned } = await scanRange(key, from, head, head, () => stopped)
+            if (stopped) return
+            cursors[key] = head
+            setState((s) => {
+              const seen = new Set(s.payments.map((p) => p.key))
+              const fresh = found.filter((p) => !seen.has(p.key))
+              return {
+                payments: [...fresh, ...s.payments].sort((a, b) => b.ts - a.ts).slice(0, MAX),
+                heads: { ...s.heads, [key]: head },
+                blocksScanned: s.blocksScanned + scanned,
+                errors: { ...s.errors, [key]: undefined },
+              }
+            })
+          } catch (e) {
+            if (!stopped) setState((s) => ({ ...s, errors: { ...s.errors, [key]: errMessage(e) } }))
           }
-        })
-      } catch (e) {
-        if (!stopped) setState((s) => ({ ...s, error: errMessage(e) }))
+        }))
       } finally {
         running = false
       }
@@ -150,9 +164,10 @@ export function usePayments() {
     return () => { stopped = true; clearInterval(id) }
   }, [])
 
+  // Keyed by chain and address: the same operator uses different addresses per chain.
   const senderCounts = useMemo(() => {
     const c: Record<string, number> = {}
-    for (const p of state.payments) c[p.facilitator] = (c[p.facilitator] ?? 0) + 1
+    for (const p of state.payments) { const k = `${p.chain}:${p.facilitator}`; c[k] = (c[k] ?? 0) + 1 }
     return c
   }, [state.payments])
 
