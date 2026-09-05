@@ -91,6 +91,14 @@ export const zh: Dict = {
   'pay.rpcError': 'RPC: {message}',
   'pay.unlabeled': '未标记 {id}',
 
+  'page.range': '{total} 条中的 {from}-{to}',
+  'page.first': '第一页',
+  'page.prev': '上一页',
+  'page.next': '下一页',
+  'page.last': '最后一页',
+  'page.newItems': '{n} 条新增',
+  'pwa.install': '安装',
+  'pwa.offline': '离线',
   'theme.dark': '深色',
   'theme.light': '浅色',
 }

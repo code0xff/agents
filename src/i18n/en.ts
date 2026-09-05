@@ -89,6 +89,14 @@ export const en = {
   'pay.rpcError': 'RPC: {message}',
   'pay.unlabeled': 'Unlabeled {id}',
 
+  'page.range': '{from}-{to} of {total}',
+  'page.first': 'First page',
+  'page.prev': 'Previous page',
+  'page.next': 'Next page',
+  'page.last': 'Last page',
+  'page.newItems': '{n} new',
+  'pwa.install': 'Install',
+  'pwa.offline': 'Offline',
   'theme.dark': 'dark',
   'theme.light': 'light',
 }

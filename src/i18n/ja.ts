@@ -91,6 +91,14 @@ export const ja: Dict = {
   'pay.rpcError': 'RPC: {message}',
   'pay.unlabeled': '未識別 {id}',
 
+  'page.range': '{total}件中 {from}-{to}',
+  'page.first': '最初のページ',
+  'page.prev': '前のページ',
+  'page.next': '次のページ',
+  'page.last': '最後のページ',
+  'page.newItems': '新着 {n}件',
+  'pwa.install': 'インストール',
+  'pwa.offline': 'オフライン',
   'theme.dark': 'ダーク',
   'theme.light': 'ライト',
 }

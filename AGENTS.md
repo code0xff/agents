@@ -23,6 +23,8 @@ x402 payments) by reading public data directly from the browser. Deployed to Git
 8. **Four languages.** All user-facing UI strings go through `src/i18n` (en, ko, ja, zh). No literal UI
    strings in components. Documentation and code comments are written in English.
 9. **Branch: `dev`.** `dev` is the default and only managed branch; deploys run from `dev`.
+10. **Mobile first.** Every panel must work at 360px wide with no horizontal overflow. Long lists are
+    paginated rather than nested in their own scroll area. See `docs/pwa.md`.
 
 ## Stack
 
@@ -36,6 +38,7 @@ Vite 8 · React 19 · TypeScript · Tailwind v4 · motion · GSAP · Lenis · D3
 | `docs/architecture.md` | Directory layout, data flow, state management, module boundaries |
 | `docs/design.md` | Design system: color tokens, theming, typography, motion principles, component rules |
 | `docs/i18n.md` | Localization: supported locales, how to add strings, locale detection |
+| `docs/pwa.md` | PWA manifest, service worker caching, mobile layout rules, pagination |
 | `docs/data-sources.md` | Data source catalog: chain RPCs, contract addresses, public APIs, constraints |
 | `docs/deploy.md` | GitHub Pages deployment, `base` path, SPA fallback, env vars, snapshot workflow |
 | `docs/features/marketplaces.md` | Feature 1: marketplace directory + extra data collection |

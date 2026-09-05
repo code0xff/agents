@@ -8,8 +8,8 @@ src/
   App.tsx               # layout shell, theme + locale toggles
   index.css             # Tailwind + @theme tokens
   i18n/                 # locale dictionaries and useT() hook
-  components/           # shared UI (Panel, Stat, ThemeToggle, LocaleSwitch ...)
-  lib/                  # clients.ts (viem clients), format.ts, theme.ts
+  components/           # shared UI (Panel, Stat, Pagination, ThemeToggle, LocaleSwitch ...)
+  lib/                  # clients.ts (viem clients), format.ts, theme.ts, usePwa.ts, useMediaQuery.ts
   data/                 # static data: marketplaces.json, facilitators.json, chains.ts
   features/
     marketplaces/       # feature 1

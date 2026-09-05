@@ -8,10 +8,14 @@ function initial(): Theme {
   return window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
 }
 
+const THEME_COLOR: Record<Theme, string> = { dark: '#050505', light: '#f7f7f8' }
+
 export function applyTheme(t: Theme) {
   const el = document.documentElement
   el.classList.toggle('light', t === 'light')
   el.classList.toggle('dark', t === 'dark')
+  // Keeps the mobile browser chrome and the installed app's status bar in sync.
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_COLOR[t])
 }
 
 export function useTheme() {

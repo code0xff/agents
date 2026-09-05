@@ -11,9 +11,9 @@ export function Panel({ title, eyebrow, right, children, className = '', delay =
       transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
       className={`relative overflow-hidden rounded-xl border border-ink-800 bg-panel backdrop-blur-md ${className}`}
     >
-      <header className="flex items-center justify-between border-b border-ink-800 px-5 py-3">
-        <div>
-          {eyebrow && <p className="font-mono text-[10px] tracking-[0.3em] text-ink-500 uppercase">{eyebrow}</p>}
+      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-ink-800 px-4 py-3 sm:px-5">
+        <div className="min-w-0">
+          {eyebrow && <p className="truncate font-mono text-[10px] tracking-[0.25em] text-ink-500 uppercase">{eyebrow}</p>}
           <h2 className="text-sm font-medium text-ink-100">{title}</h2>
         </div>
         {right}
@@ -34,7 +34,7 @@ export function LiveDot({ active = true }: { active?: boolean }) {
 
 export function Badge({ children, dim = false }: { children: ReactNode; dim?: boolean }) {
   return (
-    <span className={`rounded border px-1.5 py-0.5 font-mono text-[10px] tracking-wider uppercase ${dim ? 'border-ink-800 text-ink-500' : 'border-ink-700 text-ink-300'}`}>
+    <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] tracking-wider whitespace-nowrap uppercase ${dim ? 'border-ink-800 text-ink-500' : 'border-ink-700 text-ink-300'}`}>
       {children}
     </span>
   )

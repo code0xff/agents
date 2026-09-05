@@ -38,7 +38,7 @@ function Card({ m, i, ae, ocai, t, tag }: {
       initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.05 * i, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -2 }}
-      className="group flex flex-col gap-3 border-b border-r border-ink-800 p-5 transition-colors hover:bg-ink-800/30"
+      className="group flex flex-col gap-3 border-b border-ink-800 p-4 transition-colors hover:bg-ink-800/30 sm:border-r sm:p-5"
     >
       <div className="flex items-start justify-between gap-2">
         <div>
@@ -48,11 +48,11 @@ function Card({ m, i, ae, ocai, t, tag }: {
         <Badge dim={m.feed === 'link'}>{t(`feed.${m.feed}` as Key)}</Badge>
       </div>
       <p className="text-xs leading-relaxed text-ink-400">{t(`mp.note.${m.id}` as Key)}</p>
-      <div className="mt-auto flex items-end justify-between gap-3">
-        <div className="flex flex-wrap gap-1">{m.chains.map((c) => <span key={c} className="font-mono text-[10px] text-ink-500">{c}</span>)}</div>
+      <div className="mt-auto flex flex-wrap items-end justify-between gap-x-3 gap-y-2">
+        <div className="flex min-w-0 flex-wrap gap-x-2 gap-y-0.5">{m.chains.map((c) => <span key={c} className="font-mono text-[10px] text-ink-500">{c}</span>)}</div>
         {metric && (
-          <div className="flex items-center gap-3">
-            {metric.spark && <Sparkline data={metric.spark} />}
+          <div className="ml-auto flex items-center gap-3">
+            {metric.spark && <Sparkline data={metric.spark} className="hidden sm:block" />}
             <div className="text-right">
               <div className="font-mono text-base text-ink-100 tabular-nums">{metric.value}</div>
               <div className="font-mono text-[9px] tracking-wider text-ink-500 uppercase">{metric.label}</div>
@@ -82,7 +82,7 @@ export function MarketplacesPanel() {
   return (
     <Panel eyebrow={t('mp.eyebrow')} title={t('mp.title')}
       right={<span className="font-mono text-[10px] text-ink-500">{status}</span>}>
-      <div className="grid grid-cols-2 divide-x divide-ink-800 border-b border-ink-800 md:grid-cols-4">
+      <div className="grid grid-cols-2 divide-x divide-y divide-ink-800 border-b border-ink-800 md:grid-cols-4 md:divide-y-0">
         <Stat label={t('mp.stat.payments')} value={d?.x402.totalTxs} format={(n) => compact(n, tag)} sub={d ? t('mp.stat.facilitators', { n: d.x402.facilitatorsTracked }) : undefined} />
         <Stat label={t('mp.stat.volume')} value={d?.x402.totalVolume} format={(n) => usd(n, 0, tag)} />
         <Stat label={t('mp.stat.agents')} value={d?.erc8004Registry.totalAgents} format={(n) => compact(n, tag)} sub={d ? t('mp.stat.chains', { n: d.erc8004Registry.chainsTracked }) : undefined} />

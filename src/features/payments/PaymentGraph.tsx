@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Translate } from '../../i18n'
 import { short } from '../../lib/format'
 import { facilitatorLabel, type Payment } from './usePayments'
@@ -11,12 +11,25 @@ const WINDOW = 120 // number of recent payments kept in the graph
 
 export function PaymentGraph({ payments, counts, t }: { payments: Payment[]; counts: Record<string, number>; t: Translate }) {
   const ref = useRef<SVGSVGElement>(null)
+  const [size, setSize] = useState({ w: 0, h: 0 })
   const sim = useRef<d3.Simulation<Node, Link> | null>(null)
   const nodesRef = useRef<Map<string, Node>>(new Map())
   const linksRef = useRef<Map<string, Link>>(new Map())
   const lastKey = useRef<string | null>(null)
 
   const recent = useMemo(() => payments.slice(0, WINDOW), [payments])
+
+  // Keep the layout centered when the viewport or panel width changes.
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const ro = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect
+      setSize((s) => (Math.abs(s.w - width) > 8 || Math.abs(s.h - height) > 8 ? { w: width, h: height } : s))
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   // Sync nodes/edges with the recent payments window
   useEffect(() => {
@@ -89,7 +102,7 @@ export function PaymentGraph({ payments, counts, t }: { payments: Payment[]; cou
       linkAll.attr('x1', (d) => (d.source as Node).x!).attr('y1', (d) => (d.source as Node).y!).attr('x2', (d) => (d.target as Node).x!).attr('y2', (d) => (d.target as Node).y!)
       nodeAll.attr('transform', (d) => `translate(${d.x},${d.y})`)
     })
-  }, [recent, counts, t])
+  }, [recent, counts, t, size])
 
   // Emit a particle along the edges for every new payment
   useEffect(() => {
@@ -114,7 +127,7 @@ export function PaymentGraph({ payments, counts, t }: { payments: Payment[]; cou
   }, [payments])
 
   return (
-    <svg ref={ref} className="h-[420px] w-full">
+    <svg ref={ref} className="h-[300px] w-full touch-pan-y sm:h-[380px] lg:h-[420px]">
       <g className="root"><g className="links" /><g className="nodes" /></g>
       <g className="fx" />
     </svg>

@@ -8,6 +8,8 @@ export const LOCALES = ['en', 'ko', 'ja', 'zh'] as const
 export type Locale = (typeof LOCALES)[number]
 
 export const LOCALE_LABEL: Record<Locale, string> = { en: 'EN', ko: '한국어', ja: '日本語', zh: '中文' }
+/** Compact codes used where horizontal space is tight. */
+export const LOCALE_SHORT: Record<Locale, string> = { en: 'EN', ko: 'KO', ja: 'JA', zh: 'ZH' }
 /** BCP 47 tag passed to Intl */
 export const INTL_TAG: Record<Locale, string> = { en: 'en', ko: 'ko-KR', ja: 'ja-JP', zh: 'zh-CN' }
 

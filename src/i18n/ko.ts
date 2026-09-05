@@ -91,6 +91,14 @@ export const ko: Dict = {
   'pay.rpcError': 'RPC: {message}',
   'pay.unlabeled': '미확인 {id}',
 
+  'page.range': '{total}건 중 {from}-{to}',
+  'page.first': '첫 페이지',
+  'page.prev': '이전 페이지',
+  'page.next': '다음 페이지',
+  'page.last': '마지막 페이지',
+  'page.newItems': '새 항목 {n}건',
+  'pwa.install': '설치',
+  'pwa.offline': '오프라인',
   'theme.dark': '다크',
   'theme.light': '라이트',
 }
