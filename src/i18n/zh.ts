@@ -116,6 +116,8 @@ export const zh: Dict = {
   'page.label': '分页',
   'theme.toggle': '切换配色主题',
   'locale.label': '语言',
+  'nav.menu': '菜单',
+  'nav.close': '关闭菜单',
   'theme.dark': '深色',
   'theme.light': '浅色',
 }

@@ -114,6 +114,8 @@ export const en = {
   'page.label': 'Pagination',
   'theme.toggle': 'Toggle colour theme',
   'locale.label': 'Language',
+  'nav.menu': 'Menu',
+  'nav.close': 'Close menu',
   'theme.dark': 'dark',
   'theme.light': 'light',
 }

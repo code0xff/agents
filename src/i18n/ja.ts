@@ -116,6 +116,8 @@ export const ja: Dict = {
   'page.label': 'ページ送り',
   'theme.toggle': 'カラーテーマの切り替え',
   'locale.label': '言語',
+  'nav.menu': 'メニュー',
+  'nav.close': 'メニューを閉じる',
   'theme.dark': 'ダーク',
   'theme.light': 'ライト',
 }

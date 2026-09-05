@@ -116,6 +116,8 @@ export const ko: Dict = {
   'page.label': '페이지 이동',
   'theme.toggle': '색상 테마 전환',
   'locale.label': '언어',
+  'nav.menu': '메뉴',
+  'nav.close': '메뉴 닫기',
   'theme.dark': '다크',
   'theme.light': '라이트',
 }
