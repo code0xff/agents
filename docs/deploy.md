@@ -7,8 +7,8 @@
 - In the repository settings set Pages → Source to **GitHub Actions**.
 - `base` path: `vite.config.ts` reads `VITE_BASE` (default `/agents/`). CI injects the repository name.
   For a custom domain or a `<user>.github.io` repo use `VITE_BASE=/`.
-- SPA fallback: `public/404.html` forwards the path as `?p=` and redirects. If a router is added, restore
-  the path from that query.
+- Routing is hash based, so deep links never produce a 404. `public/404.html` only redirects genuinely
+  unknown paths back to the app root.
 - Only `VITE_`-prefixed env vars are bundled. Never put secrets in them.
 - Snapshot workflow `.github/workflows/snapshot.yml`: every 6 hours runs `scripts/snapshot.mjs` and
   commits `public/snapshots` and `data/snapshot-state` to `dev`. Requires Settings → Actions →

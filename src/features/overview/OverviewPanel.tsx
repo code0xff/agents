@@ -34,7 +34,8 @@ export function OverviewPanel({ observedPerMin, blocksScanned }: {
         <Signal label={t('mp.stat.volume')} value={d?.x402.totalVolume} format={(n) => usd(n, 0, tag)}
           sub={d ? t('mp.stat.facilitators', { n: d.x402.facilitatorsTracked }) : undefined} />
         <Signal label={t('mp.stat.agents')} value={d?.erc8004Registry.totalAgents} format={(n) => compact(n, tag)}
-          trend={agentTrend} series={agentSeries.slice(-30)} />
+          trend={agentTrend} series={agentSeries.slice(-30)}
+          sub={d ? t('mp.stat.chains', { n: d.erc8004Registry.chainsTracked }) : undefined} />
         <Signal label={t('sig.observed')} value={observedPerMin} live
           format={(n) => t('sig.perMin', { n: n.toFixed(1) })}
           sub={blocksScanned ? t('sig.window', { n: blocksScanned }) : undefined} />

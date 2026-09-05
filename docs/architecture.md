@@ -5,7 +5,8 @@
 ```
 src/
   main.tsx              # entry, QueryClientProvider, I18nProvider
-  App.tsx               # layout shell, theme + locale toggles
+  router.ts             # hash routing (overview / payments / registry / marketplaces)
+  App.tsx               # shell: header, page head, route switch; owns the live data hooks
   index.css             # Tailwind + @theme tokens
   i18n/                 # locale dictionaries and useT() hook
   components/           # shared UI (Panel, Stat, Pagination, ThemeToggle, LocaleSwitch ...)
@@ -31,6 +32,15 @@ Snapshot JSON (`public/snapshots/`) → produced by CI, fetched at runtime
 
 All remote calls are wrapped in TanStack Query or a polling hook. Polling intervals are defined per
 feature doc.
+
+## Routing
+
+Hash based (`#/payments`). GitHub Pages serves static files only, so a hash keeps deep links working
+without a 404 redirect, and behaves identically offline under the service worker. `public/404.html`
+therefore only sends genuinely unknown paths back to the app root.
+
+The payments and registry pollers live in `App`, above the route switch, so moving between routes
+neither restarts a block scan nor discards events already collected.
 
 ## State
 

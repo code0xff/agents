@@ -2,23 +2,33 @@ import Lenis from 'lenis'
 import { motion, useScroll, useTransform } from 'motion/react'
 import { useEffect, useMemo } from 'react'
 import { AppHeader } from './components/AppHeader'
+import type { ChainKey } from './data/chains'
+import { PageHead } from './components/PageHead'
 import { MarketplacesPanel } from './features/marketplaces/MarketplacesPanel'
 import { OverviewPanel } from './features/overview/OverviewPanel'
 import { PaymentsPanel } from './features/payments/PaymentsPanel'
 import { paymentsPerMinute, usePayments } from './features/payments/usePayments'
 import { RegistryLog } from './features/registry/RegistryLog'
+import { useRegistry } from './features/registry/useRegistry'
 import { useT } from './i18n'
+import type { Key } from './i18n/en'
 import { useMediaQuery } from './lib/useMediaQuery'
 import { usePwa } from './lib/usePwa'
+import { useHashRoute, type Route } from './router'
+
+const REGISTRY_CHAINS: readonly ChainKey[] = ['base', 'ethereum', 'bnb']
 
 export default function App() {
   const { t } = useT()
+  const route = useHashRoute()
   const { online } = usePwa()
   // Native momentum scrolling is better on touch, and it avoids fighting nested scrollers.
   const smoothOk = useMediaQuery('(min-width: 768px) and (pointer: fine)')
 
-  // One payments stream feeds both the overview rate and the flow panel.
+  // Both live streams sit above the router so navigating between pages neither restarts
+  // the block scan nor loses the events already collected.
   const payments = usePayments()
+  const registry = useRegistry(REGISTRY_CHAINS)
   const perMin = useMemo(() => paymentsPerMinute(payments), [payments])
 
   useEffect(() => {
@@ -38,30 +48,32 @@ export default function App() {
       <motion.div style={{ y: gridY }} className="bg-grid pointer-events-none fixed inset-0 -z-20 [mask-image:radial-gradient(ellipse_at_top,black_25%,transparent_70%)]" />
       <div className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-px animate-scan bg-gradient-to-r from-transparent via-ink-300/30 to-transparent" />
 
-      <AppHeader />
+      <AppHeader route={route} />
 
-      <section id="overview" className="mx-auto max-w-7xl px-4 pt-10 pb-6 sm:px-6 sm:pt-16 sm:pb-8">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.9 }}
-          className="flex items-center gap-2 font-mono text-[10px] tracking-[0.25em] text-ink-500 uppercase">
-          <span className={`h-1.5 w-1.5 rounded-full ${online ? 'animate-pulse bg-ink-200' : 'bg-ink-600'}`} />
-          {online ? t('hero.status') : t('pwa.offline')}
+      <main className="mx-auto flex max-w-7xl flex-col gap-5 px-4 pt-8 pb-16 sm:gap-6 sm:px-6 sm:pt-12 sm:pb-24">
+        <PageHead
+          title={t(`nav.${route}` as Key)}
+          lead={t(`page.${route}.lead` as Key)}
+          status={
+            <span className="flex items-center gap-2 font-mono text-[10px] tracking-[0.25em] text-ink-500 uppercase">
+              <span className={`h-1.5 w-1.5 rounded-full ${online ? 'animate-pulse bg-ink-200' : 'bg-ink-600'}`} />
+              {online ? t('hero.status') : t('pwa.offline')}
+            </span>
+          }
+        />
+
+        {/* Keyed, but deliberately without AnimatePresence: an exit animation that stalls
+            (a throttled background tab, reduced motion) would keep the previous page on
+            screen. Swapping on the key change and animating only the entry cannot get stuck. */}
+        <motion.div
+          key={route}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="flex flex-col gap-4 sm:gap-6"
+        >
+          <Page route={route} payments={payments} registry={registry} perMin={perMin} />
         </motion.div>
-        <motion.h1 initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-3 max-w-3xl text-3xl leading-[1.05] font-light tracking-tight text-ink-50 sm:text-5xl md:text-6xl">
-          {t('header.title')} <span className="text-ink-500">{t('header.titleAccent')}</span>
-        </motion.h1>
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25, duration: 0.8 }}
-          className="mt-4 max-w-xl text-sm leading-relaxed text-ink-400">
-          {t('header.tagline')}
-        </motion.p>
-      </section>
-
-      <main className="mx-auto flex max-w-7xl flex-col gap-4 px-4 pb-16 sm:gap-6 sm:px-6 sm:pb-24">
-        <OverviewPanel observedPerMin={perMin} blocksScanned={payments.blocksScanned} />
-        <div id="payments"><PaymentsPanel state={payments} /></div>
-        <div id="registry"><RegistryLog /></div>
-        <div id="marketplaces"><MarketplacesPanel /></div>
       </main>
 
       <footer className="border-t border-ink-800 px-4 py-8 text-center font-mono text-[10px] leading-relaxed tracking-wider text-ink-600 sm:px-6">
@@ -70,4 +82,18 @@ export default function App() {
       </footer>
     </div>
   )
+}
+
+function Page({ route, payments, registry, perMin }: {
+  route: Route
+  payments: ReturnType<typeof usePayments>
+  registry: ReturnType<typeof useRegistry>
+  perMin: number | null
+}) {
+  switch (route) {
+    case 'payments': return <PaymentsPanel state={payments} />
+    case 'registry': return <RegistryLog state={registry} />
+    case 'marketplaces': return <MarketplacesPanel />
+    default: return <OverviewPanel observedPerMin={perMin} blocksScanned={payments.blocksScanned} />
+  }
 }

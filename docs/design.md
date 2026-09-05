@@ -36,14 +36,19 @@ CJK locales fall back to the system sans stack; keep line-height generous.
 - Never write large amounts of custom keyframes. Libraries first.
 
 ## Layout and hierarchy
-A sticky header carries the mark, section links, and the locale and theme controls on the right.
-Installation is left to the browser, so no install button is shown.
+The app is split into four routes rather than one long scroll: overview, payments, registry,
+marketplaces. A sticky header carries the mark, the route tabs, and the locale and theme controls on
+the right. Installation is left to the browser, so no install button is shown.
 
-Below it the page reads top-down as: hero → signals → concentration → live panels → directory.
+Each route opens with a `PageHead`: status line, route title, one line of lead copy. The title uses
+the mono family like everything else; a proportional display face read as a separate product sitting
+on top of the dashboard.
+
+Overview is the interpretation layer.
 The point of the top half is interpretation, not raw totals: each `Signal` pairs a headline number
 with its 7-day momentum and the shape of the series, and the `Concentration` panel answers where the
 activity actually sits (which facilitator settles most payments, which chain holds most agents).
-Raw feeds come after that.
+Raw feeds live on their own routes.
 
 ## Component rules
 - `rounded-lg`/`rounded-xl`, 1px borders, no shadows (blurred panel background instead of glow)

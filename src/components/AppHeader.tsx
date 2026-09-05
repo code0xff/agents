@@ -1,35 +1,36 @@
+import { motion } from 'motion/react'
 import { LocaleSwitch } from './LocaleSwitch'
 import { ThemeToggle } from './ThemeToggle'
 import { useT } from '../i18n'
+import type { Key } from '../i18n/en'
 import { useTheme } from '../lib/theme'
+import { hrefFor, ROUTES, type Route } from '../router'
 
-const NAV = [
-  { href: '#overview', key: 'nav.overview' },
-  { href: '#payments', key: 'nav.payments' },
-  { href: '#registry', key: 'nav.registry' },
-  { href: '#marketplaces', key: 'nav.marketplaces' },
-] as const
-
-export function AppHeader() {
+export function AppHeader({ route }: { route: Route }) {
   const { t } = useT()
   const { theme, toggle } = useTheme()
   return (
-    <header className="sticky top-0 z-40 border-b border-ink-800 bg-ink-950/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-ink-800 bg-ink-950/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6">
-        <a href="#overview" className="flex shrink-0 items-center gap-2">
+        <a href={hrefFor('overview')} className="flex shrink-0 items-center gap-2">
           <Mark />
-          <span className="font-mono text-[11px] tracking-[0.2em] text-ink-200 uppercase">
-            Observatory
-          </span>
+          <span className="font-mono text-[11px] tracking-[0.2em] text-ink-200 uppercase">Observatory</span>
         </a>
 
-        <nav className="ml-4 hidden items-center gap-5 lg:flex">
-          {NAV.map((n) => (
-            <a key={n.href} href={n.href}
-              className="font-mono text-[10px] tracking-[0.18em] text-ink-500 uppercase transition hover:text-ink-100">
-              {t(n.key)}
-            </a>
-          ))}
+        <nav className="ml-2 flex min-w-0 flex-1 items-center gap-1 overflow-x-auto sm:ml-6 sm:gap-2">
+          {ROUTES.map((r) => {
+            const active = r === route
+            return (
+              <a key={r} href={hrefFor(r)} aria-current={active ? 'page' : undefined}
+                className={`relative shrink-0 rounded px-2 py-1 font-mono text-[10px] tracking-[0.16em] uppercase transition ${active ? 'text-ink-50' : 'text-ink-500 hover:text-ink-200'}`}>
+                {t(`nav.${r}` as Key)}
+                {active && (
+                  <motion.span layoutId="nav-underline" transition={{ type: 'spring', stiffness: 480, damping: 38 }}
+                    className="absolute inset-x-1 -bottom-[9px] h-px bg-ink-100" />
+                )}
+              </a>
+            )
+          })}
         </nav>
 
         <div className="ml-auto flex shrink-0 items-center gap-2">

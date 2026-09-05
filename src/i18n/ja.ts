@@ -1,17 +1,9 @@
 import type { Dict } from './en'
 
 export const ja: Dict = {
-  'header.tagline': 'ブラウザから直接読む公開チェーンデータ',
-  'header.title': 'Agent Economy',
-  'header.titleAccent': 'Observatory',
-  'nav.marketplaces': 'マーケットプレイス',
-  'nav.registry': 'レジストリ',
-  'nav.payments': '決済',
   'footer.sources': '出典: base.org, tenderly, publicnode, agenteconomy.to, onchainagentintel.io, facilitators.x402.watch',
   'footer.nobackend': 'バックエンドとAPIキーなし。',
 
-  'common.loading': '読み込み中',
-  'common.unavailable': '利用不可',
   'common.block': 'ブロック',
   'common.scanned': 'ブロック走査',
   'common.snapshot': 'スナップショット {time} 前',
@@ -31,7 +23,6 @@ export const ja: Dict = {
   'mp.stat.volume': 'x402 取引額',
   'mp.stat.agents': 'ERC-8004 エージェント',
   'mp.stat.chains': '{n} チェーン',
-  'mp.stat.endpoints': 'エンドポイントが応答するエージェント',
   'mp.stat.endpointsSub': 'MCP 到達可能',
   'mp.metric.resources': 'リソース',
   'mp.metric.agentsIndexed': '索引済みエージェント',
@@ -98,7 +89,6 @@ export const ja: Dict = {
   'page.last': '最後のページ',
   'page.newItems': '新着 {n}件',
   'pwa.offline': 'オフライン',
-  'nav.overview': '概要',
   'hero.status': 'Base、Ethereum、BNB を直接読み取り中',
   'sig.trend7': '直近7日と前7日の比較',
   'sig.noTrend': '傾向データなし',
@@ -114,6 +104,14 @@ export const ja: Dict = {
   'ins.others': 'その他',
   'ins.usdc': 'x402 取引額に占める USDC の割合',
   'ins.noData': '集計は利用不可',
+  'nav.overview': '概要',
+  'nav.payments': '決済',
+  'nav.registry': 'レジストリ',
+  'nav.marketplaces': 'マーケットプレイス',
+  'page.overview.lead': '総量と傾向、そして活動が集中する場所。',
+  'page.payments.lead': 'Base 上で facilitator が送信する USDC 決済をリアルタイムで。',
+  'page.registry.lead': 'Base、Ethereum、BNB に登録されるエージェントをリアルタイムで。',
+  'page.marketplaces.lead': 'エージェントと有料サービスが掲載される場所と、各所が公開するデータ。',
   'theme.dark': 'ダーク',
   'theme.light': 'ライト',
 }

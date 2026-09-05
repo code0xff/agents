@@ -58,7 +58,7 @@ export interface RegistryState {
   loading: boolean
 }
 
-export function useRegistry(chains: ChainKey[]) {
+export function useRegistry(chains: readonly ChainKey[]) {
   const qc = useQueryClient()
   const cursors = useRef<Partial<Record<ChainKey, bigint>>>({})
   const [state, setState] = useState<RegistryState>({ events: [], heads: {}, errors: {}, loading: true })

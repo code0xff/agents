@@ -1,5 +1,13 @@
-<!doctype html><html><head><meta charset="utf-8"><script>
-// GitHub Pages SPA fallback: pass the path as a query string and redirect to index.html
-var p=location.pathname.split('/').slice(2).join('/');
-location.replace(location.pathname.split('/').slice(0,2).join('/')+'/?p='+encodeURIComponent(p)+location.hash);
-</script></head><body></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Agent Economy Observatory</title>
+    <script>
+      // Routing is hash based, so any 404 here is a genuinely unknown path.
+      // Send it to the app root and let the router pick the default view.
+      location.replace(location.pathname.split('/').slice(0, 2).join('/') + '/');
+    </script>
+  </head>
+  <body></body>
+</html>

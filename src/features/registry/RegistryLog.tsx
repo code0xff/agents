@@ -6,7 +6,7 @@ import { CHAINS, type ChainKey } from '../../data/chains'
 import { useT, type Translate } from '../../i18n'
 import { short, timeAgo } from '../../lib/format'
 import { useIsMobile } from '../../lib/useMediaQuery'
-import { useRegistry } from './useRegistry'
+import type { RegistryState } from './useRegistry'
 import type { RegistryEvent } from './types'
 
 const ALL: ChainKey[] = ['base', 'ethereum', 'bnb']
@@ -63,11 +63,11 @@ function Row({ e, t }: { e: RegistryEvent; t: Translate }) {
   )
 }
 
-export function RegistryLog() {
+export function RegistryLog({ state }: { state: RegistryState }) {
   const { t } = useT()
   const isMobile = useIsMobile()
   const [chains, setChains] = useState<ChainKey[]>(ALL)
-  const { events, heads, errors, loading } = useRegistry(ALL)
+  const { events, heads, errors, loading } = state
   const shown = events.filter((e) => chains.includes(e.chain))
   const paged = usePagination(shown, isMobile ? 8 : 12)
 

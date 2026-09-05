@@ -1,17 +1,9 @@
 import type { Dict } from './en'
 
 export const zh: Dict = {
-  'header.tagline': '在浏览器中直接读取的公开链上数据',
-  'header.title': 'Agent Economy',
-  'header.titleAccent': 'Observatory',
-  'nav.marketplaces': '市场',
-  'nav.registry': '注册表',
-  'nav.payments': '支付',
   'footer.sources': '来源: base.org, tenderly, publicnode, agenteconomy.to, onchainagentintel.io, facilitators.x402.watch',
   'footer.nobackend': '无后端，无 API 密钥。',
 
-  'common.loading': '加载中',
-  'common.unavailable': '不可用',
   'common.block': '区块',
   'common.scanned': '已扫描区块',
   'common.snapshot': '快照 {time} 前',
@@ -31,7 +23,6 @@ export const zh: Dict = {
   'mp.stat.volume': 'x402 交易额',
   'mp.stat.agents': 'ERC-8004 代理',
   'mp.stat.chains': '{n} 条链',
-  'mp.stat.endpoints': '端点可用的代理',
   'mp.stat.endpointsSub': 'MCP 可达',
   'mp.metric.resources': '资源',
   'mp.metric.agentsIndexed': '已索引代理',
@@ -98,7 +89,6 @@ export const zh: Dict = {
   'page.last': '最后一页',
   'page.newItems': '{n} 条新增',
   'pwa.offline': '离线',
-  'nav.overview': '概览',
   'hero.status': '正在直接读取 Base、Ethereum 与 BNB',
   'sig.trend7': '近 7 天与前 7 天对比',
   'sig.noTrend': '暂无趋势数据',
@@ -114,6 +104,14 @@ export const zh: Dict = {
   'ins.others': '其他',
   'ins.usdc': 'USDC 占 x402 交易额比例',
   'ins.noData': '汇总不可用',
+  'nav.overview': '概览',
+  'nav.payments': '支付',
+  'nav.registry': '注册表',
+  'nav.marketplaces': '市场',
+  'page.overview.lead': '总量、趋势，以及活动集中的位置。',
+  'page.payments.lead': '实时呈现 facilitator 在 Base 上提交的每一笔 USDC 结算。',
+  'page.registry.lead': '实时呈现在 Base、Ethereum 与 BNB 上注册的代理。',
+  'page.marketplaces.lead': '代理与付费服务的登记之处，以及各自公开的数据。',
   'theme.dark': '深色',
   'theme.light': '浅色',
 }

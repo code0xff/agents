@@ -1,17 +1,9 @@
 import type { Dict } from './en'
 
 export const ko: Dict = {
-  'header.tagline': '브라우저에서 직접 읽는 공개 체인 데이터',
-  'header.title': 'Agent Economy',
-  'header.titleAccent': 'Observatory',
-  'nav.marketplaces': '마켓플레이스',
-  'nav.registry': '레지스트리',
-  'nav.payments': '결제',
   'footer.sources': '출처: base.org, tenderly, publicnode, agenteconomy.to, onchainagentintel.io, facilitators.x402.watch',
   'footer.nobackend': '백엔드와 API 키 없음.',
 
-  'common.loading': '불러오는 중',
-  'common.unavailable': '사용 불가',
   'common.block': '블록',
   'common.scanned': '블록 스캔',
   'common.snapshot': '스냅샷 {time} 전',
@@ -31,7 +23,6 @@ export const ko: Dict = {
   'mp.stat.volume': 'x402 거래액',
   'mp.stat.agents': 'ERC-8004 에이전트',
   'mp.stat.chains': '{n}개 체인',
-  'mp.stat.endpoints': '엔드포인트가 살아 있는 에이전트',
   'mp.stat.endpointsSub': 'MCP 응답',
   'mp.metric.resources': '리소스',
   'mp.metric.agentsIndexed': '색인된 에이전트',
@@ -98,7 +89,6 @@ export const ko: Dict = {
   'page.last': '마지막 페이지',
   'page.newItems': '새 항목 {n}건',
   'pwa.offline': '오프라인',
-  'nav.overview': '개요',
   'hero.status': 'Base, Ethereum, BNB를 직접 읽는 중',
   'sig.trend7': '최근 7일 대 이전 7일',
   'sig.noTrend': '추세 데이터 없음',
@@ -114,6 +104,14 @@ export const ko: Dict = {
   'ins.others': '기타',
   'ins.usdc': 'x402 거래액 중 USDC 비중',
   'ins.noData': '집계 사용 불가',
+  'nav.overview': '개요',
+  'nav.payments': '결제',
+  'nav.registry': '레지스트리',
+  'nav.marketplaces': '마켓플레이스',
+  'page.overview.lead': '총량과 추세, 그리고 활동이 몰리는 지점.',
+  'page.payments.lead': 'Base에서 facilitator가 제출하는 USDC 정산을 실시간으로.',
+  'page.registry.lead': 'Base, Ethereum, BNB에 등록되는 에이전트를 실시간으로.',
+  'page.marketplaces.lead': '에이전트와 유료 서비스가 등록되는 곳, 그리고 각각이 공개하는 데이터.',
   'theme.dark': '다크',
   'theme.light': '라이트',
 }
