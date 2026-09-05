@@ -38,7 +38,8 @@ export function AppHeader({ route }: { route: Route }) {
 
   return (
     <header className="sticky top-0 z-40 border-b border-ink-800 bg-ink-950/85 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6">
+      {/* relative so the mobile panel can overlay the page instead of growing the header */}
+      <div className="relative mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6">
         <a href={hrefFor('overview')} className="flex shrink-0 items-center gap-2">
           <Mark />
           <span className="font-mono text-[11px] tracking-[0.2em] text-ink-200 uppercase">Observatory</span>
@@ -75,9 +76,9 @@ export function AppHeader({ route }: { route: Route }) {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden border-t border-ink-800 md:hidden"
+            className="absolute inset-x-0 top-full z-10 overflow-hidden border-b border-ink-800 bg-ink-950 md:hidden"
           >
-            <nav className="flex flex-col px-4 py-2">
+            <nav className="flex flex-col px-4 pt-2 pb-3">
               {ROUTES.map((r) => (
                 <a
                   key={r}

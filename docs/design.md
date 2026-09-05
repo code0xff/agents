@@ -54,9 +54,12 @@ Raw feeds live on their own routes.
 Language is a native `select`: compact at any width, accessible for free, and it opens as the
 platform picker on touch. Theme is a single icon button that swaps a sun and moon glyph.
 
-Below `md` the route tabs and both controls collapse behind a menu button on the right. The panel
-closes on navigation, on Escape, and on a tap outside. Its open state is stored as the route it was
-opened on, so a route change closes it during render rather than through an effect.
+Below `md` the route tabs and both controls collapse behind a menu button on the right. The panel is
+absolutely positioned under the header bar so it overlays the page; laid out in flow it grew the
+sticky header and pushed the content down. Its background is opaque rather than translucent, or the
+page shows through the menu items. It closes on navigation, on Escape, and on a tap outside. Its open
+state is stored as the route it was opened on, so a route change closes it during render rather than
+through an effect.
 
 ## Motion and correctness
 Geometry and visibility are set directly, never only through a transition. A transition that never
