@@ -1,6 +1,8 @@
 # Deployment (GitHub Pages)
 
+- Repository: https://github.com/code0xff/agents (public; Pages requires public on the free plan)
 - Branch: `dev` is the default branch; the deploy workflow runs on every push to `dev`.
+- Live URL: https://code0xff.github.io/agents/
 - Workflow: `.github/workflows/deploy.yml` — builds and publishes to Pages.
 - In the repository settings set Pages → Source to **GitHub Actions**.
 - `base` path: `vite.config.ts` reads `VITE_BASE` (default `/agents/`). CI injects the repository name.
