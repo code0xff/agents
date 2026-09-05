@@ -13,8 +13,9 @@ function Row({ e }: { e: RegistryEvent }) {
   const [open, setOpen] = useState(false)
   return (
     <motion.li
-      initial={{ opacity: 0, x: -12, backgroundColor: 'rgba(255,255,255,0.08)' }}
-      animate={{ opacity: 1, x: 0, backgroundColor: 'rgba(255,255,255,0)' }}
+      initial={{ opacity: 0, x: -12 }}
+      animate={{ opacity: 1, x: 0 }}
+      style={{ animation: 'flash 2.5s ease-out' }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, backgroundColor: { duration: 2.5 } }}
       className="border-b border-ink-800/60 px-5 py-2.5 font-mono text-xs hover:bg-ink-800/30"

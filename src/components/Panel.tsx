@@ -9,7 +9,7 @@ export function Panel({ title, eyebrow, right, children, className = '', delay =
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={`relative overflow-hidden rounded-xl border border-ink-800 bg-ink-900/60 backdrop-blur-md ${className}`}
+      className={`relative overflow-hidden rounded-xl border border-ink-800 bg-panel backdrop-blur-md ${className}`}
     >
       <header className="flex items-center justify-between border-b border-ink-800 px-5 py-3">
         <div>

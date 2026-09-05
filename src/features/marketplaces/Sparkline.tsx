@@ -8,7 +8,7 @@ export function Sparkline({ data, w = 120, h = 28 }: { data: number[]; w?: numbe
   const d = d3.line<number>().x((_, i) => x(i)).y((v) => y(v)).curve(d3.curveMonotoneX)(data) ?? ''
   return (
     <svg width={w} height={h} className="overflow-visible">
-      <motion.path d={d} fill="none" stroke="#cfcfd6" strokeWidth={1.2} initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.6, ease: 'easeOut' }} />
+      <motion.path d={d} fill="none" stroke="var(--ink-200)" strokeWidth={1.2} initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.6, ease: 'easeOut' }} />
     </svg>
   )
 }

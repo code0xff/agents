@@ -4,8 +4,11 @@ import { useEffect } from 'react'
 import { MarketplacesPanel } from './features/marketplaces/MarketplacesPanel'
 import { PaymentsPanel } from './features/payments/PaymentsPanel'
 import { RegistryLog } from './features/registry/RegistryLog'
+import { ThemeToggle } from './components/ThemeToggle'
+import { useTheme } from './lib/theme'
 
 export default function App() {
+  const { theme, toggle } = useTheme()
   useEffect(() => {
     const lenis = new Lenis({ lerp: 0.1 })
     let raf = 0
@@ -30,10 +33,11 @@ export default function App() {
             Agent Economy <span className="text-ink-400">Observatory</span>
           </motion.h1>
         </div>
-        <motion.nav initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="hidden gap-6 font-mono text-[11px] tracking-wider text-ink-500 uppercase md:flex">
-          <a href="#marketplaces" className="hover:text-ink-100">Marketplaces</a>
-          <a href="#registry" className="hover:text-ink-100">Registry</a>
-          <a href="#payments" className="hover:text-ink-100">Payments</a>
+        <motion.nav initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="flex items-center gap-6 font-mono text-[11px] tracking-wider text-ink-500 uppercase">
+          <a href="#marketplaces" className="hidden hover:text-ink-100 md:inline">Marketplaces</a>
+          <a href="#registry" className="hidden hover:text-ink-100 md:inline">Registry</a>
+          <a href="#payments" className="hidden hover:text-ink-100 md:inline">Payments</a>
+          <ThemeToggle theme={theme} onToggle={toggle} />
         </motion.nav>
       </header>
 
