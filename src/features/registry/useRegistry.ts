@@ -9,7 +9,7 @@ const POLL_MS = 15_000
 const MAX_EVENTS = 200
 
 /** Approximate seconds per block, used to date events without spending an RPC call each. */
-const BLOCK_SECONDS: Record<ChainKey, number> = { base: 2, ethereum: 12, bnb: 3, polygon: 2 }
+const BLOCK_SECONDS: Record<ChainKey, number> = { base: 2, bnb: 3, polygon: 2 }
 
 async function fetchRange(chain: ChainKey, from: bigint, to: bigint, head: bigint): Promise<RegistryEvent[]> {
   const client = getClient(chain)

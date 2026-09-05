@@ -6,7 +6,6 @@ Verified 2026-09-05. Evidence in `docs/research/`.
 | Chain | RPC | getLogs range | Use |
 |---|---|---|---|
 | Base (8453) | `https://mainnet.base.org` | 10k | ERC-8004 registration logs, x402 payment block scan (primary) |
-| Ethereum (1) | `https://gateway.tenderly.co/public/mainnet` (fallback `https://rpc.mevblocker.io`) | 10k (tenderly accepts 50k) | ERC-8004 registration logs. drpc replaced after frequent getLogs routing failures |
 | BNB (56) | `https://bsc-rpc.publicnode.com` | 5k | ERC-8004 registration logs |
 | Polygon (137) | `https://polygon-bor-rpc.publicnode.com` (fallback `https://polygon.drpc.org`) | 2k | x402 payment settlements |
 
@@ -42,6 +41,11 @@ Snapshot files: `<name>.json` (latest 300 items + totals, for the browser), `<na
 - `marketplaces.json` — marketplace cards (descriptions are i18n keys)
 - `facilitators.json` — facilitator name/URL/networks/addresses
 - `chains.ts` — chain metadata (name, RPC, explorer)
+
+## Not read
+- Ethereum: 68k agents cumulatively but one registration in six hours, and 522 x402 payments ever.
+- Solana: 29.3% of x402 payments, but no chain-wide filter and a single CORS-open RPC.
+  See `research/solana-payments.md`.
 
 ## Constraints
 - Public RPC range limits as in the table above. Chunking + 15s polling.

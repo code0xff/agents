@@ -1,6 +1,6 @@
-import { base, bsc, mainnet, polygon, type Chain } from 'viem/chains'
+import { base, bsc, polygon, type Chain } from 'viem/chains'
 
-export type ChainKey = 'base' | 'ethereum' | 'bnb' | 'polygon'
+export type ChainKey = 'base' | 'bnb' | 'polygon'
 
 export interface ChainConfig {
   key: ChainKey
@@ -20,11 +20,6 @@ export const CHAINS: Record<ChainKey, ChainConfig> = {
     key: 'base', label: 'Base', short: 'BASE', chain: base,
     rpcs: [env.VITE_RPC_BASE ?? 'https://mainnet.base.org'],
     logRange: 10_000n, explorer: 'https://basescan.org',
-  },
-  ethereum: {
-    key: 'ethereum', label: 'Ethereum', short: 'ETH', chain: mainnet,
-    rpcs: [env.VITE_RPC_ETHEREUM ?? 'https://gateway.tenderly.co/public/mainnet', 'https://rpc.mevblocker.io'],
-    logRange: 10_000n, explorer: 'https://etherscan.io',
   },
   bnb: {
     key: 'bnb', label: 'BNB Chain', short: 'BNB', chain: bsc,

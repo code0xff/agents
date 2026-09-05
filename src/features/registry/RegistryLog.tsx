@@ -10,7 +10,11 @@ import type { RegistryState } from './useRegistry'
 import { AgentModal } from './AgentModal'
 import type { RegistryEvent } from './types'
 
-const ALL: ChainKey[] = ['base', 'ethereum', 'bnb']
+/**
+ * Ethereum was dropped: it holds 68k agents cumulatively but produced one registration in six
+ * hours, so the panel was almost always empty there. Polygon carries none at all.
+ */
+const ALL: ChainKey[] = ['base', 'bnb']
 
 function fallbackLabel(e: RegistryEvent, t: Translate) {
   if (!e.uri) return t('reg.noUri')

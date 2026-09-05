@@ -16,7 +16,7 @@ import { useMediaQuery } from './lib/useMediaQuery'
 import { usePwa } from './lib/usePwa'
 import { useHashRoute, type Route } from './router'
 
-const REGISTRY_CHAINS: readonly ChainKey[] = ['base', 'ethereum', 'bnb']
+const REGISTRY_CHAINS: readonly ChainKey[] = ['base', 'bnb']
 
 export default function App() {
   const { t } = useT()
