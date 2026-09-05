@@ -64,5 +64,9 @@ runs leaves the element at its initial value, so animating in from `opacity: 0` 
 a blank panel. Animate changes, but make the resting state correct without them.
 
 ## Component rules
+Headline facts that sit side by side get their own outline. Run together as plain text they read as
+one sentence and the reader cannot tell where each fact ends; the `Fact` chip in `Concentration`
+pairs a muted uppercase label with an emphasised value inside a bordered box.
+
 - `rounded-lg`/`rounded-xl`, 1px borders, no shadows (blurred panel background instead of glow)
 - Dense data uses mono font at small sizes (`text-xs`)
