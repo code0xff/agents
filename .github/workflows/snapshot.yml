@@ -8,9 +8,14 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: snapshot
+  cancel-in-progress: false
+
 jobs:
   snapshot:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,5 +27,7 @@ jobs:
           git config user.name "snapshot-bot"
           git config user.email "snapshot-bot@users.noreply.github.com"
           git add public/snapshots data/snapshot-state
-          git diff --cached --quiet || git commit -m "chore: refresh data snapshots"
+          git diff --cached --quiet && echo "no changes" && exit 0
+          git commit -m "chore: refresh data snapshots"
+          git pull --rebase origin dev
           git push
