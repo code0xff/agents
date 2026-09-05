@@ -104,11 +104,16 @@ export function PaymentGraph({ payments, counts, t, compact = false }: { payment
     nodeAll.select('title').remove()
     nodeAll.append('title').text((d) => `${d.kind} ${d.id}`)
 
-    // Keep every node inside the canvas; labels sit above a node, so the top needs more room.
+    // Keep every node inside the canvas. Labels are centred on the node and sit above it,
+    // so a labelled node needs half its label width horizontally and extra room on top.
+    const labelled = new Set<string>()
+    nodeAll.select<SVGTextElement>('text').each(function (d) { if (this.textContent) labelled.add(d.id) })
     const clamp = (d: Node) => {
-      const pad = r(d) + 4
-      d.x = Math.max(pad, Math.min(width - pad, d.x ?? width / 2))
-      d.y = Math.max(pad + 12, Math.min(height - pad, d.y ?? height / 2))
+      const rad = r(d)
+      const half = labelled.has(d.id) ? Math.max(rad, (d.label.length * 5.4) / 2) : rad
+      const padX = Math.min(half + 4, width / 2)
+      d.x = Math.max(padX, Math.min(width - padX, d.x ?? width / 2))
+      d.y = Math.max(rad + 16, Math.min(height - rad - 4, d.y ?? height / 2))
     }
     s.on('tick', () => {
       for (const n of N) clamp(n)
