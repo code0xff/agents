@@ -35,6 +35,16 @@ CJK locales fall back to the system sans stack; keep line-height generous.
 - Numbers: count-up (motion `animate`)
 - Never write large amounts of custom keyframes. Libraries first.
 
+## Layout and hierarchy
+A sticky header carries the mark, section links, and the locale and theme controls on the right.
+Installation is left to the browser, so no install button is shown.
+
+Below it the page reads top-down as: hero → signals → concentration → live panels → directory.
+The point of the top half is interpretation, not raw totals: each `Signal` pairs a headline number
+with its 7-day momentum and the shape of the series, and the `Concentration` panel answers where the
+activity actually sits (which facilitator settles most payments, which chain holds most agents).
+Raw feeds come after that.
+
 ## Component rules
 - `rounded-lg`/`rounded-xl`, 1px borders, no shadows (blurred panel background instead of glow)
 - Dense data uses mono font at small sizes (`text-xs`)

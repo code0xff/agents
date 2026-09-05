@@ -46,6 +46,8 @@ export function PaymentGraph({ payments, counts, t, compact = false }: { payment
       n.weight++; n.label = label; keep.add(id); return n
     }
     const upL = (a: string, b: string) => { const id = `${a}>${b}`; let l = links.get(id); if (!l) { l = { id, source: a, target: b, weight: 0 }; links.set(id, l) } l.weight++; keepL.add(id) }
+    // d3-force requires stable, mutable node objects across ticks, so the maps below are
+    // updated in place rather than rebuilt. `recent` itself is only ever read.
     for (const p of recent) {
       const fl = facilitatorLabel(p, counts, t) ?? short(p.facilitator)
       up(p.facilitator, 'facilitator', fl); up(p.payer, 'payer', short(p.payer)); up(p.payTo, 'payTo', short(p.payTo))

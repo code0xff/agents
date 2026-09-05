@@ -36,6 +36,15 @@ export interface PaymentsState {
   senderCounts: Record<string, number>
 }
 
+/** Base produces a block every 2s, so scanned blocks convert directly to elapsed time. */
+export const BASE_BLOCK_SECONDS = 2
+
+export function paymentsPerMinute(s: PaymentsState): number | null {
+  if (!s.blocksScanned || s.payments.length === 0) return null
+  const minutes = (s.blocksScanned * BASE_BLOCK_SECONDS) / 60
+  return minutes > 0 ? s.payments.length / minutes : null
+}
+
 const POLL_MS = 10_000
 const BACKFILL = 40n
 const MAX = 300

@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 export interface AgentEconomy {
   updatedAt: string
-  x402: { totalTxs: number; totalVolume: number; facilitatorsTracked: number; daily: { day: string; txs: number }[]; protocols: { name: string; share: number }[]; chains: { name: string; txs: number }[] }
+  x402: { totalTxs: number; totalVolume: number; facilitatorsTracked: number; daily: { day: string; txs: number }[]; protocols: { name: string; share: number }[]; chains: { name: string; txs: number }[]; tokenSplit?: { usdcSharePct: number; windowDays: number } }
   erc8004Registry: { totalAgents: number; chainsTracked: number; chains: { name: string; agents: number }[]; daily: { day: string; agents: number }[] }
   virtualsAcp: { totalMemos: number; daily: { day: string; memos: number }[] }
   olas: { totalTxs: number; weekly: { week: string; txs: number }[] }

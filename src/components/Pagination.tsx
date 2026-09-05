@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useT } from '../i18n'
 
 export interface Paged<T> {
+  /** Items added since the reader left page one; 0 while on page one. */
+  addedSinceLeaving: number
   page: number
   totalPages: number
   items: T[]
@@ -18,11 +20,20 @@ export function usePagination<T>(all: T[], pageSize: number): Paged<T> {
   const [page, setPageRaw] = useState(1)
   const total = all.length
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
-  useEffect(() => { if (page > totalPages) setPageRaw(totalPages) }, [page, totalPages])
+  // Derived rather than stored: a shrinking list clamps the page without an extra render.
   const current = Math.min(page, totalPages)
-  const setPage = useCallback((p: number) => setPageRaw(Math.min(Math.max(1, p), totalPages)), [totalPages])
+  // Recorded when the reader navigates away from page one, so a live list that keeps
+  // growing underneath them can be explained without watching it from an effect.
+  const [leftPageOneAt, setLeftPageOneAt] = useState<number | null>(null)
+  const setPage = useCallback((p: number) => {
+    const next = Math.min(Math.max(1, p), totalPages)
+    const size = all.length
+    setLeftPageOneAt((prev) => (next === 1 ? null : (prev ?? size)))
+    setPageRaw(next)
+  }, [totalPages, all.length])
   const items = useMemo(() => all.slice((current - 1) * pageSize, current * pageSize), [all, current, pageSize])
   return {
+    addedSinceLeaving: current === 1 || leftPageOneAt === null ? 0 : Math.max(0, total - leftPageOneAt),
     page: current, totalPages, items, total,
     from: total === 0 ? 0 : (current - 1) * pageSize + 1,
     to: Math.min(current * pageSize, total),

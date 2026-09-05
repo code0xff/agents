@@ -1,10 +1,9 @@
 import { motion } from 'motion/react'
 import { Badge, Panel } from '../../components/Panel'
-import { Stat } from '../../components/Stat'
 import marketplaces from '../../data/marketplaces.json'
 import { useT, type Translate } from '../../i18n'
 import type { Key } from '../../i18n/en'
-import { compact, timeAgo, usd } from '../../lib/format'
+import { compact, timeAgo } from '../../lib/format'
 import { Sparkline } from './Sparkline'
 import { useAgentEconomy, useOcaiStats, useSnapshot } from './useAggregates'
 
@@ -82,12 +81,6 @@ export function MarketplacesPanel() {
   return (
     <Panel eyebrow={t('mp.eyebrow')} title={t('mp.title')}
       right={<span className="font-mono text-[10px] text-ink-500">{status}</span>}>
-      <div className="grid grid-cols-2 divide-x divide-y divide-ink-800 border-b border-ink-800 md:grid-cols-4 md:divide-y-0">
-        <Stat label={t('mp.stat.payments')} value={d?.x402.totalTxs} format={(n) => compact(n, tag)} sub={d ? t('mp.stat.facilitators', { n: d.x402.facilitatorsTracked }) : undefined} />
-        <Stat label={t('mp.stat.volume')} value={d?.x402.totalVolume} format={(n) => usd(n, 0, tag)} />
-        <Stat label={t('mp.stat.agents')} value={d?.erc8004Registry.totalAgents} format={(n) => compact(n, tag)} sub={d ? t('mp.stat.chains', { n: d.erc8004Registry.chainsTracked }) : undefined} />
-        <Stat label={t('mp.stat.endpoints')} value={ocai.data?.mcp_agents} sub={t('mp.stat.endpointsSub')} />
-      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
         {marketplaces.map((m, i) => <Card key={m.id} m={m} i={i} ae={d} ocai={ocai.data} t={t} tag={tag} />)}
       </div>

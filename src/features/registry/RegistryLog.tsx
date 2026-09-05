@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Badge, LiveDot, Panel } from '../../components/Panel'
 import { Pagination, usePagination } from '../../components/Pagination'
 import { CHAINS, type ChainKey } from '../../data/chains'
@@ -71,13 +71,8 @@ export function RegistryLog() {
   const shown = events.filter((e) => chains.includes(e.chain))
   const paged = usePagination(shown, isMobile ? 8 : 12)
 
-  // While the reader is off page 1, count what arrived so the shifting list is explainable.
-  const [anchor, setAnchor] = useState<number | null>(null)
-  useEffect(() => {
-    if (paged.page === 1) setAnchor(null)
-    else setAnchor((a) => (a === null ? paged.total : a))
-  }, [paged.page, paged.total])
-  const newCount = anchor === null ? 0 : Math.max(0, paged.total - anchor)
+  // While the reader is off page 1, show what arrived so the shifting list is explainable.
+  const newCount = paged.addedSinceLeaving
 
   return (
     <Panel eyebrow={t('reg.eyebrow')} title={t('reg.title')} delay={0.1}

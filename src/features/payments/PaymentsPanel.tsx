@@ -7,12 +7,12 @@ import { useT } from '../../i18n'
 import { short, timeAgo, usd } from '../../lib/format'
 import { useIsMobile } from '../../lib/useMediaQuery'
 import { PaymentGraph } from './PaymentGraph'
-import { facilitatorLabel, usePayments } from './usePayments'
+import { facilitatorLabel, type PaymentsState } from './usePayments'
 
-export function PaymentsPanel() {
+export function PaymentsPanel({ state }: { state: PaymentsState }) {
   const { t, tag } = useT()
   const isMobile = useIsMobile()
-  const { payments, head, blocksScanned, error, senderCounts } = usePayments()
+  const { payments, head, blocksScanned, error, senderCounts } = state
   const stats = useMemo(() => ({
     vol: payments.reduce((a, p) => a + p.usdc, 0),
     facs: new Set(payments.map((p) => p.facilitator)).size,
