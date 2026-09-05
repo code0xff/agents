@@ -33,6 +33,8 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // GitHub Pages serves every project from one origin, so cache names must be
+        // project-scoped or they collide with the account's other Pages apps.
         // Snapshots are handled at runtime so they refresh without a service worker update.
         globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
         globIgnores: ['**/snapshots/**', '**/404.html'],
@@ -46,7 +48,7 @@ export default defineConfig({
             urlPattern: ({ url }) => url.pathname.includes('/snapshots/'),
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'snapshots',
+              cacheName: 'aeo-snapshots',
               networkTimeoutSeconds: 6,
               expiration: { maxEntries: 12, maxAgeSeconds: 60 * 60 * 24 * 7 },
               cacheableResponse: { statuses: [0, 200] },
@@ -58,7 +60,7 @@ export default defineConfig({
               url.hostname === 'dashboard.agenteconomy.to' || url.hostname === 'api.onchainagentintel.io',
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'aggregates',
+              cacheName: 'aeo-aggregates',
               networkTimeoutSeconds: 6,
               expiration: { maxEntries: 16, maxAgeSeconds: 60 * 60 * 6 },
               cacheableResponse: { statuses: [0, 200] },
@@ -67,13 +69,13 @@ export default defineConfig({
           {
             urlPattern: ({ url }) => url.hostname === 'fonts.googleapis.com',
             handler: 'StaleWhileRevalidate',
-            options: { cacheName: 'google-fonts-styles' },
+            options: { cacheName: 'aeo-google-fonts-styles' },
           },
           {
             urlPattern: ({ url }) => url.hostname === 'fonts.gstatic.com',
             handler: 'CacheFirst',
             options: {
-              cacheName: 'google-fonts-files',
+              cacheName: 'aeo-google-fonts-files',
               expiration: { maxEntries: 24, maxAgeSeconds: 60 * 60 * 24 * 365 },
               cacheableResponse: { statuses: [0, 200] },
             },

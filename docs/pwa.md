@@ -19,6 +19,10 @@ header, and the online/offline state, which drives the Offline badge.
 | Google Fonts CSS | StaleWhileRevalidate | Rarely changes |
 | Google Fonts files | CacheFirst, 1y | Immutable |
 
+Cache names are prefixed `aeo-`. Every GitHub Pages project of an account is served from the same
+origin, so unprefixed names would collide with the account's other apps. The same reason is why the
+`localStorage` keys are `aeo-theme` and `aeo-locale`.
+
 RPC calls are POST requests, which Workbox does not cache. Live panels therefore show their empty or
 error state when offline, while aggregates and snapshots still render.
 
