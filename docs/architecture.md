@@ -9,13 +9,16 @@ src/
   index.css             # Tailwind + @theme 토큰
   components/           # 공용 UI (Panel, Badge, AnimatedNumber ...)
   lib/                  # chains.ts(viem 클라이언트), format.ts, 공통 fetch 유틸
-  data/                 # 정적 JSON (마켓플레이스 목록, 컨트랙트 주소 등)
+  data/                 # 정적 데이터: marketplaces.json, facilitators.json, chains.ts
   features/
     marketplaces/       # 기능 1
     registry/           # 기능 2
     payments/           # 기능 3
 docs/                   # 문서
 public/404.html         # GH Pages SPA fallback
+public/snapshots/       # CI가 생성하는 스냅샷 JSON (브라우저에서 fetch)
+data/snapshot-state/    # 스냅샷 diff용 상태 (배포 제외)
+scripts/snapshot.mjs    # 스냅샷 수집기
 ```
 
 ## 데이터 흐름

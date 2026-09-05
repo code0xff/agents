@@ -1,0 +1,26 @@
+name: Refresh data snapshots
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/snapshot.mjs
+      - name: Commit snapshots
+        run: |
+          git config user.name "snapshot-bot"
+          git config user.email "snapshot-bot@users.noreply.github.com"
+          git add public/snapshots data/snapshot-state
+          git diff --cached --quiet || git commit -m "chore: refresh data snapshots"
+          git push

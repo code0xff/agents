@@ -1,41 +1,51 @@
-import { motion } from 'motion/react'
-
-const sections = [
-  { id: 'marketplaces', title: 'Marketplaces', desc: 'Agent marketplace directory' },
-  { id: 'registry', title: 'ERC-8004 Registry', desc: 'Live agent registration log' },
-  { id: 'payments', title: 'x402 Payments', desc: 'Facilitator payment flow graph' },
-]
+import Lenis from 'lenis'
+import { motion, useScroll, useTransform } from 'motion/react'
+import { useEffect } from 'react'
+import { MarketplacesPanel } from './features/marketplaces/MarketplacesPanel'
+import { PaymentsPanel } from './features/payments/PaymentsPanel'
+import { RegistryLog } from './features/registry/RegistryLog'
 
 export default function App() {
+  useEffect(() => {
+    const lenis = new Lenis({ lerp: 0.1 })
+    let raf = 0
+    const loop = (t: number) => { lenis.raf(t); raf = requestAnimationFrame(loop) }
+    raf = requestAnimationFrame(loop)
+    return () => { cancelAnimationFrame(raf); lenis.destroy() }
+  }, [])
+  const { scrollY } = useScroll()
+  const gridY = useTransform(scrollY, [0, 1000], [0, -120])
+
   return (
-    <div className="bg-grid relative min-h-full">
-      <header className="border-b border-ink-800 px-8 py-6">
-        <motion.h1
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="font-mono text-sm tracking-[0.3em] text-ink-300 uppercase"
-        >
-          Agent Economy Observatory
-        </motion.h1>
+    <div className="relative min-h-full">
+      <motion.div style={{ y: gridY }} className="bg-grid pointer-events-none fixed inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_75%)]" />
+      <div className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-px animate-scan bg-gradient-to-r from-transparent via-ink-300/40 to-transparent" />
+
+      <header className="mx-auto flex max-w-7xl items-end justify-between px-6 pt-14 pb-10">
+        <div>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} className="font-mono text-[10px] tracking-[0.4em] text-ink-500 uppercase">
+            backend-less · live from public rpc
+          </motion.p>
+          <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} className="mt-2 text-3xl font-light tracking-tight text-ink-50 md:text-5xl">
+            Agent Economy <span className="text-ink-400">Observatory</span>
+          </motion.h1>
+        </div>
+        <motion.nav initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="hidden gap-6 font-mono text-[11px] tracking-wider text-ink-500 uppercase md:flex">
+          <a href="#marketplaces" className="hover:text-ink-100">Marketplaces</a>
+          <a href="#registry" className="hover:text-ink-100">Registry</a>
+          <a href="#payments" className="hover:text-ink-100">Payments</a>
+        </motion.nav>
       </header>
 
-      <main className="grid gap-6 p-8 md:grid-cols-3">
-        {sections.map((s, i) => (
-          <motion.section
-            key={s.id}
-            id={s.id}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 * i, duration: 0.5 }}
-            className="rounded-lg border border-ink-800 bg-ink-900/60 p-6 backdrop-blur"
-          >
-            <h2 className="text-lg font-medium text-ink-50">{s.title}</h2>
-            <p className="mt-2 text-sm text-ink-400">{s.desc}</p>
-            <p className="mt-6 font-mono text-xs text-ink-500">// TODO: see docs/</p>
-          </motion.section>
-        ))}
+      <main className="mx-auto flex max-w-7xl flex-col gap-6 px-6 pb-24">
+        <div id="marketplaces"><MarketplacesPanel /></div>
+        <div id="payments"><PaymentsPanel /></div>
+        <div id="registry"><RegistryLog /></div>
       </main>
+
+      <footer className="border-t border-ink-800 px-6 py-6 text-center font-mono text-[10px] tracking-wider text-ink-600">
+        data: base.org · drpc · publicnode · agenteconomy.to · onchainagentintel.io · facilitators.x402.watch — no backend, no keys
+      </footer>
     </div>
   )
 }

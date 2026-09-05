@@ -31,7 +31,7 @@
 | 체인 | RPC | getLogs 범위 | CORS | 비고 |
 |---|---|---|---|---|
 | Base | `https://mainnet.base.org` | 10,000 블록 OK (78 logs, 350ms) | `*` | **주력**. publicnode/1rpc는 getLogs 거부 |
-| Ethereum | `https://eth.drpc.org` | 5,000 OK | `*` | publicnode/ankr/flashbots/merkle/cloudflare 전부 거부 |
+| Ethereum | `https://gateway.tenderly.co/public/mainnet`, `https://rpc.mevblocker.io` | 10,000 OK (tenderly 50k OK, mevblocker 10k 제한) | `*` | drpc는 "Can't route" 간헐 실패로 제외. publicnode(아카이브 토큰 요구)/ankr(인증)/1rpc(50블록)/blastapi/zan/blockrazor 거부 |
 | BNB | `https://bsc-rpc.publicnode.com` | 5,000 OK (27 logs) | 미확인(다음 단계) | binance dataseed는 범위 초과 거부. drpc는 429 |
 | Polygon | `https://polygon-bor-rpc.publicnode.com` | 1,000 OK | 미확인 | polygon-rpc.com 401 |
 | Arbitrum | `https://arb1.arbitrum.io/rpc` | 5,000 OK | 미확인 | 활동 적음 |
@@ -62,5 +62,5 @@
 4. 체인별 신규 에이전트 상세(이름/스킬)는 agentscan 스냅샷으로 보강 (CI, `docs/research/marketplaces.md` 참고).
 
 ## 미해결
-- BNB/Polygon RPC 브라우저 CORS 실측 (구현 시 첫 단계).
+- BNB publicnode는 구현 시 브라우저에서 정상 동작 확인(2026-09-05). Polygon 미구현.
 - `Registered`에 URI가 비어 있고 나중에 `URIUpdated`로 채워지는 케이스 → 두 이벤트 모두 구독해 병합.

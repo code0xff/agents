@@ -14,3 +14,9 @@ D3 force graph. facilitator 중앙 노드, 결제 발생 시 엣지 따라 파�
 
 ## 리서치
 `docs/research/payments.md` (작성 전) — facilitator 목록/주소, 온체인 식별 방법, 공개 API 존재 여부
+
+## 구현 (2026-09-05)
+- `usePayments.ts`: Base 최신 40블록 백필 후 10s 폴링, 블록 full-tx에서 USDC EIP-3009 호출 디코드. facilitator 라벨은 `facilitators.json`, 미라벨은 3건 이상이면 `Unlabeled xxxx`.
+- `PaymentGraph.tsx`: D3 force, 최근 120건 유지, 결제마다 payer→facilitator→payTo 파티클 + 링 펄스. 드래그 가능.
+- `PaymentsPanel.tsx`: 윈도우 통계, top senders, 최근 목록.
+- 미적용: Bazaar payTo 매핑(`public/snapshots/bazaar-cdp.payto.json`)으로 수취 노드 이름 표시 — 다음 단계.

@@ -20,3 +20,7 @@
 
 ## 리서치
 `docs/research/marketplaces.md` (작성 전)
+
+## 구현 (2026-09-05)
+- `src/features/marketplaces/MarketplacesPanel.tsx`: 정적 카드 + 상단 집계(agenteconomy, OCAI) + 스냅샷 카드(리소스 수, 24h 신규, 최근 추가 3건) + 스파크라인.
+- 훅: `useAggregates.ts` (`useAgentEconomy`, `useOcaiStats`, `useSnapshot`).

@@ -13,3 +13,8 @@
 
 ## 리서치
 `docs/research/registry.md` (작성 전) — 컨트랙트 주소, ABI, 이벤트 시그니처, 배포 체인 확정
+
+## 구현 (2026-09-05)
+- `useRegistry.ts`: 체인별 초기 범위 getLogs(Registered + URIUpdated) → 15s 폴링. `data:` URI 인라인 파싱.
+- `RegistryLog.tsx`: 체인 토글, 새 항목 슬라이드-인 + 배경 플래시, 클릭 시 설명 펼침.
+- 이더리움은 등록 빈도가 낮아 10k 블록(~33h) 내 소수(28건/20k 기준).

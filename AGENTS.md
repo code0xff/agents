@@ -36,7 +36,9 @@ Vite 8 · React 19 · TypeScript · Tailwind v4 · motion · GSAP · Lenis · D3
 | `docs/features/marketplaces.md` | 기능 1: 마켓플레이스 디렉토리 + 추가 데이터 수집 |
 | `docs/features/registry.md` | 기능 2: ERC-8004 에이전트 등록 이벤트 로그 |
 | `docs/features/payments.md` | 기능 3: Facilitator 기준 x402 결제 흐름 그래프 |
+| `scripts/snapshot.mjs` | CI 스냅샷 수집기 (CORS 차단 소스 → `public/snapshots/`) |
 | `docs/research/` | 기능별 사전 리서치 결과 (구현 전 필수 작성). registry / payments / marketplaces 완료 |
+| `docs/features/*.md` 하단 "구현" 절 | 각 기능의 현재 구현 상태와 다음 단계 |
 
 ## 명령
 
