@@ -6,7 +6,15 @@
 Icons live in `public/`: `favicon.svg` plus 192/512 PNGs and maskable variants, generated from the SVG
 by the snippet in `scripts/` history (re-run with `sharp` if the mark changes).
 
-`registerType: 'autoUpdate'` means a new deploy replaces the old service worker without a prompt.
+`registerType: 'autoUpdate'` means a new deploy replaces the old service worker without a prompt, and
+the page reloads once it takes control.
+
+Registration is done by `src/lib/registerPwa.ts` rather than the script vite-plugin-pwa injects
+(`injectRegister: null`). The injected script only calls `register()`: it never asks an existing
+registration to look for a new build, so a tab left open, or a returning visitor served the precached
+shell, kept running the deploy it started with. This is what made a shipped fix look unshipped. The
+module registers through `virtual:pwa-register`, which reloads when the new worker takes control, and
+re-checks hourly and whenever the tab becomes visible again.
 `usePwa()` exposes the deferred `beforeinstallprompt` event, which drives the Install button in the
 header, and the online/offline state, which drives the Offline badge.
 

@@ -13,6 +13,9 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
+      // Registered from src/lib/registerPwa.ts so a new deploy can also be picked up by an
+      // already-open tab; the injected script only registers and never re-checks.
+      injectRegister: null,
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Agent Economy Observatory',
