@@ -32,6 +32,7 @@ export function PaymentGraph({ payments, counts, t, compact = false }: {
   const linksRef = useRef<Map<string, Link>>(new Map())
   const lastKey = useRef<string | null>(null)
   const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null)
+  const shapeRef = useRef('')
   const userMovedAt = useRef(0)
   const compactRef = useRef(compact)
   // Touch has to be claimed explicitly. Filtering to two fingers does not work: d3-zoom
@@ -145,20 +146,32 @@ export function PaymentGraph({ payments, counts, t, compact = false }: {
     const N = [...nodes.values()], L = [...links.values()]
     if (!sim.current) {
       sim.current = d3.forceSimulation<Node, Link>()
-        .force('charge', d3.forceManyBody<Node>().strength((d) => d.kind === 'facilitator' ? -520 : -190).distanceMax(560))
-        .force('collide', d3.forceCollide<Node>().radius((d) => r(d) + 10))
-        .alphaDecay(0.02)
-        .velocityDecay(0.35)
+        // Repulsion is deliberately mild and the pull to centre firm. Strong repulsion drove
+        // every node onto the boundary, so the cluster took the shape of whatever bound it
+        // hit instead of settling into one of its own.
+        .force('charge', d3.forceManyBody<Node>().strength((d) => d.kind === 'facilitator' ? -400 : -140).distanceMax(500))
+        .force('collide', d3.forceCollide<Node>().radius((d) => r(d) + 12))
+        .alphaDecay(0.025)
+        .velocityDecay(0.42)
     }
     const s = sim.current
     s.nodes(N)
     s.force('link', d3.forceLink<Node, Link>(L).id((d) => d.id)
-      .distance((l) => ((l.source as Node).kind === 'facilitator' || (l.target as Node).kind === 'facilitator') ? 150 : 90)
-      .strength(0.18))
-    s.force('center', d3.forceCenter(W / 2, H / 2))
-    s.force('x', d3.forceX(W / 2).strength(0.015))
-    s.force('y', d3.forceY(H / 2).strength(0.02))
-    s.alpha(0.7).restart()
+      .distance((l) => ((l.source as Node).kind === 'facilitator' || (l.target as Node).kind === 'facilitator') ? 140 : 85)
+      .strength(0.16))
+    // forceCenter shifts every node each tick to keep the centroid fixed, which fights the
+    // radial pull and makes the whole cluster slide. The x/y forces alone hold the centre.
+    s.force('center', null)
+    s.force('x', d3.forceX(W / 2).strength(0.03))
+    s.force('y', d3.forceY(H / 2).strength(0.042))
+
+    // Reheat only when the cast actually changed. Re-running the layout on every poll made
+    // the graph rearrange under the reader, including right after they panned.
+    const shape = N.map((n) => n.id).join('|')
+    const changed = shape !== shapeRef.current
+    shapeRef.current = shape
+    if (changed) s.alpha(Math.min(0.45, 0.12 + N.length * 0.004)).restart()
+    else if (s.alpha() < s.alphaMin()) s.alpha(0.02).restart()
 
     const scene = svg.select<SVGGElement>('g.scene')
 

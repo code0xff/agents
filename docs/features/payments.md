@@ -20,8 +20,9 @@ the target node pulses. A recent-payments list sits beside the graph.
   from full-transaction blocks. Facilitator labels from `facilitators.json`; unlabeled senders with
   3+ payments become `Unlabeled xxxx` nodes.
 - `PaymentGraph.tsx`: D3 force on a canvas 1.9x the panel, viewed through a camera. Nodes are bounded
-  to an ellipse rather than the canvas rectangle, so the cluster never fills the corners and stops
-  reading as a box, and the SVG carries an edge mask (`.map-fade`) so the view dissolves at the panel
+  to an ellipse rather than the canvas rectangle, and the forces are tuned so the cluster settles well
+  inside that bound (max normalised radius around 0.8, nothing resting on it). A bound only shapes the
+  layout when the layout is pressed against it, which is what made the graph look like a box, and the SVG carries an edge mask (`.map-fade`) so the view dissolves at the panel
   boundary instead of being cut by a straight line. The layout is
   allowed to spread instead of being packed into the visible rectangle; the camera eases toward the
   centroid of the newest settlements and yields to the reader for 9s after any pan, zoom or drag.
@@ -35,6 +36,8 @@ the target node pulses. A recent-payments list sits beside the graph.
   lets the browser steal the gesture the moment it moves vertically. `touchable` is forced on, because
   d3 otherwise decides whether to bind touch handlers from a capability sniff at call time.
   Particle plus ring pulse per payment, draggable nodes.
+  The simulation is reheated only when the set of nodes actually changes. Reheating on every poll
+  rearranged the graph under the reader, including immediately after they panned.
 - `PaymentsPanel.tsx`: window stats, top senders, recent list.
 - Not yet applied: Bazaar payTo map (`public/snapshots/bazaar-cdp.payto.json`) to name payTo nodes.
   Measured 2026-09-05: it resolves about 30% of live settlements to a service host, which would
