@@ -7,7 +7,7 @@ import { facilitatorLabel, type Payment } from './usePayments'
 type Kind = 'facilitator' | 'payer' | 'payTo'
 /** Keyed by role as well as address: the same address can act in several roles at once,
  *  and a single shared node would flip its colour, size and label between them. */
-interface Node extends d3.SimulationNodeDatum { id: string; addr: string; chain: string; kind: Kind; label: string; weight: number }
+interface Node extends d3.SimulationNodeDatum { id: string; addr: string; chain: string; kind: Kind; label: string; operator?: string | null; weight: number }
 /** Chain is part of the identity: the same address on two chains is two actors. */
 const nodeId = (chain: string, kind: Kind, addr: string) => `${chain}:${kind}:${addr}`
 interface Link extends d3.SimulationLinkDatum<Node> { id: string; source: string | Node; target: string | Node; weight: number }
@@ -112,19 +112,18 @@ export function PaymentGraph({ payments, compact = false }: { payments: Payment[
 
     const nodes = nodesRef.current, links = linksRef.current
     const keep = new Set<string>(), keepL = new Set<string>()
-    const up = (chain: string, kind: Kind, addr: string, label: string) => {
+    const up = (chain: string, kind: Kind, addr: string, label: string, operator?: string | null) => {
       const id = nodeId(chain, kind, addr)
       let n = nodes.get(id)
       if (!n) { n = { id, addr, chain, kind, label, weight: 0, x: W / 2 + (Math.random() - 0.5) * 160, y: H / 2 + (Math.random() - 0.5) * 160 }; nodes.set(id, n) }
-      n.label = label; keep.add(id); return n
+      n.label = label; n.operator = operator ?? n.operator; keep.add(id); return n
     }
     const upL = (a: string, b: string) => { const id = `${a}>${b}`; if (!links.has(id)) links.set(id, { id, source: a, target: b, weight: 0 }); keepL.add(id) }
 
     // d3-force requires stable, mutable node objects across ticks, so the maps below are
     // updated in place rather than rebuilt. `recent` itself is only ever read.
     for (const p of recent) {
-      const fl = facilitatorLabel(p)
-      up(p.chain, 'facilitator', p.facilitator, fl)
+      up(p.chain, 'facilitator', p.facilitator, facilitatorLabel(p), p.facilitatorName)
       up(p.chain, 'payer', p.payer, short(p.payer))
       up(p.chain, 'payTo', p.payTo, short(p.payTo))
       upL(nodeId(p.chain, 'payer', p.payer), nodeId(p.chain, 'facilitator', p.facilitator))
@@ -202,7 +201,7 @@ export function PaymentGraph({ payments, compact = false }: { payments: Payment[
       .on('drag', (ev, d) => { d.fx = ev.x; d.fy = ev.y })
       .on('end', (ev, d) => { if (!ev.active) s.alphaTarget(0); d.fx = null; d.fy = null }))
     nodeAll.select('title').remove()
-    nodeAll.append('title').text((d) => `${d.chain} ${d.kind} ${d.addr}`)
+    nodeAll.append('title').text((d) => `${d.chain} ${d.kind} ${d.addr}${d.operator ? ` — ${d.operator}` : ''}`)
 
     // Bounded to an ellipse rather than the canvas rectangle. A rectangular bound lets the
     // layout fill the corners, which reads as a box; an elliptical one keeps the cluster

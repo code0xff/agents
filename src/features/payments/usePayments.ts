@@ -188,8 +188,8 @@ export function paymentsPerMinute(s: PaymentsState): number | null {
 }
 
 /**
- * A facilitator's name when a public directory lists one, otherwise the address itself.
- * Labelling every unknown sender "Unnamed" repeated a word on every row and said nothing;
- * the address alone already shows that no name was found.
+ * Always the address. One operator runs many addresses, so printing its name on every row
+ * repeats a word that distinguishes nothing while hiding the one thing that does. The
+ * operator name is still carried on the payment and shown on hover.
  */
-export const facilitatorLabel = (p: Payment) => p.facilitatorName ?? short(p.facilitator)
+export const facilitatorLabel = (p: Payment) => short(p.facilitator)

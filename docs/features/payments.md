@@ -67,7 +67,13 @@ Detection is exact: the facilitator is `tx.from` on the USDC call. Naming is the
 151 Base blocks on 2026-09-05, 209 settlements came from 28 distinct senders and **none** matched the
 58 Base addresses in `facilitators.json`. The public directory (facilitators.x402.watch) does not list
 them either, and BaseScan has no name tag for the busiest of them. Operators appear to rotate relayer
-addresses, and the public lists still carry addresses first seen in late 2025. Unknown senders are shown as their address, with no filler word. Labelling each one "Unnamed"
+addresses, and the public lists still carry addresses first seen in late 2025. Facilitators are always labelled by address. One operator runs many addresses, so printing its name
+on every row repeated a word that distinguished nothing while hiding the one thing that did: with
+Polygon added, the graph filled with twenty identical "Polygon Facilitator" labels. The operator name
+moved to hover, where it still answers who is behind an address, and the graph now shows what it
+could not before, that dozens of separate addresses converge on one receiving service.
+
+Unknown senders are shown as their address too, with no filler word. Labelling each one "Unnamed"
 repeated a word on every row and added nothing, and the earlier Korean rendering, "미확인", read as
 "unverified" and wrongly suggested the payment itself was in doubt. A name appears only when a
 directory supplies one; hovering an address explains that none does.

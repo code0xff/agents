@@ -78,7 +78,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
               return (
                 <li key={senderKey} className="flex items-center justify-between gap-2 py-0.5">
                   <a className="flex min-w-0 items-center gap-1.5 text-ink-300 hover:text-ink-50"
-                    title={p?.facilitatorName ? undefined : t('pay.unlabeledHelp')}
+                    title={p?.facilitatorName ?? t('pay.unlabeledHelp')}
                     href={`${CHAINS[chain].explorer}/address/${addr}`} target="_blank" rel="noreferrer">
                     <span className="shrink-0 text-[9px] text-ink-600">{CHAINS[chain].short}</span>
                     <span className="truncate">{p ? facilitatorLabel(p) : short(addr)}</span>
@@ -106,7 +106,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
                       <span className="shrink-0 text-ink-100 tabular-nums">{usd(p.usdc, 4, tag)}</span>
                       <span className="hidden truncate text-ink-500 sm:inline md:hidden lg:inline">{short(p.payer, 3)}→{short(p.payTo, 3)}</span>
                       <span className="ml-auto">
-                        <Badge dim={!named} title={named ? undefined : t('pay.unlabeledHelp')}>
+                        <Badge dim={!named} title={p.facilitatorName ?? t('pay.unlabeledHelp')}>
                           {facilitatorLabel(p)}
                         </Badge>
                       </span>

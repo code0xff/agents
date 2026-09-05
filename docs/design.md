@@ -90,6 +90,10 @@ Tailwind v4's preflight leaves buttons at the browser default cursor. `src/index
 `not-allowed`.
 
 ## Component rules
+A label that repeats across every row is background, not information. Both "Unnamed" and an operator
+name shared by twenty addresses were removed for this reason: the address distinguishes, the repeated
+word does not. Detail that only some readers want goes to hover.
+
 Headline facts that sit side by side get their own outline. Run together as plain text they read as
 one sentence and the reader cannot tell where each fact ends; the `Fact` chip in `Concentration`
 pairs a muted uppercase label with an emphasised value inside a bordered box.
