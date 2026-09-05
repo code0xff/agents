@@ -1,13 +1,23 @@
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { execSync } from 'node:child_process'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+
+/** Short build id, shown in the footer so a stale service worker is diagnosable at a glance. */
+function buildId(): string {
+  // The deploy workflow checks out the tip of dev, which can be ahead of the SHA that
+  // triggered it, so the working tree is the accurate source.
+  try { return execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim() } catch { /* not a repo */ }
+  return process.env.GITHUB_SHA?.slice(0, 7) ?? 'dev'
+}
 
 // GitHub Pages: the repository name becomes the base path. Use '/' for a custom domain or user page.
 const base = process.env.VITE_BASE ?? '/agents/'
 
 export default defineConfig({
   base,
+  define: { __BUILD_ID__: JSON.stringify(buildId()) },
   plugins: [
     react(),
     tailwindcss(),

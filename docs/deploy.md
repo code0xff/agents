@@ -19,4 +19,6 @@
   triggering SHA so the just-made snapshot commit is included.
 - A scheduled workflow only runs from the default branch, and GitHub registers a workflow when the file
   lands on that branch. If a schedule never fires, push a change to the workflow file to re-register it.
+- The footer shows the short commit the bundle was built from. If it does not match the tip of `dev`,
+  the visitor is being served an older build by their service worker; one reload picks up the new one.
 - Local check: `VITE_BASE=/agents/ npm run build && npm run preview`
