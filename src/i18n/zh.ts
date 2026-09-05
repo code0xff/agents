@@ -122,7 +122,10 @@ export const zh: Dict = {
   'zoom.out': '缩小',
   'zoom.reset': '重置视图',
   'zoom.hint': '拖动平移，滚动缩放',
-  'zoom.hintTouch': '双指平移与缩放',
+  'zoom.hintTouch': '点击手形按钮以平移与缩放地图',
+  'zoom.touchOn': '启用地图手势',
+  'zoom.touchOff': '关闭地图手势',
+  'zoom.hintTouchOn': '拖动与双指缩放地图。再次点击手形按钮可恢复页面滚动。',
   'theme.dark': '深色',
   'theme.light': '浅色',
 }

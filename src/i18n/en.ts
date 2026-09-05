@@ -120,7 +120,10 @@ export const en = {
   'zoom.out': 'Zoom out',
   'zoom.reset': 'Reset view',
   'zoom.hint': 'Drag to pan, scroll to zoom',
-  'zoom.hintTouch': 'Two fingers to pan and zoom',
+  'zoom.hintTouch': 'Tap the hand to pan and pinch the map',
+  'zoom.touchOn': 'Enable map gestures',
+  'zoom.touchOff': 'Release map gestures',
+  'zoom.hintTouchOn': 'Drag and pinch the map. Tap the hand again to scroll the page.',
   'theme.dark': 'dark',
   'theme.light': 'light',
 }

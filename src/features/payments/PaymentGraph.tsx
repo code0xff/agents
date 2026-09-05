@@ -34,12 +34,18 @@ export function PaymentGraph({ payments, counts, t, compact = false }: {
   const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null)
   const userMovedAt = useRef(0)
   const compactRef = useRef(compact)
+  // Touch has to be claimed explicitly. Filtering to two fingers does not work: d3-zoom
+  // never registers the first touch, so it cannot form a pinch, and `touch-action: pan-y`
+  // lets the browser steal the gesture as soon as it moves vertically.
+  const [touchMap, setTouchMap] = useState(false)
+  const touchMapRef = useRef(false)
 
   const recent = useMemo(() => payments.slice(0, compact ? WINDOW_MOBILE : WINDOW_DESKTOP), [payments, compact])
 
   // The camera filter reads this from an event handler, so it is synchronised in an effect
   // rather than during render.
   useEffect(() => { compactRef.current = compact }, [compact])
+  useEffect(() => { touchMapRef.current = touchMap }, [touchMap])
 
   useEffect(() => {
     const el = ref.current
@@ -59,15 +65,15 @@ export function PaymentGraph({ payments, counts, t, compact = false }: {
     const svg = d3.select(el)
     const zoom = d3.zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.35, 2.5])
+      // d3 otherwise decides whether to bind touch handlers from a capability sniff at call
+      // time. The gate that matters is the toggle in `filter`, so bind them unconditionally.
+      .touchable(() => true)
       .filter((event: Event) => {
         // Dragging a node must not also drag the camera.
         if ((event.target as Element).closest?.('g.n')) return false
-        // The graph sits inside a scrolling page. One finger has to keep scrolling the
-        // page, so touch only drives the map once a second finger is down.
-        if (event.type.startsWith('touch')) {
-          const touches = (event as TouchEvent).touches
-          return touches ? touches.length >= 2 : false
-        }
+        // The graph sits inside a scrolling page, so touch reaches the map only while the
+        // reader has claimed it. A mouse always drives the map.
+        if (event.type.startsWith('touch')) return touchMapRef.current
         return true
       })
       .on('start', (event) => { if (event.sourceEvent) userMovedAt.current = Date.now() })
@@ -271,23 +277,38 @@ export function PaymentGraph({ payments, counts, t, compact = false }: {
 
   return (
     <div className="relative">
-      <svg ref={ref} className="h-[300px] w-full cursor-grab touch-pan-y active:cursor-grabbing sm:h-[440px] lg:h-[520px]">
+      <svg ref={ref}
+        style={{ touchAction: touchMap ? 'none' : 'pan-y' }}
+        className={`h-[300px] w-full cursor-grab active:cursor-grabbing sm:h-[440px] lg:h-[520px] ${touchMap ? 'ring-1 ring-ink-600 ring-inset' : ''}`}>
         <g className="scene">
           <g className="links" />
           <g className="nodes" />
           <g className="fx" />
         </g>
       </svg>
-      <Controls onIn={() => nudgeZoom(1.45)} onOut={() => nudgeZoom(1 / 1.45)} onReset={resetView} />
+      <Controls onIn={() => nudgeZoom(1.45)} onOut={() => nudgeZoom(1 / 1.45)} onReset={resetView}
+        touchMap={touchMap} onToggleTouch={() => setTouchMap((v) => !v)} />
     </div>
   )
 }
 
-function Controls({ onIn, onOut, onReset }: { onIn: () => void; onOut: () => void; onReset: () => void }) {
+function Controls({ onIn, onOut, onReset, touchMap, onToggleTouch }: {
+  onIn: () => void; onOut: () => void; onReset: () => void; touchMap: boolean; onToggleTouch: () => void
+}) {
   const { t } = useT()
   const cls = 'grid h-7 w-7 place-items-center rounded-md border border-ink-800 bg-ink-950/80 text-ink-300 backdrop-blur transition hover:border-ink-600 hover:text-ink-100 focus-visible:border-ink-500 focus-visible:outline-none'
   return (
     <div className="absolute top-3 right-3 flex flex-col gap-1.5">
+      {/* Touch only: claims the gesture for the map, releasing the page scroll. */}
+      <button type="button" onClick={onToggleTouch} aria-pressed={touchMap}
+        aria-label={t(touchMap ? 'zoom.touchOff' : 'zoom.touchOn')}
+        title={t(touchMap ? 'zoom.touchOff' : 'zoom.touchOn')}
+        className={`${cls} sm:hidden ${touchMap ? 'border-ink-500 text-ink-50' : ''}`}>
+        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden>
+          <path d="M8 2v6M5.4 3.6v4.4M10.6 3.6v4.4M3 6.4v3.1a4.5 4.5 0 0 0 4.5 4.5h.6a4.4 4.4 0 0 0 4.4-4.4V5.6"
+            stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
       <button type="button" onClick={onIn} aria-label={t('zoom.in')} title={t('zoom.in')} className={cls}>
         <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden>
           <path d="M8 3.5v9M3.5 8h9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />

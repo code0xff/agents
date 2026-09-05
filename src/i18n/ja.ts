@@ -122,7 +122,10 @@ export const ja: Dict = {
   'zoom.out': '縮小',
   'zoom.reset': '表示をリセット',
   'zoom.hint': 'ドラッグで移動、スクロールで拡大',
-  'zoom.hintTouch': '2 本指で移動と拡大',
+  'zoom.hintTouch': '手のボタンで移動とピンチ操作',
+  'zoom.touchOn': 'マップ操作を有効化',
+  'zoom.touchOff': 'マップ操作を解除',
+  'zoom.hintTouchOn': 'ドラッグとピンチで操作します。手のボタンをもう一度押すとページ送りに戻ります。',
   'theme.dark': 'ダーク',
   'theme.light': 'ライト',
 }

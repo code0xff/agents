@@ -122,7 +122,10 @@ export const ko: Dict = {
   'zoom.out': '축소',
   'zoom.reset': '보기 초기화',
   'zoom.hint': '끌어서 이동, 스크롤로 확대',
-  'zoom.hintTouch': '두 손가락으로 이동과 확대',
+  'zoom.hintTouch': '손 버튼을 눌러 맵을 이동·확대',
+  'zoom.touchOn': '맵 제스처 켜기',
+  'zoom.touchOff': '맵 제스처 끄기',
+  'zoom.hintTouchOn': '맵을 끌고 오므려 조작합니다. 손 버튼을 다시 누르면 페이지 스크롤로 돌아갑니다.',
   'theme.dark': '다크',
   'theme.light': '라이트',
 }

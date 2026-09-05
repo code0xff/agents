@@ -22,9 +22,15 @@ the target node pulses. A recent-payments list sits beside the graph.
 - `PaymentGraph.tsx`: D3 force on a canvas 1.9x the panel, viewed through a camera. The layout is
   allowed to spread instead of being packed into the visible rectangle; the camera eases toward the
   centroid of the newest settlements and yields to the reader for 9s after any pan, zoom or drag.
-  Zoom and pan controls sit in the corner of the canvas; the wheel zooms and dragging pans. On touch,
-  one finger keeps scrolling the page and two fingers drive the map, so the graph never traps
-  scrolling. Reset recentres and hands the camera back to the follower.
+  Zoom and pan controls sit in the corner of the canvas; the wheel zooms and dragging pans. Reset
+  recentres and hands the camera back to the follower.
+
+  Touch is claimed explicitly through a hand button shown only on small screens. Until it is pressed
+  the map ignores touch entirely and the page scrolls as usual; once pressed the SVG switches to
+  `touch-action: none` and one finger pans while a pinch zooms. Filtering to two fingers instead does
+  not work: d3-zoom never registers the first touch, so no pinch can form, and `touch-action: pan-y`
+  lets the browser steal the gesture the moment it moves vertically. `touchable` is forced on, because
+  d3 otherwise decides whether to bind touch handlers from a capability sniff at call time.
   Particle plus ring pulse per payment, draggable nodes.
 - `PaymentsPanel.tsx`: window stats, top senders, recent list.
 - Not yet applied: Bazaar payTo map (`public/snapshots/bazaar-cdp.payto.json`) to name payTo nodes.
