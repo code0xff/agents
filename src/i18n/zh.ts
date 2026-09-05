@@ -146,6 +146,8 @@ export const zh: Dict = {
   'pay.unlabeledHelp': '地址是明确的，但没有公开目录为其登记名称。',
   'pay.viewTx': '在 BaseScan 查看交易',
   'sig.observedSub': 'Base 与 Polygon',
+  'pay.chain': '链',
+  'reg.chain': '链',
   'theme.dark': '深色',
   'theme.light': '浅色',
 }

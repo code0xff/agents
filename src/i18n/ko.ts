@@ -146,6 +146,8 @@ export const ko: Dict = {
   'pay.unlabeledHelp': '주소는 확인되지만, 이 주소의 이름을 등록한 공개 디렉터리가 없습니다.',
   'pay.viewTx': 'BaseScan에서 트랜잭션 보기',
   'sig.observedSub': 'Base와 Polygon',
+  'pay.chain': '체인',
+  'reg.chain': '체인',
   'theme.dark': '다크',
   'theme.light': '라이트',
 }

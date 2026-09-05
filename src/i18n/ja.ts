@@ -146,6 +146,8 @@ export const ja: Dict = {
   'pay.unlabeledHelp': 'アドレスは判明していますが、名称を登録した公開ディレクトリがありません。',
   'pay.viewTx': 'BaseScan でトランザクションを見る',
   'sig.observedSub': 'Base と Polygon',
+  'pay.chain': 'チェーン',
+  'reg.chain': 'チェーン',
   'theme.dark': 'ダーク',
   'theme.light': 'ライト',
 }

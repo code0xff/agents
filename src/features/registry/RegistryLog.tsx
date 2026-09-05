@@ -20,7 +20,6 @@ function fallbackLabel(e: RegistryEvent, t: Translate) {
 }
 
 function Row({ e, t, onOpen }: { e: RegistryEvent; t: Translate; onOpen: () => void }) {
-  const cfg = CHAINS[e.chain]
   return (
     <motion.li
       initial={{ opacity: 0, x: -12 }}
@@ -33,7 +32,6 @@ function Row({ e, t, onOpen }: { e: RegistryEvent; t: Translate; onOpen: () => v
         {/* Mobile stacks the row in two lines; from sm up it is a single line. */}
         <span className="flex flex-wrap items-center gap-x-2 gap-y-1 sm:flex-nowrap sm:gap-3">
           <span className="w-7 shrink-0 text-ink-500 tabular-nums">{timeAgo(e.ts)}</span>
-          <Badge>{cfg.short}</Badge>
           <span className={`shrink-0 ${e.kind === 'registered' ? 'text-ink-100' : 'text-ink-400'}`}>
             {e.kind === 'registered' ? t('reg.register') : t('reg.seturi')}
           </span>
@@ -52,9 +50,11 @@ function Row({ e, t, onOpen }: { e: RegistryEvent; t: Translate; onOpen: () => v
 export function RegistryLog({ state }: { state: RegistryState }) {
   const { t } = useT()
   const isMobile = useIsMobile()
-  const [chains, setChains] = useState<ChainKey[]>(ALL)
+  // One chain at a time, as on the payments page. A merged stream is ordered by time, so the
+  // busiest chain crowds the others out of view rather than sitting beside them.
+  const [chain, setChain] = useState<ChainKey>('base')
   const { events, heads, errors, loading, allFailed } = state
-  const shown = events.filter((e) => chains.includes(e.chain))
+  const shown = events.filter((e) => e.chain === chain)
   const paged = usePagination(shown, isMobile ? 8 : 12)
   const [open, setOpen] = useState<RegistryEvent | null>(null)
 
@@ -71,15 +71,19 @@ export function RegistryLog({ state }: { state: RegistryState }) {
               {t('page.newItems', { n: newCount })}
             </button>
           )}
-          {ALL.map((c) => (
-            <button key={c} aria-pressed={chains.includes(c)}
-              onClick={() => setChains((s) => s.includes(c) ? s.filter((x) => x !== c) : [...s, c])}
-              className={`rounded border px-2 py-0.5 font-mono text-[10px] tracking-wider transition ${chains.includes(c) ? 'border-ink-500 text-ink-100' : 'border-ink-800 text-ink-600'}`}
-              title={errors[c] ?? (heads[c] ? `${t('common.block')} ${heads[c]}` : '')}>
-              {CHAINS[c].short}{errors[c] ? ' !' : ''}
-            </button>
-          ))}
-          <LiveDot active={!loading && !allFailed} />
+          <div role="radiogroup" aria-label={t('reg.chain')} className="flex items-center gap-1">
+            {ALL.map((c) => (
+              <button key={c} role="radio" aria-checked={chain === c} onClick={() => setChain(c)}
+                className={`rounded border px-2 py-0.5 font-mono text-[10px] tracking-wider transition ${chain === c ? 'border-ink-500 text-ink-100' : 'border-ink-800 text-ink-600 hover:text-ink-300'}`}
+                title={errors[c] ?? CHAINS[c].label}>
+                {CHAINS[c].short}{errors[c] ? ' !' : ''}
+              </button>
+            ))}
+          </div>
+          <span className="font-mono text-[10px] text-ink-500">
+            {heads[chain] ? `${t('common.block')} ${heads[chain]}` : '—'}
+          </span>
+          <LiveDot active={!loading && !allFailed && !errors[chain]} />
         </div>
       }>
       <ul>

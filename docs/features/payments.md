@@ -56,7 +56,10 @@ the target node pulses. A recent-payments list sits beside the graph.
 - Retention is bounded: 300 payments, 200 registry events, 120 nodes in the graph window. Blocks and
   logs are scanned and discarded, never accumulated. Measured over 6.8 minutes the payment list held
   at exactly 300 and the JS heap stayed flat around 16 MB.
-- `PaymentsPanel.tsx`: window stats, top senders, recent list. Every recent row is a real settlement,
+- `PaymentsPanel.tsx`: window stats, top senders, recent list. One chain is shown at a time. Base and
+  Polygon never settle with each other, so drawing both in one graph suggested a single flow where
+  there are two separate networks, and a merged list ordered by time let the busier chain crowd the
+  other out. Node identity still carries the chain, and links resolve to that chain's explorer. Every recent row is a real settlement,
   so it links to its transaction on BaseScan.
 - Not yet applied: Bazaar payTo map (`public/snapshots/bazaar-cdp.payto.json`) to name payTo nodes.
   Measured 2026-09-05: it resolves about 30% of live settlements to a service host, which would

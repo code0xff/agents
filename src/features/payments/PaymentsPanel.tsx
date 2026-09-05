@@ -13,9 +13,11 @@ import { facilitatorLabel, type PaymentsState } from './usePayments'
 export function PaymentsPanel({ state }: { state: PaymentsState }) {
   const { t, tag } = useT()
   const isMobile = useIsMobile()
-  const { payments: all, heads, blocksScanned, errors } = state
-  const [chains, setChains] = useState<PaymentChainKey[]>(PAYMENT_CHAIN_KEYS)
-  const payments = useMemo(() => all.filter((p) => chains.includes(p.chain)), [all, chains])
+  const { payments: all, heads, errors } = state
+  // One chain at a time. Base and Polygon never settle with each other, so drawing them in one
+  // graph would suggest a single flow where there are two separate networks.
+  const [chain, setChain] = useState<PaymentChainKey>('base')
+  const payments = useMemo(() => all.filter((p) => p.chain === chain), [all, chain])
   const stats = useMemo(() => ({
     vol: payments.reduce((a, p) => a + p.usdc, 0),
     facs: new Set(payments.map((p) => p.facilitator)).size,
@@ -36,16 +38,19 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
   return (
     <Panel eyebrow={t('pay.eyebrow')} title={t('pay.title')} delay={0.2}
       right={<div className="flex flex-wrap items-center gap-2">
-        {PAYMENT_CHAIN_KEYS.map((c) => (
-          <button key={c} aria-pressed={chains.includes(c)}
-            onClick={() => setChains((prev) => prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c])}
-            className={`rounded border px-2 py-0.5 font-mono text-[10px] tracking-wider transition ${chains.includes(c) ? 'border-ink-500 text-ink-100' : 'border-ink-800 text-ink-600'}`}
-            title={errors[c] ?? (heads[c] ? `${t('common.block')} ${heads[c]}` : '')}>
-            {CHAINS[c].short}{errors[c] ? ' !' : ''}
-          </button>
-        ))}
-        <span className="font-mono text-[10px] text-ink-500">{blocksScanned} {t('common.scanned')}</span>
-        <LiveDot active={Object.keys(heads).length > 0} />
+        <div role="radiogroup" aria-label={t('pay.chain')} className="flex items-center gap-1">
+          {PAYMENT_CHAIN_KEYS.map((c) => (
+            <button key={c} role="radio" aria-checked={chain === c} onClick={() => setChain(c)}
+              className={`rounded border px-2 py-0.5 font-mono text-[10px] tracking-wider transition ${chain === c ? 'border-ink-500 text-ink-100' : 'border-ink-800 text-ink-600 hover:text-ink-300'}`}
+              title={errors[c] ?? CHAINS[c].label}>
+              {CHAINS[c].short}{errors[c] ? ' !' : ''}
+            </button>
+          ))}
+        </div>
+        <span className="font-mono text-[10px] text-ink-500">
+          {heads[chain] ? `${t('common.block')} ${heads[chain]}` : '—'}
+        </span>
+        <LiveDot active={heads[chain] != null && !errors[chain]} />
       </div>}>
       <div className="grid grid-cols-3 divide-x divide-ink-800 border-b border-ink-800">
         <Stat label={t('pay.stat.count')} value={stats.n} />
@@ -74,14 +79,13 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
             {top.length === 0 && <li className="py-2 text-ink-600">{t('pay.waiting')}</li>}
             {top.map(([senderKey, n]) => {
               const p = find(senderKey)
-              const [chain, addr] = senderKey.split(':') as [PaymentChainKey, string]
+              const [senderChain, addr] = senderKey.split(':') as [PaymentChainKey, string]
               return (
                 <li key={senderKey} className="flex items-center justify-between gap-2 py-0.5">
-                  <a className="flex min-w-0 items-center gap-1.5 text-ink-300 hover:text-ink-50"
+                  <a className="min-w-0 truncate text-ink-300 hover:text-ink-50"
                     title={p?.facilitatorName ?? t('pay.unlabeledHelp')}
-                    href={`${CHAINS[chain].explorer}/address/${addr}`} target="_blank" rel="noreferrer">
-                    <span className="shrink-0 text-[9px] text-ink-600">{CHAINS[chain].short}</span>
-                    <span className="truncate">{p ? facilitatorLabel(p) : short(addr)}</span>
+                    href={`${CHAINS[senderChain].explorer}/address/${addr}`} target="_blank" rel="noreferrer">
+                    {p ? facilitatorLabel(p) : short(addr)}
                   </a>
                   <span className="shrink-0 text-ink-500 tabular-nums">{n}</span>
                 </li>
@@ -102,7 +106,6 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
                       title={t('pay.viewTx')}
                       className="flex items-center gap-2 px-4 py-1.5 transition-colors hover:bg-ink-800/40">
                       <span className="w-6 shrink-0 text-ink-600">{timeAgo(p.ts)}</span>
-                      <span className="shrink-0 text-[9px] text-ink-600">{CHAINS[p.chain].short}</span>
                       <span className="shrink-0 text-ink-100 tabular-nums">{usd(p.usdc, 4, tag)}</span>
                       <span className="hidden truncate text-ink-500 sm:inline md:hidden lg:inline">{short(p.payer, 3)}→{short(p.payTo, 3)}</span>
                       <span className="ml-auto">

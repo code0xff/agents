@@ -18,7 +18,9 @@ relative time.
 ## Implementation (2026-09-05)
 - `useRegistry.ts`: initial range `getLogs` (Registered + URIUpdated) per chain, then 15s polling.
   Inline `data:` URI parsing.
-- `RegistryLog.tsx`: chain toggles, slide-in + background flash for new rows. A row opens `AgentModal`.
+- `RegistryLog.tsx`: one chain at a time, matching the payments page. A merged stream is ordered by
+  time, so the busiest chain crowds the others out of view rather than sitting beside them.
+  Slide-in and background flash for new rows. A row opens `AgentModal`.
 - `AgentModal.tsx` + `meta.ts`: the registration file is parsed into a card rather than shown as raw
   JSON. `normalizeAgentMeta` accepts a field only when it has the right type, because these documents
   are written by anyone and an object where a string was expected would throw during render.

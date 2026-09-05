@@ -144,6 +144,8 @@ export const en = {
   'pay.unlabeledHelp': 'The address is known; no public directory lists a name for it.',
   'pay.viewTx': 'View transaction on BaseScan',
   'sig.observedSub': 'Base and Polygon',
+  'pay.chain': 'Chain',
+  'reg.chain': 'Chain',
   'theme.dark': 'dark',
   'theme.light': 'light',
 }
