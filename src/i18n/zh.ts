@@ -45,7 +45,7 @@ export const zh: Dict = {
 
   'mp.note.cdp-bazaar': '通过 CDP facilitator 注册的按次计费 HTTP 与 MCP 资源。',
   'mp.note.payai-bazaar': '注册在 PayAI facilitator 上的资源。',
-  'mp.note.erc8004': '每条链一个注册表合约。注册记录显示在下方日志中。',
+  'mp.note.erc8004': '每条链一个注册表合约。实时注册记录在注册表页面。',
   'mp.note.agentscan': '包含名称、技能与声誉的已索引代理。',
   'mp.note.ocai': '探测已注册代理的 MCP 与 OpenAPI 端点是否可达。',
   'mp.note.virtuals': '通过 ACP 备忘结算的代理之间的任务。',

@@ -3,7 +3,7 @@
     "id": "cdp-bazaar",
     "name": "x402 Bazaar",
     "operator": "Coinbase CDP",
-    "url": "https://docs.cdp.coinbase.com/x402/bazaar",
+    "url": "https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources?limit=25",
     "kind": "x402disc",
     "chains": [
       "Base",
@@ -21,7 +21,7 @@
     "id": "payai-bazaar",
     "name": "PayAI Bazaar",
     "operator": "PayAI",
-    "url": "https://payai.network",
+    "url": "https://facilitator.payai.network/discovery/resources?limit=25",
     "kind": "x402disc",
     "chains": [
       "Base",
@@ -38,7 +38,7 @@
     "id": "erc8004",
     "name": "ERC-8004 Identity Registry",
     "operator": "Ethereum / 8004 team",
-    "url": "https://eips.ethereum.org/EIPS/eip-8004",
+    "url": "https://basescan.org/address/0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
     "kind": "registry",
     "chains": [
       "Base",
@@ -55,7 +55,7 @@
     "id": "agentscan",
     "name": "agentscan",
     "operator": "agentscan.info",
-    "url": "https://agentscan.info",
+    "url": "https://agentscan.info/agents",
     "kind": "explorer",
     "chains": [
       "22 networks"
@@ -70,7 +70,7 @@
     "id": "ocai",
     "name": "On-Chain Agent Intel",
     "operator": "onchainagentintel.io",
-    "url": "https://onchainagentintel.io",
+    "url": "https://onchainagentintel.io/agents",
     "kind": "index",
     "chains": [
       "Base",
@@ -87,7 +87,7 @@
     "id": "virtuals",
     "name": "Virtuals ACP",
     "operator": "Virtuals Protocol",
-    "url": "https://app.virtuals.io",
+    "url": "https://app.virtuals.io/acp",
     "kind": "acp",
     "chains": [
       "Base"
@@ -102,7 +102,7 @@
     "id": "olas",
     "name": "Olas Mech Marketplace",
     "operator": "Olas",
-    "url": "https://olas.network/mech-marketplace",
+    "url": "https://marketplace.olas.network/ethereum/ai-agents",
     "kind": "tasks",
     "chains": [
       "Gnosis",
@@ -119,7 +119,7 @@
     "id": "8004scan",
     "name": "8004scan",
     "operator": "AltLayer",
-    "url": "https://8004scan.io",
+    "url": "https://8004scan.io/agents",
     "kind": "explorer",
     "chains": [
       "multi"
@@ -180,7 +180,7 @@
     "id": "x402scan",
     "name": "x402scan",
     "operator": "Merit Systems",
-    "url": "https://x402scan.com",
+    "url": "https://www.x402scan.com/",
     "kind": "x402explorer",
     "chains": [
       "Base",

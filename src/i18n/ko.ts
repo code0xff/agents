@@ -45,7 +45,7 @@ export const ko: Dict = {
 
   'mp.note.cdp-bazaar': 'CDP facilitator를 통해 등록된 호출당 과금 HTTP·MCP 리소스.',
   'mp.note.payai-bazaar': 'PayAI facilitator에 등록된 리소스.',
-  'mp.note.erc8004': '체인마다 레지스트리 컨트랙트 하나. 등록은 아래 로그에 표시된다.',
+  'mp.note.erc8004': '체인마다 레지스트리 컨트랙트 하나. 실시간 등록은 레지스트리 페이지에 있다.',
   'mp.note.agentscan': '이름, 스킬, 평판이 포함된 색인 에이전트.',
   'mp.note.ocai': '등록된 에이전트의 MCP·OpenAPI 엔드포인트 응답 여부를 점검한다.',
   'mp.note.virtuals': 'ACP 메모로 정산되는 에이전트 간 작업.',

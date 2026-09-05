@@ -45,7 +45,7 @@ export const ja: Dict = {
 
   'mp.note.cdp-bazaar': 'CDP facilitator 経由で登録された従量課金の HTTP・MCP リソース。',
   'mp.note.payai-bazaar': 'PayAI facilitator に登録されたリソース。',
-  'mp.note.erc8004': 'チェーンごとに 1 つのレジストリ契約。登録は下のログに表示される。',
+  'mp.note.erc8004': 'チェーンごとに 1 つのレジストリ契約。リアルタイムの登録はレジストリのページにある。',
   'mp.note.agentscan': '名前、スキル、評価を含む索引済みエージェント。',
   'mp.note.ocai': '登録済みエージェントの MCP・OpenAPI エンドポイントの応答を検査する。',
   'mp.note.virtuals': 'ACP メモで決済されるエージェント間ジョブ。',

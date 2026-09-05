@@ -19,7 +19,20 @@ the target node pulses. A recent-payments list sits beside the graph.
 - `usePayments.ts`: backfill the latest 40 Base blocks, then poll every 10s; decode USDC EIP-3009 calls
   from full-transaction blocks. Facilitator labels from `facilitators.json`; unlabeled senders with
   3+ payments become `Unlabeled xxxx` nodes.
-- `PaymentGraph.tsx`: D3 force, keeps the latest 120 payments, particle + ring pulse per payment,
-  draggable nodes.
+- `PaymentGraph.tsx`: D3 force on a canvas 1.9x the panel, viewed through a camera. The layout is
+  allowed to spread instead of being packed into the visible rectangle; the camera eases toward the
+  centroid of the newest settlements and yields to the reader for 9s after any pan, zoom or drag.
+  Touch gestures are left to the page on mobile so the graph does not trap scrolling.
+  Particle plus ring pulse per payment, draggable nodes.
 - `PaymentsPanel.tsx`: window stats, top senders, recent list.
 - Not yet applied: Bazaar payTo map (`public/snapshots/bazaar-cdp.payto.json`) to name payTo nodes.
+  Measured 2026-09-05: it resolves about 30% of live settlements to a service host, which would
+  replace hex with names such as `agents.chain.link` on the receiving side.
+
+## Facilitator labelling
+Detection is exact: the facilitator is `tx.from` on the USDC call. Naming is the gap. Measured over
+151 Base blocks on 2026-09-05, 209 settlements came from 28 distinct senders and **none** matched the
+58 Base addresses in `facilitators.json`. The public directory (facilitators.x402.watch) does not list
+them either, and BaseScan has no name tag for the busiest of them. Operators appear to rotate relayer
+addresses, and the public lists still carry addresses first seen in late 2025. `Unlabeled xxxx` is
+therefore an accurate statement about public knowledge, not a defect in the pipeline.

@@ -11,22 +11,35 @@ interface Node extends d3.SimulationNodeDatum { id: string; addr: string; kind: 
 const nodeId = (kind: Kind, addr: string) => `${kind}:${addr}`
 interface Link extends d3.SimulationLinkDatum<Node> { id: string; source: string | Node; target: string | Node; weight: number }
 
-// Recent payments kept in the graph. A small phone canvas cannot hold the desktop
-// window legibly, so it keeps fewer.
 const WINDOW_DESKTOP = 120
 const WINDOW_MOBILE = 40
 
-export function PaymentGraph({ payments, counts, t, compact = false }: { payments: Payment[]; counts: Record<string, number>; t: Translate; compact?: boolean }) {
+/** The layout is drawn on a canvas larger than the panel and viewed through it, so nodes
+ *  can spread out instead of being packed into the visible rectangle. */
+const CANVAS_SCALE = 1.9
+/** How long the camera leaves the reader alone after they pan or zoom. */
+const USER_CONTROL_MS = 9_000
+const FOLLOW_MS = 1_400
+
+export function PaymentGraph({ payments, counts, t, compact = false }: {
+  payments: Payment[]; counts: Record<string, number>; t: Translate; compact?: boolean
+}) {
   const ref = useRef<SVGSVGElement>(null)
   const [size, setSize] = useState({ w: 0, h: 0 })
   const sim = useRef<d3.Simulation<Node, Link> | null>(null)
   const nodesRef = useRef<Map<string, Node>>(new Map())
   const linksRef = useRef<Map<string, Link>>(new Map())
   const lastKey = useRef<string | null>(null)
+  const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null)
+  const userMovedAt = useRef(0)
+  const compactRef = useRef(compact)
 
   const recent = useMemo(() => payments.slice(0, compact ? WINDOW_MOBILE : WINDOW_DESKTOP), [payments, compact])
 
-  // Keep the layout centered when the viewport or panel width changes.
+  // The camera filter reads this from an event handler, so it is synchronised in an effect
+  // rather than during render.
+  useEffect(() => { compactRef.current = compact }, [compact])
+
   useEffect(() => {
     const el = ref.current
     if (!el) return
@@ -38,19 +51,48 @@ export function PaymentGraph({ payments, counts, t, compact = false }: { payment
     return () => ro.disconnect()
   }, [])
 
-  // Sync nodes/edges with the recent payments window
+  // Camera. Set up once; panning and zooming apply a transform to the whole scene.
   useEffect(() => {
-    const svg = d3.select(ref.current!)
-    const { width, height } = ref.current!.getBoundingClientRect()
+    const el = ref.current
+    if (!el) return
+    const svg = d3.select(el)
+    const zoom = d3.zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.35, 2.5])
+      .filter((event: Event) => {
+        // Dragging a node must not also drag the camera.
+        if ((event.target as Element).closest?.('g.n')) return false
+        // On a phone the graph sits inside a scrolling page, so touch gestures belong to
+        // the page; the camera follows activity on its own there.
+        if (compactRef.current && event.type.startsWith('touch')) return false
+        return true
+      })
+      .on('start', (event) => { if (event.sourceEvent) userMovedAt.current = Date.now() })
+      .on('zoom', (event) => svg.select('g.scene').attr('transform', event.transform.toString()))
+    zoomRef.current = zoom
+    svg.call(zoom)
+    return () => { svg.on('.zoom', null) }
+  }, [])
+
+  // Nodes, links and layout, on the enlarged canvas.
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const svg = d3.select(el)
+    const { width, height } = el.getBoundingClientRect()
+    if (!width || !height) return
+    const W = width * CANVAS_SCALE
+    const H = height * CANVAS_SCALE
+
     const nodes = nodesRef.current, links = linksRef.current
     const keep = new Set<string>(), keepL = new Set<string>()
     const up = (kind: Kind, addr: string, label: string) => {
       const id = nodeId(kind, addr)
       let n = nodes.get(id)
-      if (!n) { n = { id, addr, kind, label, weight: 0, x: width / 2 + (Math.random() - 0.5) * 80, y: height / 2 + (Math.random() - 0.5) * 80 }; nodes.set(id, n) }
+      if (!n) { n = { id, addr, kind, label, weight: 0, x: W / 2 + (Math.random() - 0.5) * 160, y: H / 2 + (Math.random() - 0.5) * 160 }; nodes.set(id, n) }
       n.label = label; keep.add(id); return n
     }
     const upL = (a: string, b: string) => { const id = `${a}>${b}`; if (!links.has(id)) links.set(id, { id, source: a, target: b, weight: 0 }); keepL.add(id) }
+
     // d3-force requires stable, mutable node objects across ticks, so the maps below are
     // updated in place rather than rebuilt. `recent` itself is only ever read.
     for (const p of recent) {
@@ -71,34 +113,35 @@ export function PaymentGraph({ payments, counts, t, compact = false }: { payment
       links.get(`${nodeId('payer', p.payer)}>${nodeId('facilitator', p.facilitator)}`)!.weight += 1
       links.get(`${nodeId('facilitator', p.facilitator)}>${nodeId('payTo', p.payTo)}`)!.weight += 1
     }
-    for (const n of nodes.values()) if (n.kind === 'facilitator') { n.fx = undefined; n.fy = undefined }
 
     const N = [...nodes.values()], L = [...links.values()]
     if (!sim.current) {
       sim.current = d3.forceSimulation<Node, Link>()
-        .force('charge', d3.forceManyBody<Node>().strength((d) => d.kind === 'facilitator' ? -500 : -160).distanceMax(400))
-        .force('x', d3.forceX(width / 2).strength(0.04))
-        .force('y', d3.forceY(height / 2).strength(0.06))
-        .force('center', d3.forceCenter(width / 2, height / 2))
-        .force('collide', d3.forceCollide<Node>().radius((d) => r(d) + 4))
+        .force('charge', d3.forceManyBody<Node>().strength((d) => d.kind === 'facilitator' ? -520 : -190).distanceMax(560))
+        .force('collide', d3.forceCollide<Node>().radius((d) => r(d) + 10))
         .alphaDecay(0.02)
         .velocityDecay(0.35)
     }
     const s = sim.current
     s.nodes(N)
-    s.force('link', d3.forceLink<Node, Link>(L).id((d) => d.id).distance((l) => ((l.source as Node).kind === 'facilitator' || (l.target as Node).kind === 'facilitator') ? 120 : 70).strength(0.2))
-    s.force('center', d3.forceCenter(width / 2, height / 2))
-    s.alpha(0.6).restart()
+    s.force('link', d3.forceLink<Node, Link>(L).id((d) => d.id)
+      .distance((l) => ((l.source as Node).kind === 'facilitator' || (l.target as Node).kind === 'facilitator') ? 150 : 90)
+      .strength(0.18))
+    s.force('center', d3.forceCenter(W / 2, H / 2))
+    s.force('x', d3.forceX(W / 2).strength(0.015))
+    s.force('y', d3.forceY(H / 2).strength(0.02))
+    s.alpha(0.7).restart()
 
-    const g = svg.select<SVGGElement>('g.root')
+    const scene = svg.select<SVGGElement>('g.scene')
+
     // Geometry and visibility are set directly rather than through a transition: a transition
     // that never runs (throttled tab, reduced motion) would leave the graph blank.
-    const link = g.select('g.links').selectAll<SVGLineElement, Link>('line').data(L, (d) => d.id)
+    const link = scene.select('g.links').selectAll<SVGLineElement, Link>('line').data(L, (d) => d.id)
     link.exit().remove()
-    const linkE = link.enter().append('line').attr('stroke', 'var(--ink-200)').attr('opacity', 0.18)
+    const linkE = link.enter().append('line').attr('stroke', 'var(--ink-200)').attr('opacity', 0.16)
     const linkAll = linkE.merge(link).attr('stroke-width', (d) => Math.min(3, 0.6 + d.weight * 0.3))
 
-    const node = g.select('g.nodes').selectAll<SVGGElement, Node>('g.n').data(N, (d) => d.id)
+    const node = scene.select('g.nodes').selectAll<SVGGElement, Node>('g.n').data(N, (d) => d.id)
     node.exit().remove()
     const nodeE = node.enter().append('g').attr('class', 'n').attr('opacity', 1)
     nodeE.append('circle')
@@ -109,34 +152,67 @@ export function PaymentGraph({ payments, counts, t, compact = false }: { payment
       .attr('stroke', (d) => d.kind === 'payer' ? 'var(--ink-400)' : 'none').attr('stroke-width', 1)
       .attr('r', r)
     const minFacWeight = compact ? 6 : 0
-    nodeAll.select('text').text((d) =>
-      d.kind === 'facilitator' ? (d.weight >= minFacWeight ? d.label : '')
+    nodeAll.select('text')
+      .text((d) => d.kind === 'facilitator' ? (d.weight >= minFacWeight ? d.label : '')
         : d.kind === 'payTo' && !compact && d.weight >= 3 ? d.label : '')
       .attr('fill', (d) => d.kind === 'facilitator' ? 'var(--ink-50)' : 'var(--ink-300)')
     nodeAll.call(d3.drag<SVGGElement, Node>()
-      .on('start', (ev, d) => { if (!ev.active) s.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y })
+      .on('start', (ev, d) => { if (!ev.active) s.alphaTarget(0.3).restart(); userMovedAt.current = Date.now(); d.fx = d.x; d.fy = d.y })
       .on('drag', (ev, d) => { d.fx = ev.x; d.fy = ev.y })
       .on('end', (ev, d) => { if (!ev.active) s.alphaTarget(0); d.fx = null; d.fy = null }))
     nodeAll.select('title').remove()
     nodeAll.append('title').text((d) => `${d.kind} ${d.addr}`)
 
-    // Keep every node inside the canvas. Labels are centred on the node and sit above it,
-    // so a labelled node needs half its label width horizontally and extra room on top.
+    // Nodes stay on the enlarged canvas rather than the visible rectangle, so the layout
+    // can breathe; the camera is what keeps the interesting part in view.
     const labelled = new Set<string>()
     nodeAll.select<SVGTextElement>('text').each(function (d) { if (this.textContent) labelled.add(d.id) })
     const clamp = (d: Node) => {
       const rad = r(d)
       const half = labelled.has(d.id) ? Math.max(rad, (d.label.length * 5.4) / 2) : rad
-      const padX = Math.min(half + 4, width / 2)
-      d.x = Math.max(padX, Math.min(width - padX, d.x ?? width / 2))
-      d.y = Math.max(rad + 16, Math.min(height - rad - 4, d.y ?? height / 2))
+      const padX = Math.min(half + 6, W / 2)
+      d.x = Math.max(padX, Math.min(W - padX, d.x ?? W / 2))
+      d.y = Math.max(rad + 16, Math.min(H - rad - 6, d.y ?? H / 2))
     }
     s.on('tick', () => {
       for (const n of N) clamp(n)
       linkAll.attr('x1', (d) => (d.source as Node).x!).attr('y1', (d) => (d.source as Node).y!).attr('x2', (d) => (d.target as Node).x!).attr('y2', (d) => (d.target as Node).y!)
       nodeAll.attr('transform', (d) => `translate(${d.x},${d.y})`)
     })
+
+    // Start centred on the canvas rather than at its top-left corner.
+    const zoom = zoomRef.current
+    if (zoom && !svg.property('__framed')) {
+      svg.property('__framed', true)
+      svg.call(zoom.transform, d3.zoomIdentity.translate((width - W) / 2, (height - H) / 2))
+    }
   }, [recent, counts, t, size, compact])
+
+  // The camera drifts toward wherever the newest settlements are, unless the reader
+  // has just taken control.
+  useEffect(() => {
+    const el = ref.current
+    const zoom = zoomRef.current
+    if (!el || !zoom || payments.length === 0) return
+    if (Date.now() - userMovedAt.current < USER_CONTROL_MS) return
+    const { width, height } = el.getBoundingClientRect()
+    if (!width || !height) return
+
+    const focus = payments.slice(0, 6)
+    const pts: Node[] = []
+    for (const p of focus) {
+      const f = nodesRef.current.get(nodeId('facilitator', p.facilitator))
+      const to = nodesRef.current.get(nodeId('payTo', p.payTo))
+      if (f?.x != null) pts.push(f)
+      if (to?.x != null) pts.push(to)
+    }
+    if (pts.length === 0) return
+    const cx = d3.mean(pts, (p) => p.x!)!
+    const cy = d3.mean(pts, (p) => p.y!)!
+    const k = d3.zoomTransform(el).k
+    const target = d3.zoomIdentity.translate(width / 2 - cx * k, height / 2 - cy * k).scale(k)
+    d3.select(el).transition().duration(FOLLOW_MS).ease(d3.easeCubicInOut).call(zoom.transform, target)
+  }, [payments])
 
   // Emit a particle along the edges for every new payment
   useEffect(() => {
@@ -172,9 +248,12 @@ export function PaymentGraph({ payments, counts, t, compact = false }: { payment
   }, [])
 
   return (
-    <svg ref={ref} className="h-[280px] w-full touch-pan-y sm:h-[380px] lg:h-[420px]">
-      <g className="root"><g className="links" /><g className="nodes" /></g>
-      <g className="fx" />
+    <svg ref={ref} className="h-[300px] w-full touch-pan-y sm:h-[440px] sm:cursor-grab sm:active:cursor-grabbing lg:h-[520px]">
+      <g className="scene">
+        <g className="links" />
+        <g className="nodes" />
+        <g className="fx" />
+      </g>
     </svg>
   )
 }

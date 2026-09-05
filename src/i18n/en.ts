@@ -43,7 +43,7 @@ export const en = {
 
   'mp.note.cdp-bazaar': 'Pay-per-call HTTP and MCP resources registered through the CDP facilitator.',
   'mp.note.payai-bazaar': 'Resources registered with the PayAI facilitator.',
-  'mp.note.erc8004': 'One registry contract per chain. Registrations appear in the log below.',
+  'mp.note.erc8004': 'One registry contract per chain. Live registrations are on the registry page.',
   'mp.note.agentscan': 'Indexed agents with names, skills and reputation.',
   'mp.note.ocai': 'Probes registered agents for reachable MCP and OpenAPI endpoints.',
   'mp.note.virtuals': 'Agent-to-agent jobs settled through ACP memos.',
