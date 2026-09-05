@@ -14,7 +14,7 @@ export function Panel({ title, eyebrow, right, children, className = '', delay =
       <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-ink-800 px-4 py-3 sm:px-5">
         <div className="min-w-0">
           {eyebrow && <p className="truncate font-mono text-[10px] tracking-[0.25em] text-ink-500 uppercase">{eyebrow}</p>}
-          <h2 className="text-sm font-medium text-ink-100">{title}</h2>
+          <h2 className="text-[13px] font-medium tracking-[0.02em] text-ink-100">{title}</h2>
         </div>
         {right}
       </header>

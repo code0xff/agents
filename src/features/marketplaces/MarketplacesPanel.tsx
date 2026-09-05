@@ -45,12 +45,12 @@ function Card({ m, i, ae, ocai, t, tag }: {
     >
       <div className="flex items-start justify-between gap-2">
         <div>
-          <h3 className="text-sm font-medium text-ink-50 group-hover:underline">{m.name}</h3>
-          <p className="text-[11px] text-ink-500">{m.operator} · {t(`mp.kind.${m.kind}` as Key)}</p>
+          <h3 className="text-[13px] font-medium tracking-[0.02em] text-ink-50 group-hover:underline">{m.name}</h3>
+          <p className="text-[10px] leading-relaxed text-ink-500">{m.operator} · {t(`mp.kind.${m.kind}` as Key)}</p>
         </div>
         <Badge dim={m.feed === 'link'}>{t(`feed.${m.feed}` as Key)}</Badge>
       </div>
-      <p className="text-xs leading-relaxed text-ink-400">{t(`mp.note.${m.id}` as Key)}</p>
+      <p className="text-[11px] leading-[1.7] text-ink-400">{t(`mp.note.${m.id}` as Key)}</p>
       <div className="mt-auto flex flex-wrap items-end justify-between gap-x-3 gap-y-2">
         <div className="flex min-w-0 flex-wrap gap-x-2 gap-y-0.5">{m.chains.map((c) => <span key={c} className="font-mono text-[10px] text-ink-500">{c}</span>)}</div>
         {metric && (

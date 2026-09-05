@@ -20,7 +20,7 @@ export function Stat({ label, value, format, sub }: {
       <motion.span className="truncate font-mono text-lg font-medium text-ink-50 tabular-nums sm:text-2xl">
         {value == null ? <span className="text-ink-600">—</span> : text}
       </motion.span>
-      {sub && <span className="truncate text-[11px] text-ink-500 sm:text-xs">{sub}</span>}
+      {sub && <span className="truncate text-[10px] text-ink-500 sm:text-[11px]">{sub}</span>}
     </div>
   )
 }

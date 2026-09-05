@@ -21,8 +21,15 @@ secondary text `ink-400`, disabled `ink-500`. Status (success/failure) is expres
 luminance, and motion — not color.
 
 ## Typography
-Inter (body), JetBrains Mono (numbers, addresses, logs). Labels are mono, wide tracking, uppercase.
-CJK locales fall back to the system sans stack; keep line-height generous.
+One family for the whole interface: JetBrains Mono. A proportional face was used for panel titles,
+card names and descriptions, and inside otherwise monospaced panels those few elements read as a
+different product. Hierarchy comes from size, weight and luminance rather than a second family.
+
+Prose set in a monospaced face needs more room per line, so descriptions run at 11-12px with 1.7
+leading rather than the usual 12-13px. Labels stay mono, uppercase, wide tracking.
+
+CJK has no glyphs in JetBrains Mono and falls back to the system stack, so Korean, Japanese and
+Chinese render proportionally. That is expected and was already true of every label.
 
 ## Background
 `.bg-grid` subtle grid. Slow parallax via motion `useScroll`.

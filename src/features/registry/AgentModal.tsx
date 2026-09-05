@@ -69,7 +69,7 @@ function Dialog({ event, onClose }: { event: RegistryEvent; onClose: () => void 
               <p className="font-mono text-[10px] tracking-[0.2em] text-ink-500 uppercase">
                 {cfg.short} · #{event.agentId.toString()} · {timeAgo(event.ts)}
               </p>
-              <h2 className="truncate text-base font-medium text-ink-50">{title}</h2>
+              <h2 className="truncate text-sm font-medium tracking-[0.02em] text-ink-50">{title}</h2>
             </div>
           </div>
           <button ref={closeRef} type="button" onClick={onClose} aria-label={t('agent.close')}
@@ -85,7 +85,7 @@ function Dialog({ event, onClose }: { event: RegistryEvent; onClose: () => void 
 
           {meta && (
             <>
-              <p className="text-sm leading-relaxed text-ink-300">
+              <p className="text-[12px] leading-[1.75] text-ink-300">
                 {meta.description ?? t('agent.noDescription')}
               </p>
               <div className="flex flex-wrap gap-2">
@@ -109,8 +109,8 @@ function Dialog({ event, onClose }: { event: RegistryEvent; onClose: () => void 
             </>
           )}
 
-          {state?.status === 'blocked' && <p className="text-xs leading-relaxed text-ink-400">{t('agent.blocked')}</p>}
-          {state?.status === 'none' && <p className="text-xs leading-relaxed text-ink-400">{t('agent.none')}</p>}
+          {state?.status === 'blocked' && <p className="text-[11px] leading-[1.7] text-ink-400">{t('agent.blocked')}</p>}
+          {state?.status === 'none' && <p className="text-[11px] leading-[1.7] text-ink-400">{t('agent.none')}</p>}
 
           <Section title={t('agent.identity')}>
             <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 font-mono text-[11px]">

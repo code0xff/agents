@@ -52,8 +52,11 @@
   --color-ink-50: var(--ink-50);
   --color-panel: var(--panel);
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  /* One family for the whole interface. A proportional face used only for titles and
+     descriptions read as a different product sitting inside the panels. CJK has no
+     monospaced glyphs here and falls back to the system stack, which is expected. */
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "Noto Sans KR", "Noto Sans JP", "Noto Sans SC", system-ui, monospace;
+  --font-sans: var(--font-mono);
 
   --animate-scan: scan 6s linear infinite;
 
@@ -68,7 +71,7 @@ html, body, #root {
 }
 
 body {
-  @apply bg-ink-950 text-ink-100 font-sans antialiased;
+  @apply bg-ink-950 text-ink-100 font-mono antialiased;
   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
