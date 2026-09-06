@@ -2,7 +2,6 @@ import type { Dict } from './en'
 
 export const zh: Dict = {
   'footer.sources': '来源: base.org, tenderly, publicnode, agenteconomy.to, onchainagentintel.io, facilitators.x402.watch',
-  'footer.nobackend': '无后端，无 API 密钥。',
 
   'common.block': '区块',
   'common.scanned': '已扫描区块',

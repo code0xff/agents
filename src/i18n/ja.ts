@@ -2,7 +2,6 @@ import type { Dict } from './en'
 
 export const ja: Dict = {
   'footer.sources': '出典: base.org, tenderly, publicnode, agenteconomy.to, onchainagentintel.io, facilitators.x402.watch',
-  'footer.nobackend': 'バックエンドとAPIキーなし。',
 
   'common.block': 'ブロック',
   'common.scanned': 'ブロック走査',

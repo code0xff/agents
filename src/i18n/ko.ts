@@ -2,7 +2,6 @@ import type { Dict } from './en'
 
 export const ko: Dict = {
   'footer.sources': '출처: base.org, tenderly, publicnode, agenteconomy.to, onchainagentintel.io, facilitators.x402.watch',
-  'footer.nobackend': '백엔드와 API 키 없음.',
 
   'common.block': '블록',
   'common.scanned': '블록 스캔',
@@ -94,7 +93,7 @@ export const ko: Dict = {
   'sig.observed': '실시간 관측',
   'sig.perMin': '분당 {n}건',
   'sig.window': '최근 {n}블록',
-  'ins.title': '활동이 몰리는 곳',
+  'ins.title': '누가, 어디에 몰려 있나',
   'ins.eyebrow': '집중도',
   'ins.facilitators': 'facilitator별 x402 결제',
   'ins.agentChains': '체인별 ERC-8004 에이전트',
@@ -104,7 +103,7 @@ export const ko: Dict = {
   'nav.payments': '결제',
   'nav.registry': '레지스트리',
   'nav.marketplaces': '마켓플레이스',
-  'page.overview.lead': '총량과 추세, 그리고 활동이 몰리는 지점.',
+  'page.overview.lead': '총량과 추세, 그리고 어디에 쏠려 있는지.',
   'page.payments.lead': 'Base와 Polygon에서 facilitator가 제출하는 USDC 정산을 실시간으로.',
   'page.registry.lead': 'Base와 BNB에 등록되는 에이전트를 실시간으로.',
   'page.marketplaces.lead': '에이전트와 유료 서비스가 등록되는 곳, 그리고 각각이 공개하는 데이터.',

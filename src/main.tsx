@@ -6,6 +6,10 @@ import App from './App'
 import { I18nProvider } from './i18n'
 import { registerPwa } from './lib/registerPwa'
 
+// Kept out of the interface but still readable, as `document.documentElement.dataset.build`,
+// so a visitor served an old build by their service worker can be identified.
+document.documentElement.dataset.build = __BUILD_ID__
+
 registerPwa()
 
 const queryClient = new QueryClient({

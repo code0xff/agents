@@ -78,9 +78,6 @@ export default function App() {
 
       <footer className="border-t border-ink-800 px-4 py-8 text-center font-mono text-[10px] leading-relaxed tracking-wider text-ink-600 sm:px-6">
         <p className="break-words">{t('footer.sources')}</p>
-        <p className="mt-1">
-          {t('footer.nobackend')} <span className="text-ink-700">build {__BUILD_ID__}</span>
-        </p>
       </footer>
     </div>
   )

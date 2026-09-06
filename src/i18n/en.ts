@@ -1,6 +1,5 @@
 export const en = {
   'footer.sources': 'Sources: base.org, tenderly, publicnode, agenteconomy.to, onchainagentintel.io, facilitators.x402.watch',
-  'footer.nobackend': 'No backend, no API keys.',
 
   'common.block': 'block',
   'common.scanned': 'blocks scanned',
