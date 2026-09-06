@@ -55,6 +55,11 @@ the target node pulses. A recent-payments list sits beside the graph.
   Particle plus ring pulse per payment, draggable nodes.
   The simulation is reheated only when the set of nodes actually changes. Reheating on every poll
   rearranged the graph under the reader, including immediately after they panned.
+- The observed rate is derived from the `AuthorizationUsed` logs, not from the decoded payments.
+  A rate needs only a count and a span, both of which the logs already carry, so it appears as soon
+  as the first log query returns rather than after every transaction has been fetched: measured 0.76s
+  against 3.2s. It is also more accurate, because the decoded list is capped at 60 transactions per
+  scan while the log set is not, so the old figure under-reported whenever the cap bound.
 - Retention is bounded: 300 payments, 200 registry events, 120 nodes in the graph window. Blocks and
   logs are scanned and discarded, never accumulated. Measured over 6.8 minutes the payment list held
   at exactly 300 and the JS heap stayed flat around 16 MB.

@@ -43,6 +43,13 @@ export interface Payment {
 
 export interface PaymentsState {
   payments: Payment[]
+  /**
+   * Timestamps of every settlement seen in the logs, newest first. Kept apart from `payments`
+   * because a rate needs only a count and a span, both of which the logs already carry: it can
+   * be published before any transaction is fetched, and it is not truncated by the per-scan
+   * fetch cap the way the decoded list is.
+   */
+  beats: number[]
   heads: Partial<Record<PaymentChainKey, bigint>>
   blocksScanned: number
   errors: Partial<Record<PaymentChainKey, string>>
@@ -59,17 +66,25 @@ const TX_CHUNK = 8
  * so an untrimmed backfill would fetch far more than the retained window can hold.
  */
 const MAX_TX_PER_SCAN = 60
+/** Settlement timestamps retained for the rate. */
+const MAX_BEATS = 1_200
 
 interface Scan { found: Payment[]; scanned: number }
 
 async function scanRange(
   key: PaymentChainKey, from: bigint, to: bigint, head: bigint, aborted: () => boolean,
+  onBeats: (beats: number[]) => void,
 ): Promise<Scan> {
   const cfg = PAYMENT_CHAINS[key]
   const client = getClient(key)
   const scanned = Number(to - from + 1n)
   const logs = await client.getLogs({ address: cfg.usdc, event: AUTHORIZATION_USED, fromBlock: from, toBlock: to })
-  if (aborted() || logs.length === 0) return { found: [], scanned }
+  if (aborted()) return { found: [], scanned }
+
+  // Every log is one settlement. Publish their times now; the transactions only add detail.
+  const nowForBeats = Date.now()
+  onBeats(logs.map((l) => nowForBeats - Number(head - l.blockNumber) * cfg.blockSeconds * 1000))
+  if (logs.length === 0) return { found: [], scanned }
 
   // One transaction may settle several authorisations, so collapse by hash, newest first,
   // and read only as many as the retained window can use.
@@ -114,7 +129,7 @@ async function scanRange(
 
 export function usePayments() {
   const [state, setState] = useState<Omit<PaymentsState, 'senderCounts'>>({
-    payments: [], heads: {}, blocksScanned: 0, errors: {},
+    payments: [], beats: [], heads: {}, blocksScanned: 0, errors: {},
   })
 
   useEffect(() => {
@@ -137,13 +152,21 @@ export function usePayments() {
             // Bounded catch-up: skip ahead rather than replaying a long gap.
             const from = head - wanted > cfg.maxCatchup ? head - cfg.maxCatchup : wanted
             if (from > head) { cursors[key] = head; return }
-            const { found, scanned } = await scanRange(key, from, head, head, () => stopped)
+            const { found, scanned } = await scanRange(key, from, head, head, () => stopped, (beats) => {
+              if (stopped || beats.length === 0) return
+              setState((s) => ({
+                ...s,
+                beats: [...beats, ...s.beats].sort((a, b) => b - a).slice(0, MAX_BEATS),
+                heads: { ...s.heads, [key]: head },
+              }))
+            })
             if (stopped) return
             cursors[key] = head
             setState((s) => {
               const seen = new Set(s.payments.map((p) => p.key))
               const fresh = found.filter((p) => !seen.has(p.key))
               return {
+                ...s,
                 payments: [...fresh, ...s.payments].sort((a, b) => b.ts - a.ts).slice(0, MAX),
                 heads: { ...s.heads, [key]: head },
                 blocksScanned: s.blocksScanned + scanned,
@@ -178,13 +201,16 @@ export function usePayments() {
  * Rate over the retained window. Using the cumulative scanned-block count would decay once
  * older payments are evicted, because the elapsed time would keep growing while the count cannot.
  */
+/**
+ * Rate over the retained beats. Reading it from the logs rather than the decoded payments makes
+ * it appear as soon as the first log query returns, and counts every settlement in range rather
+ * than the subset whose transactions were fetched.
+ */
 export function paymentsPerMinute(s: PaymentsState): number | null {
-  if (s.payments.length < 2) return null
-  const newest = s.payments[0].ts
-  const oldest = s.payments[s.payments.length - 1].ts
-  const minutes = (newest - oldest) / 60_000
+  if (s.beats.length < 2) return null
+  const minutes = (s.beats[0] - s.beats[s.beats.length - 1]) / 60_000
   if (minutes < 0.5) return null
-  return s.payments.length / minutes
+  return s.beats.length / minutes
 }
 
 /**
