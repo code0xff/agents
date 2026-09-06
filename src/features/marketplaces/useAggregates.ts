@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 export interface AgentEconomy {
   updatedAt: string
-  x402: { totalTxs: number; totalVolume: number; facilitatorsTracked: number; daily: { day: string; txs: number }[]; protocols: { name: string; share: number }[]; chains: { name: string; txs: number }[]; tokenSplit?: { usdcSharePct: number; windowDays: number } }
+  x402: { totalTxs: number; totalVolume: number; facilitatorsTracked: number; asOf?: string; chainsAsOf?: string; daily: { day: string; txs: number }[]; protocols: { name: string; share: number }[]; chains: { name: string; txs: number }[]; tokenSplit?: { usdcSharePct: number; windowDays: number } }
   erc8004Registry: { totalAgents: number; chainsTracked: number; chains: { name: string; agents: number }[]; daily: { day: string; agents: number }[] }
   virtualsAcp: { totalMemos: number; daily: { day: string; memos: number }[] }
   olas: { totalTxs: number; weekly: { week: string; txs: number }[] }
@@ -27,6 +27,9 @@ function normalizeAgentEconomy(raw: unknown): AgentEconomy {
     x402: {
       totalTxs: numOr(x.totalTxs), totalVolume: numOr(x.totalVolume),
       facilitatorsTracked: numOr(x.facilitatorsTracked),
+      // The chain split is refreshed on its own schedule and runs well behind the totals.
+      asOf: typeof x.asOf === 'string' ? x.asOf : undefined,
+      chainsAsOf: typeof x.chainsAsOf === 'string' ? x.chainsAsOf : undefined,
       daily: arr<{ day: string; txs: number }>(x.daily),
       protocols: arr<{ name: string; share: number }>(x.protocols),
       chains: arr<{ name: string; txs: number }>(x.chains),

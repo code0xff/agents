@@ -1,7 +1,7 @@
 import { motion } from 'motion/react'
 import { useMemo } from 'react'
 import { useT } from '../../i18n'
-import { compact, usd } from '../../lib/format'
+import { compact, timeAgo, usd } from '../../lib/format'
 import { useAgentEconomy, useOcaiStats } from '../marketplaces/useAggregates'
 import { agentChainShares, facilitatorShares, paymentChainShares, trend } from './derive'
 import { Concentration } from './Concentration'
@@ -38,10 +38,14 @@ export function OverviewPanel({ observedPerMin }: { observedPerMin: number | nul
         <Signal label={t('sig.observed')} value={observedPerMin} live
           format={(n) => t('sig.perMin', { n: n.toFixed(1) })}
           sub={t('sig.observedSub')} />
+        <p className="col-span-full border-t border-ink-800 px-4 py-2 font-mono text-[9px] leading-relaxed text-ink-600 sm:px-5">
+          {t('src.label')}: {d ? t('src.aggregate', { time: timeAgo(d.updatedAt) }) : '—'} · {t('src.live')}
+        </p>
       </motion.div>
 
-      <Concentration facilitators={facs} paymentChains={payChains} chains={chains} usdcPct={d?.x402.tokenSplit?.usdcSharePct}
-        mcpAgents={ocai.data?.mcp_agents} />
+      <Concentration facilitators={facs} paymentChains={payChains} chains={chains}
+        usdcPct={d?.x402.tokenSplit?.usdcSharePct} mcpAgents={ocai.data?.mcp_agents}
+        chainsAsOf={d?.x402.chainsAsOf} />
     </div>
   )
 }

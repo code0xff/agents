@@ -33,13 +33,6 @@ function Card({ m, i, ae, ocai, t, tag }: {
   if (m.id === 'virtuals' && ae) metric = { label: t('mp.metric.memos'), value: compact(ae.virtualsAcp.totalMemos, tag), spark: ae.virtualsAcp.daily.map((d) => d.memos) }
   if (m.id === 'olas' && ae) metric = { label: t('mp.metric.mechTx'), value: compact(ae.olas.totalTxs, tag), spark: ae.olas.weekly.map((d) => d.txs) }
   if (m.id === 'ocai' && ocai) metric = { label: t('mp.metric.probed'), value: compact(ocai.agents_indexed, tag) }
-  // Bazaar directories span several chains; Solana is the one the live panels cannot read.
-  const solanaCount = (() => {
-    const nets = snap.data?.networks
-    if (!nets) return null
-    const n = Object.entries(nets).filter(([k]) => k.toLowerCase().startsWith('solana')).reduce((a, [, v]) => a + v, 0)
-    return n > 0 ? n : null
-  })()
   if (m.id === 'cdp-bazaar' && !snap.data && ae) metric = { label: t('mp.metric.x402All'), value: compact(ae.x402.totalTxs, tag), spark: ae.x402.daily.map((d) => d.txs) }
 
   return (
@@ -70,11 +63,6 @@ function Card({ m, i, ae, ocai, t, tag }: {
           </div>
         )}
       </div>
-      {solanaCount != null && (
-        <p className="font-mono text-[10px] text-ink-500">
-          {t('sol.services')} <span className="text-ink-200 tabular-nums">{compact(solanaCount, tag)}</span>
-        </p>
-      )}
       {m.feed === 'snapshot' && snap.data && snap.data.items.length > 0 && (
         <ul className="border-t border-ink-800 pt-2 font-mono text-[10px] text-ink-500">
           {uniqueBy(snap.data.items, (it) => it.name).slice(0, 3).map((it, k) => (

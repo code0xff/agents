@@ -82,7 +82,14 @@ worse deal than it looks:
    report a sample of a subset.
 2. **One RPC, no fallback.**
 
-## What was built instead (2026-09-06)
+## Built, then removed (2026-09-06)
+Built as described below, then taken out the same day. On the page it read as four look-alike cells
+holding a live sample, two aggregates and a snapshot count, and it never said what question it
+answered. Exposing a chain that cannot be read properly turned out to cost more attention than it
+returned. What survives is the chain split on the overview, where Solana appears as one row among the
+chains the headline total is made of, which is the honest place for it.
+
+## What was built (superseded)
 The conclusion above was reached against the wrong bar: it asked whether Solana could be read the way
 Base and Polygon are. Exposed as its own thing, with its limits stated, it is worth having, and three
 pieces were already within reach:

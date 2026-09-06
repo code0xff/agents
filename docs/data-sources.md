@@ -44,14 +44,14 @@ Snapshot files: `<name>.json` (latest 300 items + totals, for the browser), `<na
 
 ## Not read
 - Ethereum: 68k agents cumulatively but one registration in six hours, and 522 x402 payments ever.
-- Solana flow: no chain-wide filter and a single CORS-open RPC, so no payer-to-service graph.
-  A sampled rate, the aggregate share and the Bazaar service count are shown instead, in their own
-  block. See `research/solana-payments.md`.
+- Solana: no chain-wide filter and a single CORS-open RPC, so nothing is read from it directly. It
+  appears only inside the aggregate chain split. See `research/solana-payments.md`.
 
-## Solana (sampled)
-| Source | Use |
-|---|---|
-| `https://solana-rpc.publicnode.com` `getSignaturesForAddress` | Observed settlement rate per known facilitator. Signatures only; transactions are never fetched |
+## Provenance shown in the interface
+A reader cannot judge a number without knowing how it was obtained, so the interface says so:
+the overview's signal row names its source and age, the chain split carries its own `chainsAsOf`
+date because it is published on a slower schedule than the totals it sits beside, and marketplace
+cards carry a live / snapshot / aggregate / link badge.
 
 ## Constraints
 - Public RPC range limits as in the table above. Chunking + 15s polling.

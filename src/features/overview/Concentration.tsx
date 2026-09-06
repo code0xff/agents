@@ -4,12 +4,17 @@ import { useT } from '../../i18n'
 import { compact } from '../../lib/format'
 import type { Share } from './derive'
 
-function Bars({ title, rows, unit, tag }: { title: string; rows: Share[]; unit: 'pct' | 'count'; tag: string }) {
+function Bars({ title, rows, unit, tag, source }: {
+  title: string; rows: Share[]; unit: 'pct' | 'count'; tag: string; source?: string
+}) {
   const { t } = useT()
   const max = rows[0]?.pct ?? 100
   return (
     <div className="flex flex-col gap-2 px-4 py-4 sm:px-5">
-      <h3 className="font-mono text-[10px] tracking-[0.2em] text-ink-500 uppercase">{title}</h3>
+      <div className="flex flex-col gap-0.5">
+        <h3 className="font-mono text-[10px] tracking-[0.2em] text-ink-500 uppercase">{title}</h3>
+        {source && <p className="font-mono text-[9px] leading-relaxed text-ink-600">{source}</p>}
+      </div>
       <ul className="flex flex-col gap-1.5">
         {rows.map((r, i) => {
           const name = r.name === '__others__' ? t('ins.others') : r.name
@@ -47,10 +52,14 @@ function Fact({ label, value }: { label: string; value: string }) {
   )
 }
 
-export function Concentration({ facilitators, paymentChains, chains, usdcPct, mcpAgents }: {
-  facilitators: Share[]; paymentChains: Share[]; chains: Share[]; usdcPct?: number; mcpAgents?: number
+export function Concentration({ facilitators, paymentChains, chains, usdcPct, mcpAgents, chainsAsOf }: {
+  facilitators: Share[]; paymentChains: Share[]; chains: Share[]
+  usdcPct?: number; mcpAgents?: number; chainsAsOf?: string
 }) {
   const { t, tag } = useT()
+  const chainSource = chainsAsOf
+    ? `${t('src.asOf', { date: new Date(chainsAsOf).toLocaleDateString(tag, { month: 'short', day: 'numeric' }) })}`
+    : undefined
   const topFac = facilitators.find((f) => f.name !== '__others__')
   const topChain = chains.find((c) => c.name !== '__others__')
   const facts = [
@@ -69,8 +78,9 @@ export function Concentration({ facilitators, paymentChains, chains, usdcPct, mc
       )}
       <div className="grid divide-y divide-ink-800 md:grid-cols-3 md:divide-x md:divide-y-0">
         <Bars title={t('ins.facilitators')} rows={facilitators} unit="pct" tag={tag} />
-        {/* Which chains the headline payment total is actually made of. */}
-        <Bars title={t('ins.paymentChains')} rows={paymentChains} unit="pct" tag={tag} />
+        {/* Which chains the headline payment total is actually made of. Published on a slower
+            schedule than the totals, so it states its own date. */}
+        <Bars title={t('ins.paymentChains')} rows={paymentChains} unit="pct" tag={tag} source={chainSource} />
         <Bars title={t('ins.agentChains')} rows={chains} unit="count" tag={tag} />
       </div>
     </Panel>
