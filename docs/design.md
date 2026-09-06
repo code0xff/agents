@@ -31,6 +31,23 @@ leading rather than the usual 12-13px. Labels stay mono, uppercase, wide trackin
 CJK has no glyphs in JetBrains Mono and falls back to the system stack, so Korean, Japanese and
 Chinese render proportionally. That is expected and was already true of every label.
 
+## Contrast
+Measured against the panel ground, not eyeballed. The scale is not symmetric between themes, so dark
+is the binding case.
+
+| Token | Dark | Light |
+|---|---|---|
+| `ink-300` | 7.4:1 | 9.5:1 |
+| `ink-400` | 4.9:1 | 6.3:1 |
+| `ink-500` | 3.1:1 | 3.4:1 |
+| `ink-600` | 1.4:1 | 2.0:1 |
+
+`ink-400` is the floor for anything meant to be read, including 9px captions, which get no large-text
+exemption. `ink-500` is for text a reader may skip, such as a relative timestamp in a dense row.
+`ink-600` and below are borders and decoration; they are not a text colour. Dark `ink-500` and
+`ink-400` were lightened to reach these figures after a source caption shipped at 1.4:1, which is
+invisible.
+
 ## Background
 `.bg-grid` subtle grid. Slow parallax via motion `useScroll`.
 

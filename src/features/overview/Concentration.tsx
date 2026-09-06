@@ -13,7 +13,7 @@ function Bars({ title, rows, unit, tag, source }: {
     <div className="flex flex-col gap-2 px-4 py-4 sm:px-5">
       <div className="flex flex-col gap-0.5">
         <h3 className="font-mono text-[10px] tracking-[0.2em] text-ink-500 uppercase">{title}</h3>
-        {source && <p className="font-mono text-[9px] leading-relaxed text-ink-600">{source}</p>}
+        {source && <p className="font-mono text-[9px] leading-relaxed text-ink-400">{source}</p>}
       </div>
       <ul className="flex flex-col gap-1.5">
         {rows.map((r, i) => {
@@ -36,7 +36,7 @@ function Bars({ title, rows, unit, tag, source }: {
             </li>
           )
         })}
-        {rows.length === 0 && <li className="py-4 font-mono text-[11px] text-ink-600">{t('ins.noData')}</li>}
+        {rows.length === 0 && <li className="py-4 font-mono text-[11px] text-ink-500">{t('ins.noData')}</li>}
       </ul>
     </div>
   )

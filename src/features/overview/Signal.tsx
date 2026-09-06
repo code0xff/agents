@@ -36,7 +36,7 @@ export function Signal({ label, value, format, trend, trendLabel, series, live =
       </div>
 
       <motion.span className="truncate font-mono text-2xl leading-none font-light text-ink-50 tabular-nums sm:text-3xl">
-        {value == null ? <span className="text-ink-700">——</span> : text}
+        {value == null ? <span className="text-ink-600">——</span> : text}
       </motion.span>
 
       <div className="flex min-h-[28px] items-end justify-between gap-2">
@@ -46,9 +46,9 @@ export function Signal({ label, value, format, trend, trendLabel, series, live =
               <span className={up ? 'text-ink-100' : 'text-ink-400'}>{up ? '▲' : '▼'} {Math.abs(trend.pct).toFixed(1)}%</span>
             </span>
           ) : (
-            <span className="font-mono text-[11px] text-ink-700">{sub ?? t('sig.noTrend')}</span>
+            <span className="font-mono text-[11px] text-ink-500">{sub ?? t('sig.noTrend')}</span>
           )}
-          <span className="truncate font-mono text-[9px] tracking-wider text-ink-600 uppercase">
+          <span className="truncate font-mono text-[9px] tracking-wider text-ink-400 uppercase">
             {trend ? (trendLabel ?? t('sig.trend7')) : ''}
           </span>
         </div>

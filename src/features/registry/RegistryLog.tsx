@@ -43,7 +43,7 @@ function Row({ e, t, onOpen }: { e: RegistryEvent; t: Translate; onOpen: () => v
           {e.x402 && <Badge dim>x402</Badge>}
           <span className="ml-auto shrink-0 text-ink-500">{short(e.actor)}</span>
           <span className="w-full min-w-0 basis-full truncate text-ink-200 sm:order-none sm:w-auto sm:basis-auto sm:flex-1">
-            {e.name ?? <span className="text-ink-600">{fallbackLabel(e, t)}</span>}
+            {e.name ?? <span className="text-ink-500">{fallbackLabel(e, t)}</span>}
           </span>
         </span>
       </button>
@@ -78,7 +78,7 @@ export function RegistryLog({ state }: { state: RegistryState }) {
           <div role="radiogroup" aria-label={t('reg.chain')} className="flex items-center gap-1">
             {ALL.map((c) => (
               <button key={c} role="radio" aria-checked={chain === c} onClick={() => setChain(c)}
-                className={`rounded border px-2 py-0.5 font-mono text-[10px] tracking-wider transition ${chain === c ? 'border-ink-500 text-ink-100' : 'border-ink-800 text-ink-600 hover:text-ink-300'}`}
+                className={`rounded border px-2 py-0.5 font-mono text-[10px] tracking-wider transition ${chain === c ? 'border-ink-500 text-ink-100' : 'border-ink-800 text-ink-400 hover:text-ink-100'}`}
                 title={errors[c] ?? CHAINS[c].label}>
                 {CHAINS[c].short}{errors[c] ? ' !' : ''}
               </button>
@@ -95,7 +95,7 @@ export function RegistryLog({ state }: { state: RegistryState }) {
         {allFailed && (
           <li className="px-5 py-8 text-center font-mono text-xs text-ink-400">
             {t('reg.allFailed')}
-            <span className="mt-1 block text-ink-600">{Object.values(errors).filter(Boolean)[0]}</span>
+            <span className="mt-1 block text-ink-500">{Object.values(errors).filter(Boolean)[0]}</span>
           </li>
         )}
         {!loading && !allFailed && shown.length === 0 && <li className="px-5 py-8 text-center font-mono text-xs text-ink-500">{t('reg.empty')}</li>}

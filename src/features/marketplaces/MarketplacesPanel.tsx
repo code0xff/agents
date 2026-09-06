@@ -68,7 +68,7 @@ function Card({ m, i, ae, ocai, t, tag }: {
           {uniqueBy(snap.data.items, (it) => it.name).slice(0, 3).map((it, k) => (
             <li key={k} className="truncate">+ {it.name}{it.network ? ` · ${it.network}` : ''}</li>
           ))}
-          <li className="text-ink-600">{t('common.snapshot', { time: timeAgo(snap.data.generatedAt) })}</li>
+          <li className="text-ink-500">{t('common.snapshot', { time: timeAgo(snap.data.generatedAt) })}</li>
         </ul>
       )}
     </motion.a>

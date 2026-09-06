@@ -76,7 +76,7 @@ export default function App() {
         </motion.div>
       </main>
 
-      <footer className="border-t border-ink-800 px-4 py-8 text-center font-mono text-[10px] leading-relaxed tracking-wider text-ink-600 sm:px-6">
+      <footer className="border-t border-ink-800 px-4 py-8 text-center font-mono text-[10px] leading-relaxed tracking-wider text-ink-500 sm:px-6">
         <p className="break-words">{t('footer.sources')}</p>
       </footer>
     </div>

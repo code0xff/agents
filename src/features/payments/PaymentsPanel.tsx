@@ -41,7 +41,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
         <div role="radiogroup" aria-label={t('pay.chain')} className="flex items-center gap-1">
           {PAYMENT_CHAIN_KEYS.map((c) => (
             <button key={c} role="radio" aria-checked={chain === c} onClick={() => setChain(c)}
-              className={`rounded border px-2 py-0.5 font-mono text-[10px] tracking-wider transition ${chain === c ? 'border-ink-500 text-ink-100' : 'border-ink-800 text-ink-600 hover:text-ink-300'}`}
+              className={`rounded border px-2 py-0.5 font-mono text-[10px] tracking-wider transition ${chain === c ? 'border-ink-500 text-ink-100' : 'border-ink-800 text-ink-400 hover:text-ink-100'}`}
               title={errors[c] ?? CHAINS[c].label}>
               {CHAINS[c].short}{errors[c] ? ' !' : ''}
             </button>
@@ -64,8 +64,8 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
             <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-ink-50" />{t('pay.legend.facilitator')}</span>
             <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-ink-300" />{t('pay.legend.service')}</span>
             <span><i className="mr-1 inline-block h-2 w-2 rounded-full border border-ink-400 bg-ink-600" />{t('pay.legend.payer')}</span>
-            <span className="ml-auto hidden text-ink-600 sm:inline">{t('zoom.hint')}</span>
-            <span className="ml-auto text-ink-600 sm:hidden">{t('zoom.hintTouch')}</span>
+            <span className="ml-auto hidden text-ink-500 sm:inline">{t('zoom.hint')}</span>
+            <span className="ml-auto text-ink-500 sm:hidden">{t('zoom.hintTouch')}</span>
           </div>
           {Object.values(errors).find(Boolean) && (
             <p className="absolute top-2 right-4 left-4 truncate font-mono text-[10px] text-ink-400">
@@ -76,7 +76,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
         <div className="border-t border-ink-800 md:border-t-0 md:border-l">
           <div className="border-b border-ink-800 px-4 py-2 font-mono text-[10px] tracking-[0.25em] text-ink-500 uppercase">{t('pay.topSenders')}</div>
           <ul className="border-b border-ink-800 px-4 py-2 font-mono text-[11px]">
-            {top.length === 0 && <li className="py-2 text-ink-600">{t('pay.waiting')}</li>}
+            {top.length === 0 && <li className="py-2 text-ink-500">{t('pay.waiting')}</li>}
             {top.map(([senderKey, n]) => {
               const p = find(senderKey)
               const [senderChain, addr] = senderKey.split(':') as [PaymentChainKey, string]
@@ -105,7 +105,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
                     <a href={`${CHAINS[p.chain].explorer}/tx/${p.tx}`} target="_blank" rel="noreferrer noopener"
                       title={t('pay.viewTx')}
                       className="flex items-center gap-2 px-4 py-1.5 transition-colors hover:bg-ink-800/40">
-                      <span className="w-6 shrink-0 text-ink-600">{timeAgo(p.ts)}</span>
+                      <span className="w-6 shrink-0 text-ink-500">{timeAgo(p.ts)}</span>
                       <span className="shrink-0 text-ink-100 tabular-nums">{usd(p.usdc, 4, tag)}</span>
                       <span className="hidden truncate text-ink-500 sm:inline md:hidden lg:inline">{short(p.payer, 3)}→{short(p.payTo, 3)}</span>
                       <span className="ml-auto">
