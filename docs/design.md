@@ -35,6 +35,9 @@ Chinese render proportionally. That is expected and was already true of every la
 `.bg-grid` subtle grid. Slow parallax via motion `useScroll`.
 
 ## Motion principles
+Motion is for arrival and change, never for whether something is legible. See "Motion and
+correctness" below for the rule that follows from that.
+
 - Entry: motion `initial/animate`, short stagger (0.1–0.15s)
 - Scroll: Lenis smooth scrolling
 - Live events (log / payments): new rows slide in from the top with a brief background flash
@@ -44,24 +47,50 @@ Chinese render proportionally. That is expected and was already true of every la
 
 ## Layout and hierarchy
 The app is split into four routes rather than one long scroll: overview, payments, registry,
-marketplaces. A sticky header carries the mark, the route tabs, and the locale and theme controls on
-the right. Installation is left to the browser, so no install button is shown.
+marketplaces. A sticky header carries the mark, the route tabs, and on the right the locale select,
+the theme toggle and a link to the repository, in that order: the two controls a reader changes come
+before the link that leaves. Installation is left to the browser, so no install button is shown.
 
 Each route opens with a `PageHead`: status line, route title, one line of lead copy. The title uses
 the mono family like everything else; a proportional display face read as a separate product sitting
 on top of the dashboard.
 
-Overview is the interpretation layer.
-The point of the top half is interpretation, not raw totals: each `Signal` pairs a headline number
-with its 7-day momentum and the shape of the series, and the `Concentration` panel answers where the
-activity actually sits (which facilitator settles most payments, which chain holds most agents).
-Raw feeds live on their own routes.
+Overview is the interpretation layer. The point of the top half is interpretation, not raw totals:
+each `Signal` pairs a headline number with a trend and the shape of its series, and `Concentration`
+answers where the activity sits, across three shares: which facilitator settles most payments, which
+chains those payments run on, and which chains hold the agents. Raw feeds live on their own routes.
+
+Not every number compares the same span, so each tile states which comparison it shows. Counts have a
+daily series and compare seven days against the prior seven; volume exists only monthly and compares
+the last two complete months. A trend that does not say what it measured invites the reader to assume
+the wrong one.
+
+## Naming
+A label names what is being counted, not how it was obtained. "Observed live" sat beside "x402
+payments, all time" and never said what it was a rate of; as "x402 payments, live" the two read as
+one subject seen two ways, one from a twelve-month aggregate and one from what the page can see now.
+Method belongs in the sub-line or the source note.
+
+## Provenance
+A reader cannot judge a number without knowing where it came from and how old it is, so the interface
+says so next to the number rather than in a footnote. The signal row names its source and age. A chart
+whose feed refreshes on a slower schedule than the totals beside it carries its own date; the chain
+split currently reads eighteen days behind the figures above it, and nothing on the page admitted that
+until it was labelled. Marketplace cards carry a live / snapshot / aggregate / link badge.
+
+## Selection
+Where two datasets do not interact, they are selected between rather than merged. Base and Polygon
+never settle with each other, so one chain shows at a time: a single graph of both suggested one flow
+where there are two networks, and a merged list ordered by time let the busier chain crowd the other
+out of view. The chain filters are radio groups, and the row-level chain badge goes away because the
+selection already states it.
 
 ## Controls
 Language is a native `select`: compact at any width, accessible for free, and it opens as the
-platform picker on touch. Theme is a single icon button that swaps a sun and moon glyph.
+platform picker on touch. Theme is a single icon button that swaps a sun and moon glyph. The
+repository link is an icon of the same size, last in the row.
 
-Below `md` the route tabs and both controls collapse behind a menu button on the right. The panel is
+Below `md` the route tabs and all three collapse behind a menu button on the right. The panel is
 absolutely positioned under the header bar so it overlays the page; laid out in flow it grew the
 sticky header and pushed the content down. Its background is opaque rather than translucent, or the
 page shows through the menu items. It closes on navigation, on Escape, and on a tap outside. Its open
@@ -104,3 +133,5 @@ pairs a muted uppercase label with an emphasised value inside a bordered box.
 
 - `rounded-lg`/`rounded-xl`, 1px borders, no shadows (blurred panel background instead of glow)
 - Dense data uses mono font at small sizes (`text-xs`)
+- A long list is paginated rather than given its own scroll area, so a page has one scroll axis.
+  Mechanics and page sizes are in `docs/pwa.md`.
