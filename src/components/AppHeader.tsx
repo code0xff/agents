@@ -52,9 +52,9 @@ export function AppHeader({ route }: { route: Route }) {
           {ROUTES.map((r) => <Tab key={r} r={r} active={r === route} label={t(`nav.${r}` as Key)} />)}
         </nav>
         <div className="ml-auto hidden shrink-0 items-center gap-2 md:flex">
-          <SourceLink label={t('nav.source')} />
           <LocaleSwitch />
           <ThemeToggle theme={theme} onToggle={toggle} />
+          <SourceLink label={t('nav.source')} />
         </div>
 
         <button
@@ -96,8 +96,8 @@ export function AppHeader({ route }: { route: Route }) {
               <div className="flex items-center justify-between gap-3 pt-3 pb-1">
                 <LocaleSwitch />
                 <div className="flex items-center gap-2">
-                  <SourceLink label={t('nav.source')} />
                   <ThemeToggle theme={theme} onToggle={toggle} />
+                  <SourceLink label={t('nav.source')} />
                 </div>
               </div>
             </nav>
