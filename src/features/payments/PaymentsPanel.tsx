@@ -5,7 +5,7 @@ import { Pagination, usePagination } from '../../components/Pagination'
 import { Stat } from '../../components/Stat'
 import { CHAINS, PAYMENT_CHAIN_KEYS, type PaymentChainKey } from '../../data/chains'
 import { useT } from '../../i18n'
-import { short, timeAgo, usd } from '../../lib/format'
+import { short, spanFrom, timeAgo, usd } from '../../lib/format'
 import { useIsMobile } from '../../lib/useMediaQuery'
 import { PaymentGraph } from './PaymentGraph'
 import { facilitatorLabel, type PaymentsState } from './usePayments'
@@ -30,6 +30,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
     return Object.entries(c).sort((a, b) => b[1] - a[1]).slice(0, 6)
   }, [payments])
   const paged = usePagination(payments, isMobile ? 6 : 10)
+  const span = spanFrom(payments[payments.length - 1]?.ts)
   const find = (senderKey: string) => {
     const [chain, addr] = senderKey.split(':')
     return payments.find((x) => x.chain === chain && x.facilitator === addr)
@@ -48,7 +49,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
           ))}
         </div>
         <span className="font-mono text-[10px] text-ink-500">
-          {heads[chain] ? `${t('common.block')} ${heads[chain]}` : '—'}
+          {span ? t('common.spanShown', { span }) : heads[chain] ? `${t('common.block')} ${heads[chain]}` : '—'}
         </span>
         <LiveDot active={heads[chain] != null && !errors[chain]} />
       </div>}>

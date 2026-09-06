@@ -155,6 +155,7 @@ export const ko: Dict = {
   'src.asOf': '{date} 기준',
   'src.chainsStale': '이 분포는 별도 주기로 갱신되어 위 총계보다 뒤처집니다.',
   'sig.trendMonth': '직전 완결 월 대 그 전월',
+  'common.spanShown': '최근 {span}',
   'theme.dark': '다크',
   'theme.light': '라이트',
 }

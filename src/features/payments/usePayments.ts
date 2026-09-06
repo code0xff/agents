@@ -58,7 +58,12 @@ export interface PaymentsState {
 }
 
 const POLL_MS = 10_000
-const MAX = 300
+/**
+ * Retained per chain, not across both. A shared cap let Polygon, which settles roughly four times
+ * as often, crowd Base out of the buffer: selecting Base showed about a minute of history where its
+ * own backfill covers five.
+ */
+const MAX_PER_CHAIN = 200
 /** Transactions per round trip. Each response is about 1 KB. */
 const TX_CHUNK = 8
 /**
@@ -165,9 +170,15 @@ export function usePayments() {
             setState((s) => {
               const seen = new Set(s.payments.map((p) => p.key))
               const fresh = found.filter((p) => !seen.has(p.key))
+              const merged = [...fresh, ...s.payments].sort((a, b) => b.ts - a.ts)
+              const perChain: Partial<Record<PaymentChainKey, number>> = {}
               return {
                 ...s,
-                payments: [...fresh, ...s.payments].sort((a, b) => b.ts - a.ts).slice(0, MAX),
+                payments: merged.filter((p) => {
+                  const n = (perChain[p.chain] ?? 0) + 1
+                  perChain[p.chain] = n
+                  return n <= MAX_PER_CHAIN
+                }),
                 heads: { ...s.heads, [key]: head },
                 blocksScanned: s.blocksScanned + scanned,
                 errors: { ...s.errors, [key]: undefined },

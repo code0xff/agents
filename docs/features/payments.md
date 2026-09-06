@@ -60,6 +60,9 @@ the target node pulses. A recent-payments list sits beside the graph.
   as the first log query returns rather than after every transaction has been fetched: measured 0.76s
   against 3.2s. It is also more accurate, because the decoded list is capped at 60 transactions per
   scan while the log set is not, so the old figure under-reported whenever the cap bound.
+- Retention is capped per chain rather than across both. A shared cap let Polygon, at roughly four
+  times Base's rate, fill the buffer: selecting Base showed about a minute of history where its own
+  backfill covers five.
 - Retention is bounded: 300 payments, 200 registry events, 120 nodes in the graph window. Blocks and
   logs are scanned and discarded, never accumulated. Measured over 6.8 minutes the payment list held
   at exactly 300 and the JS heap stayed flat around 16 MB.

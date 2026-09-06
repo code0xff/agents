@@ -95,6 +95,12 @@ whose feed refreshes on a slower schedule than the totals beside it carries its 
 split currently reads eighteen days behind the figures above it, and nothing on the page admitted that
 until it was labelled. Marketplace cards carry a live / snapshot / aggregate / link badge.
 
+## Time windows
+A panel that shows a live feed states how far back what is on screen reaches, and one whose figures
+say "in window" has to name that window. The span is computed from the oldest item currently held,
+not from a configured range, so it stays true as a session accumulates and as retention evicts.
+Snapshot and aggregate figures state their own age instead: "snapshot 6h old", "as of 19 Aug".
+
 ## Selection
 Where two datasets do not interact, they are selected between rather than merged. Base and Polygon
 never settle with each other, so one chain shows at a time: a single graph of both suggested one flow

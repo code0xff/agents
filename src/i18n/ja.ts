@@ -155,6 +155,7 @@ export const ja: Dict = {
   'src.asOf': '{date} 時点',
   'src.chainsStale': 'この内訳は別の周期で更新され、上の合計より遅れます。',
   'sig.trendMonth': '直近の完了月と前月の比較',
+  'common.spanShown': '直近 {span}',
   'theme.dark': 'ダーク',
   'theme.light': 'ライト',
 }

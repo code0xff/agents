@@ -12,6 +12,7 @@ import { RegistryLog } from './features/registry/RegistryLog'
 import { useRegistry } from './features/registry/useRegistry'
 import { useT } from './i18n'
 import type { Key } from './i18n/en'
+import { spanFrom } from './lib/format'
 import { useMediaQuery } from './lib/useMediaQuery'
 import { usePwa } from './lib/usePwa'
 import { useHashRoute, type Route } from './router'
@@ -30,6 +31,8 @@ export default function App() {
   const payments = usePayments()
   const registry = useRegistry(REGISTRY_CHAINS)
   const perMin = useMemo(() => paymentsPerMinute(payments), [payments])
+  // The rate covers the retained beats, so the overview says how far back those reach.
+  const observedSpan = useMemo(() => spanFrom(payments.beats[payments.beats.length - 1]), [payments.beats])
 
   useEffect(() => {
     if (!smoothOk) return
@@ -72,7 +75,7 @@ export default function App() {
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-col gap-4 sm:gap-6"
         >
-          <Page route={route} payments={payments} registry={registry} perMin={perMin} />
+          <Page route={route} payments={payments} registry={registry} perMin={perMin} observedSpan={observedSpan} />
         </motion.div>
       </main>
 
@@ -83,16 +86,17 @@ export default function App() {
   )
 }
 
-function Page({ route, payments, registry, perMin }: {
+function Page({ route, payments, registry, perMin, observedSpan }: {
   route: Route
   payments: ReturnType<typeof usePayments>
   registry: ReturnType<typeof useRegistry>
   perMin: number | null
+  observedSpan: string | null
 }) {
   switch (route) {
     case 'payments': return <PaymentsPanel state={payments} />
     case 'registry': return <RegistryLog state={registry} />
     case 'marketplaces': return <MarketplacesPanel />
-    default: return <OverviewPanel observedPerMin={perMin} />
+    default: return <OverviewPanel observedPerMin={perMin} observedSpan={observedSpan} />
   }
 }

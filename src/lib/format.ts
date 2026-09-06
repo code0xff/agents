@@ -13,6 +13,20 @@ export function timeAgo(ts: number | Date | string): string {
   return `${Math.floor(s / 86400)}d`
 }
 
+/**
+ * How far back the oldest item on screen reaches. A panel that says "in window" has to say what
+ * the window is, and the honest answer is the span actually being shown, which grows as a session
+ * runs and stops at the retention cap.
+ */
+export function spanFrom(oldestTs: number | undefined): string | null {
+  if (oldestTs == null) return null
+  const s = Math.max(0, (Date.now() - oldestTs) / 1000)
+  if (s < 90) return `${Math.round(s)}s`
+  if (s < 5400) return `${Math.round(s / 60)}m`
+  if (s < 86400) return `${(s / 3600).toFixed(1)}h`
+  return `${Math.round(s / 86400)}d`
+}
+
 export const compact = (n: number, tag = 'en') =>
   new Intl.NumberFormat(tag, { notation: 'compact', maximumFractionDigits: 1 }).format(n)
 

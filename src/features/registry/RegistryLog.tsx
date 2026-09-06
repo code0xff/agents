@@ -4,7 +4,7 @@ import { Badge, LiveDot, Panel } from '../../components/Panel'
 import { Pagination, usePagination } from '../../components/Pagination'
 import { CHAINS, type ChainKey } from '../../data/chains'
 import { useT, type Translate } from '../../i18n'
-import { short, timeAgo } from '../../lib/format'
+import { short, spanFrom, timeAgo } from '../../lib/format'
 import { useIsMobile } from '../../lib/useMediaQuery'
 import type { RegistryState } from './useRegistry'
 import { AgentModal } from './AgentModal'
@@ -59,6 +59,8 @@ export function RegistryLog({ state }: { state: RegistryState }) {
   const [chain, setChain] = useState<ChainKey>('base')
   const { events, heads, errors, loading, allFailed } = state
   const shown = events.filter((e) => e.chain === chain)
+  // What the list actually reaches back to, rather than a claim about being live.
+  const span = spanFrom(shown[shown.length - 1]?.ts)
   const paged = usePagination(shown, isMobile ? 8 : 12)
   const [open, setOpen] = useState<RegistryEvent | null>(null)
 
@@ -85,7 +87,7 @@ export function RegistryLog({ state }: { state: RegistryState }) {
             ))}
           </div>
           <span className="font-mono text-[10px] text-ink-500">
-            {heads[chain] ? `${t('common.block')} ${heads[chain]}` : '—'}
+            {span ? t('common.spanShown', { span }) : heads[chain] ? `${t('common.block')} ${heads[chain]}` : '—'}
           </span>
           <LiveDot active={!loading && !allFailed && !errors[chain]} />
         </div>

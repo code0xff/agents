@@ -7,7 +7,7 @@ import { agentChainShares, facilitatorShares, paymentChainShares, periodTrend, t
 import { Concentration } from './Concentration'
 import { Signal } from './Signal'
 
-export function OverviewPanel({ observedPerMin }: { observedPerMin: number | null }) {
+export function OverviewPanel({ observedPerMin, observedSpan }: { observedPerMin: number | null; observedSpan: string | null }) {
   const { t, tag } = useT()
   const ae = useAgentEconomy()
   const ocai = useOcaiStats()
@@ -41,7 +41,7 @@ export function OverviewPanel({ observedPerMin }: { observedPerMin: number | nul
           sub={d ? t('mp.stat.chains', { n: d.erc8004Registry.chainsTracked }) : undefined} />
         <Signal label={t('sig.observed')} value={observedPerMin} live
           format={(n) => t('sig.perMin', { n: n.toFixed(1) })}
-          sub={t('sig.observedSub')} />
+          sub={observedSpan ? `${t('sig.observedSub')} · ${t('common.spanShown', { span: observedSpan })}` : t('sig.observedSub')} />
         <p className="col-span-full border-t border-ink-800 px-4 py-2 font-mono text-[9px] leading-relaxed text-ink-400 sm:px-5">
           {t('src.label')}: {d ? t('src.aggregate', { time: timeAgo(d.updatedAt) }) : '—'} · {t('src.live')}
         </p>
