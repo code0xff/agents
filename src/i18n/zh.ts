@@ -159,6 +159,7 @@ export const zh: Dict = {
   'sol.sources': '来自 {n} 个 facilitator',
   'sol.sourcesPlural': '来自 {n} 个 facilitator',
   'sol.none': '没有 Solana facilitator 响应。',
+  'nav.source': 'GitHub 源码',
   'theme.dark': '深色',
   'theme.light': '浅色',
 }

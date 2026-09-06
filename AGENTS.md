@@ -49,6 +49,9 @@ Vite 8 · React 19 · TypeScript · Tailwind v4 · motion · GSAP · Lenis · D3
 | `docs/review-2026-09.md` | Code audit findings and what was fixed or deferred |
 | `docs/research/` | Pre-implementation research per feature (required). registry / payments / marketplaces done |
 
+## License
+Apache 2.0. New source files do not carry per-file headers; `LICENSE` at the root covers the project.
+
 ## Commands
 
 ```

@@ -7,6 +7,8 @@ import type { Key } from '../i18n/en'
 import { useTheme } from '../lib/theme'
 import { hrefFor, ROUTES, type Route } from '../router'
 
+const REPO = 'https://github.com/code0xff/agents'
+
 export function AppHeader({ route }: { route: Route }) {
   const { t } = useT()
   const { theme, toggle } = useTheme()
@@ -50,6 +52,7 @@ export function AppHeader({ route }: { route: Route }) {
           {ROUTES.map((r) => <Tab key={r} r={r} active={r === route} label={t(`nav.${r}` as Key)} />)}
         </nav>
         <div className="ml-auto hidden shrink-0 items-center gap-2 md:flex">
+          <SourceLink label={t('nav.source')} />
           <LocaleSwitch />
           <ThemeToggle theme={theme} onToggle={toggle} />
         </div>
@@ -92,13 +95,27 @@ export function AppHeader({ route }: { route: Route }) {
               ))}
               <div className="flex items-center justify-between gap-3 pt-3 pb-1">
                 <LocaleSwitch />
-                <ThemeToggle theme={theme} onToggle={toggle} />
+                <div className="flex items-center gap-2">
+                  <SourceLink label={t('nav.source')} />
+                  <ThemeToggle theme={theme} onToggle={toggle} />
+                </div>
               </div>
             </nav>
           </motion.div>
         )}
       </AnimatePresence>
     </header>
+  )
+}
+
+function SourceLink({ label }: { label: string }) {
+  return (
+    <a href={REPO} target="_blank" rel="noreferrer noopener" aria-label={label} title={label}
+      className="grid h-[26px] w-[26px] place-items-center rounded-full border border-ink-800 text-ink-400 transition hover:border-ink-600 hover:text-ink-100 focus-visible:border-ink-500 focus-visible:outline-none">
+      <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="currentColor" aria-hidden>
+        <path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38l-.01-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.93-.89-1.18-.89-1.18-.73-.5.05-.49.05-.49.8.06 1.23.83 1.23.83.72 1.23 1.88.88 2.34.67.07-.52.28-.88.51-1.08-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48l-.01 2.19c0 .21.14.46.55.38A8 8 0 0 0 8 0Z" />
+      </svg>
+    </a>
   )
 }
 

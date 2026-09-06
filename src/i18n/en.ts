@@ -157,6 +157,7 @@ export const en = {
   'sol.sources': 'From {n} facilitator',
   'sol.sourcesPlural': 'From {n} facilitators',
   'sol.none': 'No Solana facilitator answered.',
+  'nav.source': 'Source on GitHub',
   'theme.dark': 'dark',
   'theme.light': 'light',
 }

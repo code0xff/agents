@@ -159,6 +159,7 @@ export const ja: Dict = {
   'sol.sources': 'facilitator {n} 件から',
   'sol.sourcesPlural': 'facilitator {n} 件から',
   'sol.none': '応答した Solana facilitator はありません。',
+  'nav.source': 'GitHub のソース',
   'theme.dark': 'ダーク',
   'theme.light': 'ライト',
 }

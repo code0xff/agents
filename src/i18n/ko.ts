@@ -159,6 +159,7 @@ export const ko: Dict = {
   'sol.sources': 'facilitator {n}곳 기준',
   'sol.sourcesPlural': 'facilitator {n}곳 기준',
   'sol.none': '응답한 솔라나 facilitator가 없습니다.',
+  'nav.source': 'GitHub 저장소',
   'theme.dark': '다크',
   'theme.light': '라이트',
 }

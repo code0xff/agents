@@ -2,6 +2,13 @@
   "name": "agents",
   "private": true,
   "version": "0.0.0",
+  "description": "A dashboard for the AI agent economy that reads public chain data directly in the browser.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/code0xff/agents.git"
+  },
+  "homepage": "https://code0xff.github.io/agents/",
   "type": "module",
   "scripts": {
     "dev": "vite",
