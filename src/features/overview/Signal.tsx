@@ -6,11 +6,13 @@ import { num } from '../../lib/format'
 import type { Trend } from './derive'
 
 /** A headline number with its 7-day momentum and a shape for the series behind it. */
-export function Signal({ label, value, format, trend, series, live = false, sub }: {
+export function Signal({ label, value, format, trend, trendLabel, series, live = false, sub }: {
   label: string
   value: number | null | undefined
   format?: (n: number) => string
   trend?: Trend | null
+  /** Which comparison the trend represents. Not every tile compares the same span. */
+  trendLabel?: string
   series?: number[]
   live?: boolean
   sub?: string
@@ -47,7 +49,7 @@ export function Signal({ label, value, format, trend, series, live = false, sub 
             <span className="font-mono text-[11px] text-ink-700">{sub ?? t('sig.noTrend')}</span>
           )}
           <span className="truncate font-mono text-[9px] tracking-wider text-ink-600 uppercase">
-            {trend ? t('sig.trend7') : sub ? '' : ''}
+            {trend ? (trendLabel ?? t('sig.trend7')) : ''}
           </span>
         </div>
         {series && series.length > 3 && <Spark data={series} />}

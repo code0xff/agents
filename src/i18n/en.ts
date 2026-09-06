@@ -153,6 +153,7 @@ export const en = {
   'src.live': 'Rate read directly from Base and Polygon',
   'src.asOf': 'as of {date}',
   'src.chainsStale': 'This split is published on its own schedule and runs behind the totals above.',
+  'sig.trendMonth': 'last full month vs prior',
   'theme.dark': 'dark',
   'theme.light': 'light',
 }

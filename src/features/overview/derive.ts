@@ -12,6 +12,19 @@ export function trend(values: number[], w = 7): Trend | null {
   return { pct: ((recent - prior) / prior) * 100, recent, prior }
 }
 
+/**
+ * Compares the last complete period against the one before it. The final entry of a monthly
+ * series is the month in progress, so including it would compare a few days against a full month
+ * and read as a collapse.
+ */
+export function periodTrend(values: number[]): Trend | null {
+  if (values.length < 3) return null
+  const recent = values[values.length - 2]
+  const prior = values[values.length - 3]
+  if (!prior) return null
+  return { pct: ((recent - prior) / prior) * 100, recent, prior }
+}
+
 export interface Share { name: string; value: number; pct: number }
 
 /** Source feeds already bucket their long tail under names like these. */

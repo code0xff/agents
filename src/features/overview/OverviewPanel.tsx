@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { useT } from '../../i18n'
 import { compact, timeAgo, usd } from '../../lib/format'
 import { useAgentEconomy, useOcaiStats } from '../marketplaces/useAggregates'
-import { agentChainShares, facilitatorShares, paymentChainShares, trend } from './derive'
+import { agentChainShares, facilitatorShares, paymentChainShares, periodTrend, trend } from './derive'
 import { Concentration } from './Concentration'
 import { Signal } from './Signal'
 
@@ -16,6 +16,9 @@ export function OverviewPanel({ observedPerMin }: { observedPerMin: number | nul
   const paySeries = useMemo(() => d?.x402.daily.map((x) => x.txs) ?? [], [d])
   const agentSeries = useMemo(() => d?.erc8004Registry.daily.map((x) => x.agents) ?? [], [d])
   const payTrend = useMemo(() => trend(paySeries), [paySeries])
+  // Volume exists only in the monthly series, so it is compared month over month.
+  const volSeries = useMemo(() => d?.x402.monthly.map((m) => m.vol) ?? [], [d])
+  const volTrend = useMemo(() => periodTrend(volSeries), [volSeries])
   const agentTrend = useMemo(() => trend(agentSeries), [agentSeries])
   const facs = useMemo(() => facilitatorShares(d), [d])
   const chains = useMemo(() => agentChainShares(d), [d])
@@ -31,6 +34,7 @@ export function OverviewPanel({ observedPerMin }: { observedPerMin: number | nul
         <Signal label={t('mp.stat.payments')} value={d?.x402.totalTxs} format={(n) => compact(n, tag)}
           trend={payTrend} series={paySeries.slice(-30)} />
         <Signal label={t('mp.stat.volume')} value={d?.x402.totalVolume} format={(n) => usd(n, 0, tag)}
+          trend={volTrend} trendLabel={t('sig.trendMonth')} series={volSeries}
           sub={d ? t('mp.stat.facilitators', { n: d.x402.facilitatorsTracked }) : undefined} />
         <Signal label={t('mp.stat.agents')} value={d?.erc8004Registry.totalAgents} format={(n) => compact(n, tag)}
           trend={agentTrend} series={agentSeries.slice(-30)}

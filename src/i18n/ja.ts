@@ -155,6 +155,7 @@ export const ja: Dict = {
   'src.live': 'レートは Base と Polygon から直接観測',
   'src.asOf': '{date} 時点',
   'src.chainsStale': 'この内訳は別の周期で更新され、上の合計より遅れます。',
+  'sig.trendMonth': '直近の完了月と前月の比較',
   'theme.dark': 'ダーク',
   'theme.light': 'ライト',
 }

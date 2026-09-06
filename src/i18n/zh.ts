@@ -155,6 +155,7 @@ export const zh: Dict = {
   'src.live': '速率直接观测自 Base 与 Polygon',
   'src.asOf': '截至 {date}',
   'src.chainsStale': '该分布按独立周期更新，落后于上方总量。',
+  'sig.trendMonth': '上一完整月与前月对比',
   'theme.dark': '深色',
   'theme.light': '浅色',
 }
