@@ -119,7 +119,7 @@ export const zh: Dict = {
   'zoom.in': '放大',
   'zoom.out': '缩小',
   'zoom.reset': '重置视图',
-  'zoom.hint': '拖动平移，滚动缩放',
+  'zoom.hint': '拖动平移，⌘/Ctrl + 滚动缩放',
   'zoom.hintTouch': '点击手形按钮以平移与缩放地图',
   'zoom.touchOn': '启用地图手势',
   'zoom.touchOff': '关闭地图手势',

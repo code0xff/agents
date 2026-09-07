@@ -120,6 +120,13 @@ page shows through the menu items. It closes on navigation, on Escape, and on a 
 state is stored as the route it was opened on, so a route change closes it during render rather than
 through an effect.
 
+## Embedded surfaces
+An interactive surface inside a scrolling page does not take the plain gesture that scrolls it. The
+flow map fills more than half the viewport, so claiming the wheel stopped the page dead wherever the
+pointer crossed it. A modifier zooms, which is also how a trackpad pinch arrives; dragging pans,
+which does not conflict; and the corner buttons make zoom discoverable without any gesture at all.
+The same rule produced the touch toggle: one finger scrolls the page until the map is claimed.
+
 ## Bounds
 A view onto something larger should not advertise its frame. The flow map bounds its layout to an
 ellipse and fades its own edges, so the panel border is the only straight line and the graph reads as

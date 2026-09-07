@@ -119,7 +119,7 @@ export const ko: Dict = {
   'zoom.in': '확대',
   'zoom.out': '축소',
   'zoom.reset': '보기 초기화',
-  'zoom.hint': '끌어서 이동, 스크롤로 확대',
+  'zoom.hint': '끌어서 이동, ⌘/Ctrl + 스크롤로 확대',
   'zoom.hintTouch': '손 버튼을 눌러 맵을 이동·확대',
   'zoom.touchOn': '맵 제스처 켜기',
   'zoom.touchOff': '맵 제스처 끄기',

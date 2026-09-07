@@ -70,6 +70,13 @@ export function PaymentGraph({ payments, compact = false }: { payments: Payment[
       .filter((event: Event) => {
         // Dragging a node must not also drag the camera.
         if ((event.target as Element).closest?.('g.n')) return false
+        // The graph fills most of the viewport, so a plain wheel has to keep scrolling the page;
+        // taking it stopped the page dead wherever the pointer crossed the map. A modifier zooms,
+        // which is also how a trackpad pinch arrives.
+        if (event.type === 'wheel') {
+          const e = event as WheelEvent
+          return e.ctrlKey || e.metaKey
+        }
         // The graph sits inside a scrolling page, so touch reaches the map only while the
         // reader has claimed it. A mouse always drives the map.
         if (event.type.startsWith('touch')) return touchMapRef.current

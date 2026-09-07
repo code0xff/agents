@@ -119,7 +119,7 @@ export const ja: Dict = {
   'zoom.in': '拡大',
   'zoom.out': '縮小',
   'zoom.reset': '表示をリセット',
-  'zoom.hint': 'ドラッグで移動、スクロールで拡大',
+  'zoom.hint': 'ドラッグで移動、⌘/Ctrl + スクロールで拡大',
   'zoom.hintTouch': '手のボタンで移動とピンチ操作',
   'zoom.touchOn': 'マップ操作を有効化',
   'zoom.touchOff': 'マップ操作を解除',

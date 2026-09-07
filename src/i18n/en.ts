@@ -117,7 +117,7 @@ export const en = {
   'zoom.in': 'Zoom in',
   'zoom.out': 'Zoom out',
   'zoom.reset': 'Reset view',
-  'zoom.hint': 'Drag to pan, scroll to zoom',
+  'zoom.hint': 'Drag to pan, ⌘/Ctrl + scroll to zoom',
   'zoom.hintTouch': 'Tap the hand to pan and pinch the map',
   'zoom.touchOn': 'Enable map gestures',
   'zoom.touchOff': 'Release map gestures',

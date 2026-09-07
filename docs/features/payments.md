@@ -41,7 +41,10 @@ the target node pulses. A recent-payments list sits beside the graph.
   boundary instead of being cut by a straight line. The layout is
   allowed to spread instead of being packed into the visible rectangle; the camera eases toward the
   centroid of the newest settlements and yields to the reader for 9s after any pan, zoom or drag.
-  Zoom and pan controls sit in the corner of the canvas; the wheel zooms and dragging pans. Reset
+  Zoom and pan controls sit in the corner of the canvas. Dragging pans, and zooming needs a modifier:
+a plain wheel keeps scrolling the page, because the canvas covers more than half the viewport and
+taking the wheel stopped the page wherever the pointer crossed it. Ctrl or Cmd with the wheel zooms,
+which is also the shape a trackpad pinch arrives in. Reset
   recentres and hands the camera back to the follower.
 
   Touch is claimed explicitly through a hand button shown only on small screens. The button inverts to
