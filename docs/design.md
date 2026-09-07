@@ -143,6 +143,10 @@ a window rather than a diagram drawn to fit a box.
 A control that holds a mode inverts: filled background, background-coloured glyph. Shifting a border
 or text one step brighter is invisible when every step is a shade of grey.
 
+The inversion has to survive the pointer. A variant's hover colour applied on top of a held control
+once brightened the glyph to the fill's own shade, so the label vanished under the cursor. The held
+state sets its colours for hover as well, and wins.
+
 ## Motion and correctness
 Geometry and visibility are set directly, never only through a transition. A transition that never
 runs leaves the element at its initial value, so animating in from `opacity: 0` or `r: 0` can render
