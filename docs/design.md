@@ -147,6 +147,13 @@ The inversion has to survive the pointer. A variant's hover colour applied on to
 once brightened the glyph to the fill's own shade, so the label vanished under the cursor. The held
 state sets its colours for hover as well, and wins.
 
+Every held state inverts the same way — a filter chip as much as a button. A chip that marked its
+selection with a coloured ring alone was invisible next to its neighbours on a light ground.
+
+Borders are drawn against the ground they actually sit on. A step of grey on a translucent panel
+reads against what shows through; on an opaque panel the same step is invisible, and the outline
+of a control at rest has to be one or two steps brighter to be drawn at all.
+
 ## Motion and correctness
 Geometry and visibility are set directly, never only through a transition. A transition that never
 runs leaves the element at its initial value, so animating in from `opacity: 0` or `r: 0` can render
