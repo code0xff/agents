@@ -61,7 +61,7 @@ export function RegistryLog({ state }: { state: RegistryState }) {
   const shown = events.filter((e) => e.chain === chain)
   // What the list actually reaches back to, rather than a claim about being live.
   const span = spanFrom(shown[shown.length - 1]?.ts)
-  const paged = usePagination(shown, isMobile ? 8 : 12)
+  const paged = usePagination(shown, isMobile ? 8 : 12, chain)
   const [open, setOpen] = useState<RegistryEvent | null>(null)
 
   // While the reader is off page 1, show what arrived so the shifting list is explainable.

@@ -15,16 +15,33 @@ export interface Paged<T> {
   prev: () => void
 }
 
-/** Index-based pagination over a live-updating list. Page is clamped when the list shrinks. */
-export function usePagination<T>(all: T[], pageSize: number): Paged<T> {
+/**
+ * Index-based pagination over a live-updating list. Page is clamped when the list shrinks.
+ *
+ * `resetKey` names what the list is of. Changing it returns to page one, because a page number
+ * means nothing once the underlying list is replaced: switching chains otherwise opened whatever
+ * page the reader had reached on the previous one.
+ */
+export function usePagination<T>(all: T[], pageSize: number, resetKey?: string): Paged<T> {
   const [page, setPageRaw] = useState(1)
   const total = all.length
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
-  // Derived rather than stored: a shrinking list clamps the page without an extra render.
-  const current = Math.min(page, totalPages)
   // Recorded when the reader navigates away from page one, so a live list that keeps
   // growing underneath them can be explained without watching it from an effect.
   const [leftPageOneAt, setLeftPageOneAt] = useState<number | null>(null)
+
+  // Reset during render rather than from an effect, so the new list never paints at the old
+  // page number first. This is React's documented pattern for state derived from a prop.
+  const [seenKey, setSeenKey] = useState(resetKey)
+  const switched = resetKey !== seenKey
+  if (switched) {
+    setSeenKey(resetKey)
+    setPageRaw(1)
+    setLeftPageOneAt(null)
+  }
+
+  // Derived rather than stored: a shrinking list clamps the page without an extra render.
+  const current = switched ? 1 : Math.min(page, totalPages)
   const setPage = useCallback((p: number) => {
     const next = Math.min(Math.max(1, p), totalPages)
     const size = all.length

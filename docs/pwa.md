@@ -50,6 +50,11 @@ error state when offline, while aggregates and snapshots still render.
 Page size is 8 (registry) and 6 (payments) on mobile, 12 and 10 from `sm` up. Pagination replaced the
 inner scroll containers, so the page has a single scroll axis on touch devices.
 
+`usePagination` takes a `resetKey` naming what the list is of, and returns to page one when it
+changes. Without it, switching chains kept the page number from the previous chain, so a reader who
+had paged into Base landed mid-way through BNB. The reset happens during render, not from an effect,
+so the new list never paints at the old page number first.
+
 Because both lists update live, the current page is clamped when the list shrinks, and the registry
 panel shows a "N new" button while the reader is off page one so a shifting list stays explainable.
 

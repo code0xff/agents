@@ -29,7 +29,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
     for (const p of payments) { const k = `${p.chain}:${p.facilitator}`; c[k] = (c[k] ?? 0) + 1 }
     return Object.entries(c).sort((a, b) => b[1] - a[1]).slice(0, 6)
   }, [payments])
-  const paged = usePagination(payments, isMobile ? 6 : 10)
+  const paged = usePagination(payments, isMobile ? 6 : 10, chain)
   const span = spanFrom(payments[payments.length - 1]?.ts)
   const find = (senderKey: string) => {
     const [chain, addr] = senderKey.split(':')
