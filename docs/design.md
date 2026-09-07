@@ -173,6 +173,10 @@ one sentence and the reader cannot tell where each fact ends; the `Fact` chip in
 pairs a muted uppercase label with an emphasised value inside a bordered box.
 
 - `rounded-lg`/`rounded-xl`, 1px borders, no shadows (blurred panel background instead of glow)
+- A panel that carries content is opaque. Translucency with a blur is for the header bar, where
+  the page scrolling under it is the point; a card, a dialog or a menu that shows the page
+  through it reads as unfinished, and its text competes with whatever is behind it. Decided
+  in Nearby after living with 60% and 85% panels; recorded here so both products agree.
 - Dense data uses mono font at small sizes (`text-xs`)
 - A long list is paginated rather than given its own scroll area, so a page has one scroll axis.
   Mechanics and page sizes are in `docs/pwa.md`.
