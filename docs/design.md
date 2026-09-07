@@ -56,7 +56,7 @@ Motion is for arrival and change, never for whether something is legible. See "M
 correctness" below for the rule that follows from that.
 
 - Entry: motion `initial/animate`, short stagger (0.1–0.15s)
-- Scroll: Lenis smooth scrolling
+- Scroll: the browser's own. See "Scrolling" below.
 - Live events (log / payments): new rows slide in from the top with a brief background flash
 - Graph: D3 transitions; node pulses use luminance only
 - Numbers: count-up (motion `animate`)
@@ -119,6 +119,13 @@ sticky header and pushed the content down. Its background is opaque rather than 
 page shows through the menu items. It closes on navigation, on Escape, and on a tap outside. Its open
 state is stored as the route it was opened on, so a route change closes it during render rather than
 through an effect.
+
+## Scrolling
+Native. A smooth-scroll library was used and removed: it takes the wheel, cancels it and animates the
+page itself against a cached scroll limit, and on a page whose height changes as data arrives and as
+routes swap that limit goes stale, so scrolling stopped short of the bottom. It also made the flow
+map's wheel handling a three-way negotiation. Eased scrolling is a finish; scrolling that reaches the
+end is the feature.
 
 ## Embedded surfaces
 An interactive surface inside a scrolling page does not take the plain gesture that scrolls it. The

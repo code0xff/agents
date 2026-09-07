@@ -16,8 +16,9 @@ x402 payments) by reading public data directly from the browser. Deployed to Git
 4. **UI is monotone, refined, futuristic.** Only achromatic tokens (`ink-*`); emphasis through luminance.
    Light and dark themes are both supported, so never hardcode hex colors — use tokens (`ink-*`,
    `var(--ink-N)`) only. Guide in `docs/design.md`.
-5. **Use animation libraries, do not hand-roll.** motion (Framer Motion), GSAP, Lenis, D3 transitions.
-   Keep custom keyframes to a minimum.
+5. **Use animation libraries, do not hand-roll.** motion (Framer Motion) and D3 transitions. Keep
+   custom keyframes to a minimum. This does not extend to scrolling: that is the browser's, and a
+   smooth-scroll library was removed for stalling short of the bottom. See `docs/design.md`.
 6. **Tailwind v4 first.** Avoid separate CSS files and CSS-in-JS. Tokens live in `@theme` in `src/index.css`.
 7. **Static-deploy compatible.** Routing, paths, and env vars must work under the GitHub Pages `base` path.
 8. **Four languages.** All user-facing UI strings go through `src/i18n` (en, ko, ja, zh). No literal UI
@@ -28,7 +29,7 @@ x402 payments) by reading public data directly from the browser. Deployed to Git
 
 ## Stack
 
-Vite 8 · React 19 · TypeScript · Tailwind v4 · motion · GSAP · Lenis · D3 · viem/wagmi · TanStack Query
+Vite 8 · React 19 · TypeScript · Tailwind v4 · motion · D3 · viem · TanStack Query
 
 ## Documentation index (look here for details)
 

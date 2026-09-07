@@ -1,6 +1,5 @@
-import Lenis from 'lenis'
 import { motion, useScroll, useTransform } from 'motion/react'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { AppHeader } from './components/AppHeader'
 import type { ChainKey } from './data/chains'
 import { PageHead } from './components/PageHead'
@@ -13,7 +12,6 @@ import { useRegistry } from './features/registry/useRegistry'
 import { useT } from './i18n'
 import type { Key } from './i18n/en'
 import { spanFrom } from './lib/format'
-import { useMediaQuery } from './lib/useMediaQuery'
 import { usePwa } from './lib/usePwa'
 import { useHashRoute, type Route } from './router'
 
@@ -23,8 +21,6 @@ export default function App() {
   const { t } = useT()
   const route = useHashRoute()
   const { online } = usePwa()
-  // Native momentum scrolling is better on touch, and it avoids fighting nested scrollers.
-  const smoothOk = useMediaQuery('(min-width: 768px) and (pointer: fine)')
 
   // Both live streams sit above the router so navigating between pages neither restarts
   // the block scan nor loses the events already collected.
@@ -33,15 +29,6 @@ export default function App() {
   const perMin = useMemo(() => paymentsPerMinute(payments), [payments])
   // The rate covers the retained beats, so the overview says how far back those reach.
   const observedSpan = useMemo(() => spanFrom(payments.beats[payments.beats.length - 1]), [payments.beats])
-
-  useEffect(() => {
-    if (!smoothOk) return
-    const lenis = new Lenis({ lerp: 0.1 })
-    let raf = 0
-    const loop = (time: number) => { lenis.raf(time); raf = requestAnimationFrame(loop) }
-    raf = requestAnimationFrame(loop)
-    return () => { cancelAnimationFrame(raf); lenis.destroy() }
-  }, [smoothOk])
 
   const { scrollY } = useScroll()
   const gridY = useTransform(scrollY, [0, 1200], [0, -140])

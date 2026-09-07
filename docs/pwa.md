@@ -40,8 +40,7 @@ error state when offline, while aggregates and snapshots still render.
 - `Stat` drops to `text-lg` and truncates so long currency values never widen the grid.
 - Registry rows stack onto two lines below `sm`; the agent name takes its own line.
 - The payment graph height steps 300 → 380 → 420px and re-centers via `ResizeObserver`.
-- Lenis smooth scrolling is enabled only for `(min-width: 768px) and (pointer: fine)`. On touch the
-  native momentum scroll is used instead, which also avoids fighting nested scroll areas.
+- Scrolling is the browser's own on every device; see `docs/design.md`.
 - `viewport-fit=cover` plus the theme-color meta, kept in sync by `applyTheme`, colors the browser
   chrome and the installed app's status bar.
 
