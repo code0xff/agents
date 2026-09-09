@@ -87,6 +87,7 @@ export const ko: Dict = {
   'page.last': '마지막 페이지',
   'page.newItems': '새 항목 {n}건',
   'pwa.offline': '오프라인',
+  'pwa.update': '새 빌드 준비됨 — 새로고침',
   'hero.status': 'Base, Polygon, BNB를 직접 읽는 중',
   'sig.trend7': '최근 7일 대 이전 7일',
   'sig.noTrend': '추세 데이터 없음',

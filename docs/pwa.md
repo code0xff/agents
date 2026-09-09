@@ -34,6 +34,35 @@ origin, so unprefixed names would collide with the account's other apps. The sam
 RPC calls are POST requests, which Workbox does not cache. Live panels therefore show their empty or
 error state when offline, while aggregates and snapshots still render.
 
+## Applying an update
+The worker is generated in `autoUpdate` mode with `skipWaiting` and `clientsClaim`, so a new build
+takes control of open tabs as soon as it installs. What it must not do is reload the page while
+someone is reading it. Left to itself that is exactly what it did: `vite-plugin-pwa`'s autoUpdate
+registration ends in
+
+```js
+wb.addEventListener('activated', e => {
+  (e.isUpdate || e.isExternal) && (onNeedReload ? onNeedReload() : window.location.reload())
+})
+```
+
+and with no `onNeedReload` the reload is unconditional. Because `registerPwa` asks for an update on
+every `visibilitychange`, the sequence was: return to the tab, check starts, route paints, worker
+activates a second or two later, document reloads and comes back on the same hash. It read as the
+page refreshing itself for no reason, and it was intermittent because it needs a new build to exist.
+
+`src/lib/registerPwa.ts` now passes `onNeedReload` and decides the moment itself:
+
+| Tab state when the build activates | What happens |
+|---|---|
+| Hidden | Reload immediately — nobody is looking |
+| Visible | A filled button appears in the header; the reload waits for it, or for the tab to be hidden |
+
+`onNeedRefresh` is the wrong hook: it is the prompt-mode callback and autoUpdate never reads it.
+
+The button is in the header bar at both breakpoints rather than inside the mobile menu, because a
+build waiting behind a closed hamburger announces nothing.
+
 ## Mobile
 - Layout breakpoints follow Tailwind defaults. The header stacks below `lg`, and the locale switch
   shows two-letter codes below `sm`.

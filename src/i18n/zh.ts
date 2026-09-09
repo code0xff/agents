@@ -87,6 +87,7 @@ export const zh: Dict = {
   'page.last': '最后一页',
   'page.newItems': '{n} 条新增',
   'pwa.offline': '离线',
+  'pwa.update': '新版本已就绪 — 重新加载',
   'hero.status': '正在直接读取 Base、Polygon 与 BNB',
   'sig.trend7': '近 7 天与前 7 天对比',
   'sig.noTrend': '暂无趋势数据',

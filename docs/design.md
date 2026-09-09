@@ -127,6 +127,13 @@ routes swap that limit goes stale, so scrolling stopped short of the bottom. It 
 map's wheel handling a three-way negotiation. Eased scrolling is a finish; scrolling that reaches the
 end is the feature.
 
+## Replacing what is on screen
+Nothing reloads or re-lays-out the page while the reader is looking at it, for a reason they cannot
+see. A new build is applied when the tab is hidden, or when they press the button that says one is
+waiting; see `docs/pwa.md`. Live data follows the same rule in the small: the flow map re-aims its
+camera when its payment list changes identity, so the list keeps its identity through a poll that
+found nothing. Motion has to be caused by something the reader can account for.
+
 ## Embedded surfaces
 An interactive surface inside a scrolling page does not take the plain gesture that scrolls it. The
 flow map fills more than half the viewport, so claiming the wheel stopped the page dead wherever the

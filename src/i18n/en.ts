@@ -85,6 +85,7 @@ export const en = {
   'page.last': 'Last page',
   'page.newItems': '{n} new',
   'pwa.offline': 'Offline',
+  'pwa.update': 'New build ready — reload',
   'hero.status': 'Reading Base, Polygon and BNB directly',
   'sig.trend7': '7d vs prior 7d',
   'sig.noTrend': 'no trend data',

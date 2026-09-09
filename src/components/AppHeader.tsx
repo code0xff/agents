@@ -5,6 +5,7 @@ import { ThemeToggle } from './ThemeToggle'
 import { useT } from '../i18n'
 import type { Key } from '../i18n/en'
 import { useTheme } from '../lib/theme'
+import { applyUpdate, usePwaUpdate } from '../lib/usePwa'
 import { hrefFor, ROUTES, type Route } from '../router'
 
 const REPO = 'https://github.com/code0xff/agents'
@@ -52,22 +53,27 @@ export function AppHeader({ route }: { route: Route }) {
           {ROUTES.map((r) => <Tab key={r} r={r} active={r === route} label={t(`nav.${r}` as Key)} />)}
         </nav>
         <div className="ml-auto hidden shrink-0 items-center gap-2 md:flex">
+          <UpdateButton />
           <LocaleSwitch />
           <ThemeToggle theme={theme} onToggle={toggle} />
           <SourceLink label={t('nav.source')} />
         </div>
 
-        <button
-          ref={buttonRef}
-          type="button"
-          onClick={() => setOpenAt(open ? null : route)}
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          aria-label={open ? t('nav.close') : t('nav.menu')}
-          className="ml-auto grid h-[26px] w-[26px] shrink-0 place-items-center rounded-full border border-ink-800 text-ink-300 transition hover:border-ink-600 hover:text-ink-100 focus-visible:border-ink-500 focus-visible:outline-none md:hidden"
-        >
-          <Burger open={open} />
-        </button>
+        {/* Kept out of the menu: a build waiting behind a closed hamburger says nothing. */}
+        <div className="ml-auto flex shrink-0 items-center gap-2 md:hidden">
+          <UpdateButton />
+          <button
+            ref={buttonRef}
+            type="button"
+            onClick={() => setOpenAt(open ? null : route)}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label={open ? t('nav.close') : t('nav.menu')}
+            className="grid h-[26px] w-[26px] shrink-0 place-items-center rounded-full border border-ink-800 text-ink-300 transition hover:border-ink-600 hover:text-ink-100 focus-visible:border-ink-500 focus-visible:outline-none"
+          >
+            <Burger open={open} />
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -105,6 +111,27 @@ export function AppHeader({ route }: { route: Route }) {
         )}
       </AnimatePresence>
     </header>
+  )
+}
+
+/**
+ * Shown only once a newer build has activated. The worker used to reload the page by itself the
+ * moment it took over, which landed as an unexplained refresh mid-read; now the reload waits for
+ * this button or for the tab to be hidden.
+ */
+function UpdateButton() {
+  const { t } = useT()
+  const ready = usePwaUpdate()
+  if (!ready) return null
+  return (
+    <button type="button" onClick={applyUpdate} aria-label={t('pwa.update')} title={t('pwa.update')}
+      className="grid h-[26px] w-[26px] shrink-0 place-items-center rounded-full border border-ink-100 bg-ink-100 text-ink-950 transition hover:border-ink-300 hover:bg-ink-300 focus-visible:outline-none">
+      <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.5"
+        strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M13 8A5 5 0 1 1 11.4 4.3" />
+        <path d="M13.3 2.2v2.8h-2.8" />
+      </svg>
+    </button>
   )
 }
 

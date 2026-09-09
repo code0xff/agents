@@ -87,6 +87,7 @@ export const ja: Dict = {
   'page.last': '最後のページ',
   'page.newItems': '新着 {n}件',
   'pwa.offline': 'オフライン',
+  'pwa.update': '新しいビルドがあります — 再読み込み',
   'hero.status': 'Base、Polygon、BNB を直接読み取り中',
   'sig.trend7': '直近7日と前7日の比較',
   'sig.noTrend': '傾向データなし',

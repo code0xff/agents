@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
+import { applyUpdate, subscribeUpdate, updateReady } from './registerPwa'
 
 /**
  * Online state for the offline indicator. Installation is left to the browser's own
@@ -18,3 +19,9 @@ export function usePwa() {
   }, [])
   return { online }
 }
+
+/** Re-exported so components read the service worker through one module. */
+export { applyUpdate }
+
+/** True once a newer build has activated and is waiting for a reload. Never resets. */
+export const usePwaUpdate = () => useSyncExternalStore(subscribeUpdate, updateReady, () => false)

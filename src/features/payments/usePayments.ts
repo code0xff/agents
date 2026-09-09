@@ -170,18 +170,25 @@ export function usePayments() {
             setState((s) => {
               const seen = new Set(s.payments.map((p) => p.key))
               const fresh = found.filter((p) => !seen.has(p.key))
-              const merged = [...fresh, ...s.payments].sort((a, b) => b.ts - a.ts)
-              const perChain: Partial<Record<PaymentChainKey, number>> = {}
-              return {
-                ...s,
-                payments: merged.filter((p) => {
+              // Identity is load-bearing downstream: the flow map rebuilds its layout and
+              // re-aims its camera whenever this array changes. Rebuilding it on every poll
+              // moved the map every ten seconds whether or not anything had settled, so a
+              // poll that found nothing hands back the array it was given.
+              let payments = s.payments
+              if (fresh.length > 0) {
+                const perChain: Partial<Record<PaymentChainKey, number>> = {}
+                payments = [...fresh, ...s.payments].sort((a, b) => b.ts - a.ts).filter((p) => {
                   const n = (perChain[p.chain] ?? 0) + 1
                   perChain[p.chain] = n
                   return n <= MAX_PER_CHAIN
-                }),
+                })
+              }
+              return {
+                ...s,
+                payments,
                 heads: { ...s.heads, [key]: head },
                 blocksScanned: s.blocksScanned + scanned,
-                errors: { ...s.errors, [key]: undefined },
+                errors: s.errors[key] === undefined ? s.errors : { ...s.errors, [key]: undefined },
               }
             })
           } catch (e) {
