@@ -8,8 +8,14 @@ export interface ChainConfig {
   short: string
   chain: Chain
   rpcs: string[]
-  /** Max eth_getLogs block range (measured, see docs/research/registry.md) */
-  logRange: bigint
+  /** Blocks read on first load, and the furthest back a catch-up may reach. */
+  logWindow: bigint
+  /**
+   * Largest range a single eth_getLogs call may ask this endpoint for. Separate from the window
+   * because it is the endpoint's limit, not ours: a wider window is simply read as more calls.
+   * Measured, and measured again whenever a chain stops answering. See `docs/research/registry.md`.
+   */
+  logChunk: bigint
   explorer: string
 }
 
@@ -19,17 +25,17 @@ export const CHAINS: Record<ChainKey, ChainConfig> = {
   base: {
     key: 'base', label: 'Base', short: 'BASE', chain: base,
     rpcs: [env.VITE_RPC_BASE ?? 'https://mainnet.base.org'],
-    logRange: 10_000n, explorer: 'https://basescan.org',
+    logWindow: 10_000n, logChunk: 2_000n, explorer: 'https://basescan.org',
   },
   bnb: {
     key: 'bnb', label: 'BNB Chain', short: 'BNB', chain: bsc,
     rpcs: [env.VITE_RPC_BNB ?? 'https://bsc-rpc.publicnode.com'],
-    logRange: 5_000n, explorer: 'https://bscscan.com',
+    logWindow: 5_000n, logChunk: 5_000n, explorer: 'https://bscscan.com',
   },
   polygon: {
     key: 'polygon', label: 'Polygon', short: 'POL', chain: polygon,
     rpcs: [env.VITE_RPC_POLYGON ?? 'https://polygon-bor-rpc.publicnode.com', 'https://polygon.drpc.org'],
-    logRange: 2_000n, explorer: 'https://polygonscan.com',
+    logWindow: 2_000n, logChunk: 2_000n, explorer: 'https://polygonscan.com',
   },
 }
 

@@ -33,12 +33,42 @@ Read functions: `tokenURI(uint256)` (= agentURI), `getAgentWallet(uint256)`, `ge
 ### Public RPC measurements (`eth_getLogs` with the Registered filter; CORS checked with an Origin header)
 | Chain | RPC | getLogs range | CORS | Notes |
 |---|---|---|---|---|
-| Base | `https://mainnet.base.org` | 10,000 blocks OK (78 logs, 350ms) | `*` | **Primary.** publicnode/1rpc reject getLogs |
+| Base | `https://mainnet.base.org` | **2,000** (was 10,000) | `*` | **Primary.** See the re-measurement below |
 | Ethereum | `https://gateway.tenderly.co/public/mainnet`, `https://rpc.mevblocker.io` | 10,000 OK (tenderly 50k OK, mevblocker capped at 10k) | `*` | drpc dropped after intermittent "Can't route" failures. Rejected: publicnode (archive token), ankr (auth), 1rpc (50-block cap), blastapi, zan, blockrazor |
 | BNB | `https://bsc-rpc.publicnode.com` | 5,000 OK (27 logs) | `*` (verified in-app) | binance dataseed rejects the range; drpc returns 429 |
 | Polygon | `https://polygon-bor-rpc.publicnode.com` | 1,000 OK | not checked | polygon-rpc.com returns 401 |
 | Arbitrum | `https://arb1.arbitrum.io/rpc` | 5,000 OK | not checked | little activity |
 | Optimism | `https://mainnet.optimism.io` | 5,000 OK | not checked | little activity |
+
+### Re-measured 2026-09-10, after Base stopped answering
+
+Base registrations had gone blank. The endpoint was up and `eth_blockNumber` answered; only
+`eth_getLogs` refused, deterministically, at any range above 2,000 blocks:
+
+```
+2000 blocks -> ok, 4 logs
+2001 blocks -> eth_getLogs is limited to a 2,000 range   (HTTP 413, code -32614)
+5000 blocks -> eth_getLogs is limited to a 2,000 range
+```
+
+So it was neither transient nor an IP block: `mainnet.base.org` lowered a standing limit, and the
+configured 10,000-block window asked for more than it would give on every single poll.
+
+No keyless Base endpoint does better, so the window is read in several calls instead:
+
+| Endpoint | Largest getLogs range |
+|---|---|
+| `mainnet.base.org` | 2,000 |
+| `base-rpc.publicnode.com` | needs an archive token |
+| `base.drpc.org` | 10 |
+| `1rpc.io/base` | 50 |
+| `base.llamarpc.com`, `base.blockpi.network/v1/rpc/public` | unreachable |
+
+The lesson is in `src/data/chains.ts`: how far back a feature wants to read and how much an
+endpoint will answer in one call are two different numbers, and they were one field. They are now
+`logWindow` and `logChunk`, and `fetchRange` walks the window in chunks. Base keeps its 5.5h of
+history as five calls; BNB (5,000) and Polygon (2,000) still take one, re-measured and unchanged.
+
 
 → First implementation covers **Base + Ethereum + BNB**, each with the RPC above plus a fallback.
 

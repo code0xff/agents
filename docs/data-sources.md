@@ -5,7 +5,7 @@ Verified 2026-09-05. Evidence in `docs/research/`.
 ## On-chain (browser → public RPC, CORS verified)
 | Chain | RPC | getLogs range | Use |
 |---|---|---|---|
-| Base (8453) | `https://mainnet.base.org` | 10k | ERC-8004 registration logs, x402 payment block scan (primary) |
+| Base (8453) | `https://mainnet.base.org` | 2k per call, 10k window | ERC-8004 registration logs, x402 payment block scan (primary) |
 | BNB (56) | `https://bsc-rpc.publicnode.com` | 5k | ERC-8004 registration logs |
 | Polygon (137) | `https://polygon-bor-rpc.publicnode.com` (fallback `https://polygon.drpc.org`) | 2k | x402 payment settlements |
 

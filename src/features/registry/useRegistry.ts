@@ -11,34 +11,50 @@ const MAX_EVENTS = 200
 /** Approximate seconds per block, used to date events without spending an RPC call each. */
 const BLOCK_SECONDS: Record<ChainKey, number> = { base: 2, bnb: 3, polygon: 2 }
 
-async function fetchRange(chain: ChainKey, from: bigint, to: bigint, head: bigint): Promise<RegistryEvent[]> {
+/**
+ * Reads `from`..`to` as a series of calls no wider than the endpoint allows, handing each one
+ * to `onChunk` as it lands.
+ *
+ * A single call used to cover the whole window. Base then lowered its eth_getLogs limit to 2,000
+ * blocks and answered every request for the 10,000-block window with `-32614`, so the chain read
+ * as permanently broken rather than as a window that needed splitting. Publishing per chunk also
+ * means a failure part-way through keeps what was already read.
+ */
+async function fetchRange(
+  chain: ChainKey, from: bigint, to: bigint, head: bigint,
+  onChunk: (events: RegistryEvent[], reached: bigint) => void,
+): Promise<void> {
   const client = getClient(chain)
-  const [reg, uri] = await Promise.all([
-    client.getLogs({ address: IDENTITY_REGISTRY, event: REGISTERED, fromBlock: from, toBlock: to }),
-    client.getLogs({ address: IDENTITY_REGISTRY, event: URI_UPDATED, fromBlock: from, toBlock: to }),
-  ])
+  const chunk = CHAINS[chain].logChunk
   const now = Date.now()
   const secs = BLOCK_SECONDS[chain]
   // Estimated from block distance rather than fetching each block: accurate enough for a
   // relative-time column, and it keeps ordering sane for the whole initial range.
   const estimate = (block: bigint) => now - Number(head - block) * secs * 1000
 
-  const out: RegistryEvent[] = []
-  const push = (
-    kind: RegistryEvent['kind'], agentId: bigint, actor: `0x${string}`, rawUri: string,
-    block: bigint, tx: `0x${string}`, logIndex: number,
-  ) => {
-    const meta = parseAgentURI(rawUri)
-    out.push({
-      key: `${chain}:${tx}:${logIndex}`, chain, kind, agentId, actor, uri: rawUri,
-      name: asString(meta?.name), description: asString(meta?.description),
-      x402: typeof meta?.x402Support === 'boolean' ? meta.x402Support : undefined,
-      block, tx, ts: estimate(block),
-    })
+  for (let lo = from; lo <= to; lo = lo + chunk + 1n) {
+    const hi = lo + chunk > to ? to : lo + chunk
+    const [reg, uri] = await Promise.all([
+      client.getLogs({ address: IDENTITY_REGISTRY, event: REGISTERED, fromBlock: lo, toBlock: hi }),
+      client.getLogs({ address: IDENTITY_REGISTRY, event: URI_UPDATED, fromBlock: lo, toBlock: hi }),
+    ])
+    const out: RegistryEvent[] = []
+    const push = (
+      kind: RegistryEvent['kind'], agentId: bigint, actor: `0x${string}`, rawUri: string,
+      block: bigint, tx: `0x${string}`, logIndex: number,
+    ) => {
+      const meta = parseAgentURI(rawUri)
+      out.push({
+        key: `${chain}:${tx}:${logIndex}`, chain, kind, agentId, actor, uri: rawUri,
+        name: asString(meta?.name), description: asString(meta?.description),
+        x402: typeof meta?.x402Support === 'boolean' ? meta.x402Support : undefined,
+        block, tx, ts: estimate(block),
+      })
+    }
+    for (const l of reg) push('registered', l.args.agentId!, l.args.owner!, l.args.agentURI ?? '', l.blockNumber, l.transactionHash, l.logIndex)
+    for (const l of uri) push('uri', l.args.agentId!, l.args.updater!, l.args.newURI ?? '', l.blockNumber, l.transactionHash, l.logIndex)
+    onChunk(out, hi)
   }
-  for (const l of reg) push('registered', l.args.agentId!, l.args.owner!, l.args.agentURI ?? '', l.blockNumber, l.transactionHash, l.logIndex)
-  for (const l of uri) push('uri', l.args.agentId!, l.args.updater!, l.args.newURI ?? '', l.blockNumber, l.transactionHash, l.logIndex)
-  return out
 }
 
 export interface RegistryState {
@@ -83,13 +99,17 @@ export function useRegistry(chains: readonly ChainKey[]) {
             const cursor = cursors[c]
             // No cursor means either the first run or a previous failure: read a bounded
             // initial window. Otherwise read forward, capped at this chain's log range.
-            const wanted = cursor === undefined ? head - cfg.logRange : cursor + 1n
-            const from = head - wanted > cfg.logRange ? head - cfg.logRange : wanted
+            const wanted = cursor === undefined ? head - cfg.logWindow : cursor + 1n
+            const from = head - wanted > cfg.logWindow ? head - cfg.logWindow : wanted
             if (from > head) { cursors[c] = head; return }
-            const evs = await fetchRange(c, from, head, head)
+            // The cursor advances per chunk, so a chunk that fails leaves the ones before it
+            // read rather than replaying the whole window on the next tick.
+            await fetchRange(c, from, head, head, (evs, reached) => {
+              if (stopped) return
+              cursors[c] = reached
+              merge(evs, { [c]: head }, { [c]: undefined })
+            })
             if (stopped) return
-            cursors[c] = head
-            merge(evs, { [c]: head }, { [c]: undefined })
           } catch (e) {
             if (!stopped) merge([], {}, { [c]: errMessage(e) })
           }
