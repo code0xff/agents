@@ -12,6 +12,19 @@ const MAX_EVENTS = 200
 const BLOCK_SECONDS: Record<ChainKey, number> = { base: 2, bnb: 3, polygon: 2 }
 
 /**
+ * Chunk sizes learned from the endpoint at runtime. Base has lowered its eth_getLogs limit twice
+ * (10,000 → 2,000 → 500), each time blanking the chain until the config caught up, so a refusal
+ * that names its limit now shrinks the chunk in place instead of failing the read.
+ */
+const learnedChunk: Partial<Record<ChainKey, bigint>> = {}
+
+/** Extracts N from "eth_getLogs is limited to a N range" (and similar wordings), if present. */
+function rangeLimit(e: unknown): bigint | undefined {
+  const m = /limited to an? ([\d,]+)(?: block)? range/i.exec(e instanceof Error ? e.message : String(e))
+  return m ? BigInt(m[1].replace(/,/g, '')) : undefined
+}
+
+/**
  * Reads `from`..`to` as a series of calls no wider than the endpoint allows, handing each one
  * to `onChunk` as it lands.
  *
@@ -25,7 +38,7 @@ async function fetchRange(
   onChunk: (events: RegistryEvent[], reached: bigint) => void,
 ): Promise<void> {
   const client = getClient(chain)
-  const chunk = CHAINS[chain].logChunk
+  let chunk = learnedChunk[chain] ?? CHAINS[chain].logChunk
   const now = Date.now()
   const secs = BLOCK_SECONDS[chain]
   // Estimated from block distance rather than fetching each block: accurate enough for a
@@ -34,10 +47,20 @@ async function fetchRange(
 
   for (let lo = from; lo <= to; lo = lo + chunk + 1n) {
     const hi = lo + chunk > to ? to : lo + chunk
-    const [reg, uri] = await Promise.all([
-      client.getLogs({ address: IDENTITY_REGISTRY, event: REGISTERED, fromBlock: lo, toBlock: hi }),
-      client.getLogs({ address: IDENTITY_REGISTRY, event: URI_UPDATED, fromBlock: lo, toBlock: hi }),
-    ])
+    let reg, uri
+    try {
+      ;[reg, uri] = await Promise.all([
+        client.getLogs({ address: IDENTITY_REGISTRY, event: REGISTERED, fromBlock: lo, toBlock: hi }),
+        client.getLogs({ address: IDENTITY_REGISTRY, event: URI_UPDATED, fromBlock: lo, toBlock: hi }),
+      ])
+    } catch (e) {
+      const limit = rangeLimit(e)
+      if (limit === undefined || limit <= 0n || limit >= chunk) throw e
+      // Retry this same chunk at the size the endpoint just named.
+      chunk = learnedChunk[chain] = limit
+      lo = lo - chunk - 1n
+      continue
+    }
     const out: RegistryEvent[] = []
     const push = (
       kind: RegistryEvent['kind'], agentId: bigint, actor: `0x${string}`, rawUri: string,

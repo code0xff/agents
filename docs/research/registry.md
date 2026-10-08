@@ -104,3 +104,9 @@ history as five calls; BNB (5,000) and Polygon (2,000) still take one, re-measur
 ## Open questions
 - Polygon not implemented.
 - A `Registered` event with an empty URI can be filled later by `URIUpdated` → subscribe to both and merge.
+
+### 2026-10-08: Base getLogs limit lowered again (2,000 → 500)
+`mainnet.base.org` now answers `eth_getLogs` only when `toBlock - fromBlock <= 500`; wider calls get
+HTTP 413 / `-32614 "eth_getLogs is limited to a 500 range"`. `logChunk` is now 500 (a 10,000-block
+window is 20 chunks). Because this is the second silent cut, `fetchRange` also parses the limit from
+the refusal and retries the chunk at that size, remembering it for the session.

@@ -25,7 +25,7 @@ export const CHAINS: Record<ChainKey, ChainConfig> = {
   base: {
     key: 'base', label: 'Base', short: 'BASE', chain: base,
     rpcs: [env.VITE_RPC_BASE ?? 'https://mainnet.base.org'],
-    logWindow: 10_000n, logChunk: 2_000n, explorer: 'https://basescan.org',
+    logWindow: 10_000n, logChunk: 500n, explorer: 'https://basescan.org',
   },
   bnb: {
     key: 'bnb', label: 'BNB Chain', short: 'BNB', chain: bsc,
