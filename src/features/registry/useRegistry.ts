@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CHAINS, IDENTITY_REGISTRY, type ChainKey } from '../../data/chains'
-import { getClient } from '../../lib/clients'
+import { getClient, readLogChunks } from '../../lib/clients'
 import { asString, errMessage, parseAgentURI } from '../../lib/format'
 import { REGISTERED, URI_UPDATED } from './abi'
 import type { RegistryEvent } from './types'
@@ -12,55 +12,23 @@ const MAX_EVENTS = 200
 const BLOCK_SECONDS: Record<ChainKey, number> = { base: 2, bnb: 3, polygon: 2 }
 
 /**
- * Chunk sizes learned from the endpoint at runtime. Base has lowered its eth_getLogs limit twice
- * (10,000 → 2,000 → 500), each time blanking the chain until the config caught up, so a refusal
- * that names its limit now shrinks the chunk in place instead of failing the read.
- */
-const learnedChunk: Partial<Record<ChainKey, bigint>> = {}
-
-/** Extracts N from "eth_getLogs is limited to a N range" (and similar wordings), if present. */
-function rangeLimit(e: unknown): bigint | undefined {
-  const m = /limited to an? ([\d,]+)(?: block)? range/i.exec(e instanceof Error ? e.message : String(e))
-  return m ? BigInt(m[1].replace(/,/g, '')) : undefined
-}
-
-/**
- * Reads `from`..`to` as a series of calls no wider than the endpoint allows, handing each one
- * to `onChunk` as it lands.
- *
- * A single call used to cover the whole window. Base then lowered its eth_getLogs limit to 2,000
- * blocks and answered every request for the 10,000-block window with `-32614`, so the chain read
- * as permanently broken rather than as a window that needed splitting. Publishing per chunk also
- * means a failure part-way through keeps what was already read.
+ * Reads `from`..`to` through the chain's endpoints in rotation (`readLogChunks`), handing each
+ * chunk to `onChunk` as it lands so a failure part-way keeps what was already read.
  */
 async function fetchRange(
   chain: ChainKey, from: bigint, to: bigint, head: bigint,
   onChunk: (events: RegistryEvent[], reached: bigint) => void,
 ): Promise<void> {
-  const client = getClient(chain)
-  let chunk = learnedChunk[chain] ?? CHAINS[chain].logChunk
   const now = Date.now()
   const secs = BLOCK_SECONDS[chain]
   // Estimated from block distance rather than fetching each block: accurate enough for a
   // relative-time column, and it keeps ordering sane for the whole initial range.
   const estimate = (block: bigint) => now - Number(head - block) * secs * 1000
 
-  for (let lo = from; lo <= to; lo = lo + chunk + 1n) {
-    const hi = lo + chunk > to ? to : lo + chunk
-    let reg, uri
-    try {
-      ;[reg, uri] = await Promise.all([
-        client.getLogs({ address: IDENTITY_REGISTRY, event: REGISTERED, fromBlock: lo, toBlock: hi }),
-        client.getLogs({ address: IDENTITY_REGISTRY, event: URI_UPDATED, fromBlock: lo, toBlock: hi }),
-      ])
-    } catch (e) {
-      const limit = rangeLimit(e)
-      if (limit === undefined || limit <= 0n || limit >= chunk) throw e
-      // Retry this same chunk at the size the endpoint just named.
-      chunk = learnedChunk[chain] = limit
-      lo = lo - chunk - 1n
-      continue
-    }
+  await readLogChunks(chain, from, to, (client, lo, hi) => Promise.all([
+    client.getLogs({ address: IDENTITY_REGISTRY, event: REGISTERED, fromBlock: lo, toBlock: hi }),
+    client.getLogs({ address: IDENTITY_REGISTRY, event: URI_UPDATED, fromBlock: lo, toBlock: hi }),
+  ]), ([reg, uri], reached) => {
     const out: RegistryEvent[] = []
     const push = (
       kind: RegistryEvent['kind'], agentId: bigint, actor: `0x${string}`, rawUri: string,
@@ -76,8 +44,8 @@ async function fetchRange(
     }
     for (const l of reg) push('registered', l.args.agentId!, l.args.owner!, l.args.agentURI ?? '', l.blockNumber, l.transactionHash, l.logIndex)
     for (const l of uri) push('uri', l.args.agentId!, l.args.updater!, l.args.newURI ?? '', l.blockNumber, l.transactionHash, l.logIndex)
-    onChunk(out, hi)
-  }
+    onChunk(out, reached)
+  })
 }
 
 export interface RegistryState {

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { decodeFunctionData, formatUnits, parseAbi, parseAbiItem, type Hex } from 'viem'
 import { PAYMENT_CHAINS, PAYMENT_CHAIN_KEYS, type PaymentChainKey } from '../../data/chains'
 import facilitators from '../../data/facilitators.json'
-import { getClient } from '../../lib/clients'
+import { getClient, readLogs } from '../../lib/clients'
 import { errMessage, short } from '../../lib/format'
 
 const ABI = parseAbi([
@@ -83,7 +83,8 @@ async function scanRange(
   const cfg = PAYMENT_CHAINS[key]
   const client = getClient(key)
   const scanned = Number(to - from + 1n)
-  const logs = await client.getLogs({ address: cfg.usdc, event: AUTHORIZATION_USED, fromBlock: from, toBlock: to })
+  const logs = await readLogs(key, from, to, (c, lo, hi) =>
+    c.getLogs({ address: cfg.usdc, event: AUTHORIZATION_USED, fromBlock: lo, toBlock: hi }))
   if (aborted()) return { found: [], scanned }
 
   // Every log is one settlement. Publish their times now; the transactions only add detail.

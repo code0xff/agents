@@ -119,5 +119,11 @@ width (even one block), while `eth_blockNumber` still answers. Keyless alternati
 - `base.gateway.tenderly.co`: CORS `*`, 500-block calls fine, 2,000 rejected.
 - drpc (free plan range error), 1rpc (50 blocks), blastapi (range error), meowrpc (no getLogs),
   llamarpc / omniatech / lava: unreachable or discontinued.
-Base now reads publicnode first (window 8,000 blocks ≈ 4.4h, chunk 5,000) with mainnet.base.org as
-viem fallback.
+Base window is 8,000 blocks (≈ 4.4h). Endpoints are publicnode (chunk 5,000), tenderly (500),
+mainnet.base.org (500).
+
+Log reads now go through `readLogChunks` (`src/lib/clients.ts`), shared by registry and payments:
+each endpoint carries its own chunk size; a refusal naming a range limit shrinks that endpoint's
+chunk and retries; any other failure (429, archive-token, timeout) cools the endpoint down for 60s
+and moves the chunk to the next one. A read fails only when every endpoint fails the same chunk.
+Verified with two refusing endpoints (base.org 429, 1rpc 50-block) placed ahead of publicnode.

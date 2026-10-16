@@ -2,20 +2,25 @@ import { base, bsc, polygon, type Chain } from 'viem/chains'
 
 export type ChainKey = 'base' | 'bnb' | 'polygon'
 
+/** One public endpoint and the widest eth_getLogs range (`toBlock - fromBlock`) it answers. */
+export interface Rpc {
+  url: string
+  /** Measured, and measured again whenever a chain stops answering. See `docs/research/registry.md`. */
+  logChunk: bigint
+}
+
 export interface ChainConfig {
   key: ChainKey
   label: string
   short: string
   chain: Chain
-  rpcs: string[]
+  /**
+   * Keyless endpoints in order of preference. Log reads rotate through them (`readLogChunks`):
+   * public RPCs cut limits and rate-limit without notice, so no single one is trusted.
+   */
+  rpcs: Rpc[]
   /** Blocks read on first load, and the furthest back a catch-up may reach. */
   logWindow: bigint
-  /**
-   * Largest range a single eth_getLogs call may ask this endpoint for. Separate from the window
-   * because it is the endpoint's limit, not ours: a wider window is simply read as more calls.
-   * Measured, and measured again whenever a chain stops answering. See `docs/research/registry.md`.
-   */
-  logChunk: bigint
   explorer: string
 }
 
@@ -24,20 +29,27 @@ const env = import.meta.env
 export const CHAINS: Record<ChainKey, ChainConfig> = {
   base: {
     key: 'base', label: 'Base', short: 'BASE', chain: base,
-    // publicnode first: mainnet.base.org now answers eth_getLogs with 429 "request limit reached".
-    // publicnode serves logs only within ~10,000 blocks of head without an archive token.
-    rpcs: [env.VITE_RPC_BASE ?? 'https://base-rpc.publicnode.com', 'https://mainnet.base.org'],
-    logWindow: 8_000n, logChunk: 5_000n, explorer: 'https://basescan.org',
+    // mainnet.base.org 429s eth_getLogs; publicnode serves logs only within ~10,000 blocks of
+    // head without an archive token, which bounds the window.
+    rpcs: [
+      { url: env.VITE_RPC_BASE ?? 'https://base-rpc.publicnode.com', logChunk: 5_000n },
+      { url: 'https://base.gateway.tenderly.co', logChunk: 500n },
+      { url: 'https://mainnet.base.org', logChunk: 500n },
+    ],
+    logWindow: 8_000n, explorer: 'https://basescan.org',
   },
   bnb: {
     key: 'bnb', label: 'BNB Chain', short: 'BNB', chain: bsc,
-    rpcs: [env.VITE_RPC_BNB ?? 'https://bsc-rpc.publicnode.com'],
-    logWindow: 5_000n, logChunk: 5_000n, explorer: 'https://bscscan.com',
+    rpcs: [{ url: env.VITE_RPC_BNB ?? 'https://bsc-rpc.publicnode.com', logChunk: 5_000n }],
+    logWindow: 5_000n, explorer: 'https://bscscan.com',
   },
   polygon: {
     key: 'polygon', label: 'Polygon', short: 'POL', chain: polygon,
-    rpcs: [env.VITE_RPC_POLYGON ?? 'https://polygon-bor-rpc.publicnode.com', 'https://polygon.drpc.org'],
-    logWindow: 2_000n, logChunk: 2_000n, explorer: 'https://polygonscan.com',
+    rpcs: [
+      { url: env.VITE_RPC_POLYGON ?? 'https://polygon-bor-rpc.publicnode.com', logChunk: 2_000n },
+      { url: 'https://polygon.drpc.org', logChunk: 2_000n },
+    ],
+    logWindow: 2_000n, explorer: 'https://polygonscan.com',
   },
 }
 
