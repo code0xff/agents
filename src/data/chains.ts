@@ -24,8 +24,10 @@ const env = import.meta.env
 export const CHAINS: Record<ChainKey, ChainConfig> = {
   base: {
     key: 'base', label: 'Base', short: 'BASE', chain: base,
-    rpcs: [env.VITE_RPC_BASE ?? 'https://mainnet.base.org'],
-    logWindow: 10_000n, logChunk: 500n, explorer: 'https://basescan.org',
+    // publicnode first: mainnet.base.org now answers eth_getLogs with 429 "request limit reached".
+    // publicnode serves logs only within ~10,000 blocks of head without an archive token.
+    rpcs: [env.VITE_RPC_BASE ?? 'https://base-rpc.publicnode.com', 'https://mainnet.base.org'],
+    logWindow: 8_000n, logChunk: 5_000n, explorer: 'https://basescan.org',
   },
   bnb: {
     key: 'bnb', label: 'BNB Chain', short: 'BNB', chain: bsc,

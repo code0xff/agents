@@ -110,3 +110,14 @@ history as five calls; BNB (5,000) and Polygon (2,000) still take one, re-measur
 HTTP 413 / `-32614 "eth_getLogs is limited to a 500 range"`. `logChunk` is now 500 (a 10,000-block
 window is 20 chunks). Because this is the second silent cut, `fetchRange` also parses the limit from
 the refusal and retries the chunk at that size, remembering it for the session.
+
+### 2026-10-16: mainnet.base.org rate-limits eth_getLogs (429)
+`mainnet.base.org` now returns HTTP 429 / `-32011 "request limit reached"` for `eth_getLogs` of any
+width (even one block), while `eth_blockNumber` still answers. Keyless alternatives re-probed:
+- `base-rpc.publicnode.com`: CORS `*`, 5,000-block calls fine; ranges reaching ≥10,000 blocks back
+  need an archive token. 9,500 back still answers.
+- `base.gateway.tenderly.co`: CORS `*`, 500-block calls fine, 2,000 rejected.
+- drpc (free plan range error), 1rpc (50 blocks), blastapi (range error), meowrpc (no getLogs),
+  llamarpc / omniatech / lava: unreachable or discontinued.
+Base now reads publicnode first (window 8,000 blocks ≈ 4.4h, chunk 5,000) with mainnet.base.org as
+viem fallback.
