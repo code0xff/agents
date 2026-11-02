@@ -3,8 +3,10 @@
 ## Installability
 `vite-plugin-pwa` generates `manifest.webmanifest` and a Workbox service worker at build time.
 `start_url` and `scope` follow Vite's `base`, so they stay correct under the GitHub Pages sub-path.
-Icons live in `public/`: `favicon.svg` plus 192/512 PNGs and maskable variants, generated from the SVG
-by the snippet in `scripts/` history (re-run with `sharp` if the mark changes).
+Icons live in `public/`: `favicon.svg` plus 192/512 PNGs and maskable variants, generated from the
+radar mark (`Mark` in `src/components/AppHeader.tsx`) with `sharp`: 64-unit tile, `#111112` ground,
+mark at 66% for the regular icons, 50% full-bleed for maskable (inside the safe zone), 62% for
+`apple-touch-icon.png`.
 
 `registerType: 'autoUpdate'` means a new deploy replaces the old service worker without a prompt, and
 the page reloads once it takes control.

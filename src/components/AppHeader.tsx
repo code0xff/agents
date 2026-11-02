@@ -170,19 +170,13 @@ function Burger({ open }: { open: boolean }) {
   )
 }
 
+/** Radar mark: ring, sweep and centre on a 32-unit grid. Shared with favicon.svg and the app icons. */
 function Mark() {
   return (
-    <svg viewBox="0 0 64 64" className="h-5 w-5" aria-hidden>
-      <g stroke="var(--ink-500)" strokeWidth="3" strokeLinecap="round">
-        <path d="M32 32 L14 18" /><path d="M32 32 L50 18" /><path d="M32 32 L14 46" />
-        <path d="M32 32 L50 46" /><path d="M32 32 L32 12" /><path d="M32 32 L32 52" />
-      </g>
-      <g fill="var(--ink-300)">
-        <circle cx="14" cy="18" r="4" /><circle cx="50" cy="18" r="4" />
-        <circle cx="14" cy="46" r="4" /><circle cx="50" cy="46" r="4" />
-        <circle cx="32" cy="12" r="3" /><circle cx="32" cy="52" r="3" />
-      </g>
-      <circle cx="32" cy="32" r="9" fill="var(--ink-50)" />
+    <svg viewBox="0 0 32 32" className="h-5 w-5 text-ink-100" fill="currentColor" aria-hidden>
+      <path fillRule="evenodd" d="M16 3a13 13 0 1 1 0 26 13 13 0 0 1 0-26Zm0 3a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z" />
+      <path d="M16 16V6.5A9.5 9.5 0 0 1 25.5 16Z" />
+      <circle cx="16" cy="16" r="2.5" />
     </svg>
   )
 }
