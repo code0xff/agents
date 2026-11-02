@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useT } from '../i18n'
 import type { Theme } from '../lib/theme'
+import { iconBtn } from './ui'
 
 export function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
   const { t } = useT()
@@ -12,7 +13,7 @@ export function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () =>
       aria-label={t('theme.toggle')}
       aria-pressed={!dark}
       title={dark ? t('theme.dark') : t('theme.light')}
-      className="grid h-[26px] w-[26px] place-items-center rounded-full border border-ink-800 text-ink-400 transition hover:border-ink-600 hover:text-ink-100 focus-visible:border-ink-500 focus-visible:outline-none"
+      className={iconBtn}
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.span

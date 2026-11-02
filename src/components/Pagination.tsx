@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useT } from '../i18n'
+import { pageBtn } from './ui'
 
 export interface Paged<T> {
   /** Items added since the reader left page one; 0 while on page one. */
@@ -64,18 +65,18 @@ export function Pagination<T>({ paged, compact = false }: { paged: Paged<T>; com
   const { t } = useT()
   const { page, totalPages, from, to, total, setPage, next, prev } = paged
   if (total === 0) return null
-  const btn = 'rounded border border-ink-800 px-2 py-1 font-mono text-[10px] text-ink-400 transition enabled:hover:border-ink-600 enabled:hover:text-ink-100 disabled:opacity-30'
+  const btn = pageBtn
   return (
     <nav className="flex items-center justify-between gap-2 border-t border-ink-800 px-4 py-2" aria-label={t('page.label')}>
-      <span className="font-mono text-[10px] text-ink-500 tabular-nums">
+      <span className="font-mono text-[11px] tracking-[.02em] text-ink-400 tabular-nums">
         {t('page.range', { from, to, total })}
       </span>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5">
         {!compact && (
           <button className={btn} onClick={() => setPage(1)} disabled={page === 1} aria-label={t('page.first')}>«</button>
         )}
         <button className={btn} onClick={prev} disabled={page === 1} aria-label={t('page.prev')}>‹</button>
-        <span aria-current="page" className="px-1 font-mono text-[10px] text-ink-300 tabular-nums">{page}/{totalPages}</span>
+        <span aria-current="page" className="inline-grid h-7 min-w-7 place-items-center rounded-lg border border-ink-800 px-1.5 font-mono text-[12px] text-ink-100 tabular-nums">{page}/{totalPages}</span>
         <button className={btn} onClick={next} disabled={page === totalPages} aria-label={t('page.next')}>›</button>
         {!compact && (
           <button className={btn} onClick={() => setPage(totalPages)} disabled={page === totalPages} aria-label={t('page.last')}>»</button>

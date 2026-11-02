@@ -1,41 +1,47 @@
 @import "tailwindcss";
 
+@font-face { font-family: "Pretendard"; font-weight: 400; font-display: swap; src: url("./assets/fonts/Pretendard-Regular.subset.woff2") format("woff2"); }
+@font-face { font-family: "Pretendard"; font-weight: 500; font-display: swap; src: url("./assets/fonts/Pretendard-Medium.subset.woff2") format("woff2"); }
+@font-face { font-family: "Pretendard"; font-weight: 600; font-display: swap; src: url("./assets/fonts/Pretendard-SemiBold.subset.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-weight: 100 800; font-display: swap; src: url("./assets/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2-variations"); }
+
 /* ── Design tokens: monotone / futuristic ─────────────────────────── */
-/* Luminance scale variables. Flipped between :root (dark) and .light. */
+/* Luminance scale variables, flipped between :root (dark) and .light. Values follow the
+   NightBrowser palette used by the 1gateway site: neutral greys, opaque surfaces. */
 :root {
   color-scheme: dark;
-  --ink-950: #050505;
-  --ink-900: #0a0a0b;
-  --ink-800: #141416;
-  --ink-700: #1f1f23;
-  --ink-600: #2c2c31;
-  --ink-500: #5f5f68;
-  --ink-400: #7d7d86;
-  --ink-300: #9d9da6;
-  --ink-200: #cfcfd6;
-  --ink-100: #ececf1;
-  --ink-50: #fafafa;
-  --grid-line: rgba(255, 255, 255, 0.04);
+  --ink-950: #111112;
+  --ink-900: #19191b;
+  --ink-800: #2c2c30;
+  --ink-700: #343438;
+  --ink-600: #48484e;
+  --ink-500: #7c7c84;
+  --ink-400: #a3a3aa;
+  --ink-300: #c0c0c6;
+  --ink-200: #dcdce0;
+  --ink-100: #f2f2f3;
+  --ink-50: #ffffff;
+  --grid-line: rgba(255, 255, 255, 0.03);
   --flash: rgba(255, 255, 255, 0.08);
-  --panel: rgba(10, 10, 11, 0.6);
+  --panel: #19191b;
 }
 
 .light {
   color-scheme: light;
-  --ink-950: #f7f7f8;
+  --ink-950: #f4f4f3;
   --ink-900: #ffffff;
-  --ink-800: #e6e6ea;
-  --ink-700: #d4d4da;
-  --ink-600: #b8b8c0;
-  --ink-500: #8a8a94;
-  --ink-400: #5f5f68;
-  --ink-300: #45454d;
-  --ink-200: #2c2c33;
-  --ink-100: #18181c;
-  --ink-50: #050505;
-  --grid-line: rgba(0, 0, 0, 0.05);
+  --ink-800: #dedee1;
+  --ink-700: #cfcfd4;
+  --ink-600: #b4b4ba;
+  --ink-500: #85858c;
+  --ink-400: #66666c;
+  --ink-300: #4a4a50;
+  --ink-200: #2e2e33;
+  --ink-100: #171719;
+  --ink-50: #0a0a0b;
+  --grid-line: rgba(0, 0, 0, 0.035);
   --flash: rgba(0, 0, 0, 0.06);
-  --panel: rgba(255, 255, 255, 0.6);
+  --panel: #ffffff;
 }
 
 @theme inline {
@@ -52,11 +58,11 @@
   --color-ink-50: var(--ink-50);
   --color-panel: var(--panel);
 
-  /* One family for the whole interface. A proportional face used only for titles and
-     descriptions read as a different product sitting inside the panels. CJK has no
-     monospaced glyphs here and falls back to the system stack, which is expected. */
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "Noto Sans KR", "Noto Sans JP", "Noto Sans SC", system-ui, monospace;
-  --font-sans: var(--font-mono);
+  /* Pretendard for interface text, JetBrains Mono for numbers, addresses and labels. */
+  --font-sans: "Pretendard", system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans JP", "Noto Sans SC", sans-serif;
+  --font-mono: "JetBrains Mono", "Pretendard", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --radius-xl: 12px;
+  --radius-lg: 8px;
 
   --animate-scan: scan 6s linear infinite;
 
@@ -64,6 +70,7 @@
     from { transform: translateY(-100%); }
     to { transform: translateY(100vh); }
   }
+
 }
 
 html, body, #root {
@@ -71,7 +78,10 @@ html, body, #root {
 }
 
 body {
-  @apply bg-ink-950 text-ink-100 font-mono antialiased;
+  @apply bg-ink-950 text-ink-100 font-sans antialiased;
+  font-size: 14px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
@@ -91,7 +101,7 @@ button:disabled,
   cursor: not-allowed;
 }
 
-/* Grid background: futuristic tone */
+/* Background grid, kept faint under opaque panels. Static: no scroll parallax. */
 .bg-grid {
   background-image:
     linear-gradient(to right, var(--grid-line) 1px, transparent 1px),

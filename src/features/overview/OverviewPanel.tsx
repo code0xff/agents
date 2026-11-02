@@ -29,7 +29,7 @@ export function OverviewPanel({ observedPerMin, observedSpan }: { observedPerMin
       <motion.div
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="grid grid-cols-1 divide-y divide-ink-800 overflow-hidden rounded-xl border border-ink-800 bg-panel backdrop-blur-md sm:grid-cols-2 sm:divide-x lg:grid-cols-4 lg:divide-y-0"
+        className="grid grid-cols-1 divide-y divide-ink-800 overflow-hidden rounded-xl border border-ink-800 bg-ink-900 sm:grid-cols-2 sm:divide-x lg:grid-cols-4 lg:divide-y-0"
       >
         <Signal label={t('mp.stat.payments')} value={d?.x402.totalTxs} format={(n) => compact(n, tag)}
           trend={payTrend} series={paySeries.slice(-30)} />

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useT } from '../../i18n'
 import { short } from '../../lib/format'
 import { facilitatorLabel, type Payment } from './usePayments'
+import { iconBtn } from '../../components/ui'
 
 type Kind = 'facilitator' | 'payer' | 'payTo'
 /** Keyed by role as well as address: the same address can act in several roles at once,
@@ -318,17 +319,17 @@ function Controls({ onIn, onOut, onReset, touchMap, onToggleTouch }: {
   onIn: () => void; onOut: () => void; onReset: () => void; touchMap: boolean; onToggleTouch: () => void
 }) {
   const { t } = useT()
-  const cls = 'grid h-7 w-7 place-items-center rounded-md border border-ink-800 bg-ink-950/80 text-ink-300 backdrop-blur transition hover:border-ink-600 hover:text-ink-100 focus-visible:border-ink-500 focus-visible:outline-none'
+  const cls = `${iconBtn} border border-ink-800 !bg-ink-900`
   return (
     <div className="absolute top-3 right-3 flex flex-col gap-1.5">
       {/* Touch only: claims the gesture for the map, releasing the page scroll. */}
       <button type="button" onClick={onToggleTouch} aria-pressed={touchMap}
         aria-label={t(touchMap ? 'zoom.touchOff' : 'zoom.touchOn')}
         title={t(touchMap ? 'zoom.touchOff' : 'zoom.touchOn')}
-        className={`grid h-7 w-7 place-items-center rounded-md border backdrop-blur transition focus-visible:outline-none sm:hidden ${
+        className={`grid h-7 w-7 place-items-center rounded-lg border transition focus-visible:outline-none sm:hidden ${
           touchMap
             ? 'border-ink-100 bg-ink-100 text-ink-950'
-            : 'border-ink-800 bg-ink-950/80 text-ink-300 hover:border-ink-600 hover:text-ink-100'
+            : 'border-ink-800 bg-ink-900 text-ink-400 hover:bg-ink-800 hover:text-ink-100'
         }`}>
         <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden>
           <path d="M8 2v6M5.4 3.6v4.4M10.6 3.6v4.4M3 6.4v3.1a4.5 4.5 0 0 0 4.5 4.5h.6a4.4 4.4 0 0 0 4.4-4.4V5.6"

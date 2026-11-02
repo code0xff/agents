@@ -12,7 +12,7 @@ function Bars({ title, rows, unit, tag, source }: {
   return (
     <div className="flex flex-col gap-2 px-4 py-4 sm:px-5">
       <div className="flex flex-col gap-0.5">
-        <h3 className="font-mono text-[10px] tracking-[0.2em] text-ink-500 uppercase">{title}</h3>
+        <h3 className="font-mono text-[10px] tracking-[.035em] text-ink-500 uppercase">{title}</h3>
         {source && <p className="font-mono text-[9px] leading-relaxed text-ink-400">{source}</p>}
       </div>
       <ul className="flex flex-col gap-1.5">
@@ -46,7 +46,7 @@ function Bars({ title, rows, unit, tag, source }: {
 function Fact({ label, value }: { label: string; value: string }) {
   return (
     <span className="inline-flex shrink-0 items-baseline gap-1.5 rounded-md border border-ink-800 bg-ink-900/40 px-2 py-1">
-      <span className="font-mono text-[9px] tracking-[0.16em] text-ink-500 uppercase">{label}</span>
+      <span className="font-mono text-[9px] tracking-[.035em] text-ink-500 uppercase">{label}</span>
       <span className="font-mono text-[11px] text-ink-100 tabular-nums">{value}</span>
     </span>
   )

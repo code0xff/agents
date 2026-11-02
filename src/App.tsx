@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform } from 'motion/react'
+import { motion } from 'motion/react'
 import { useMemo } from 'react'
 import { AppHeader } from './components/AppHeader'
 import type { ChainKey } from './data/chains'
@@ -30,12 +30,9 @@ export default function App() {
   // The rate covers the retained beats, so the overview says how far back those reach.
   const observedSpan = useMemo(() => spanFrom(payments.beats[payments.beats.length - 1]), [payments.beats])
 
-  const { scrollY } = useScroll()
-  const gridY = useTransform(scrollY, [0, 1200], [0, -140])
-
   return (
     <div className="relative min-h-full">
-      <motion.div style={{ y: gridY }} className="bg-grid pointer-events-none fixed inset-0 -z-20 [mask-image:radial-gradient(ellipse_at_top,black_25%,transparent_70%)]" />
+      <div className="bg-grid pointer-events-none fixed inset-0 -z-20 [mask-image:radial-gradient(ellipse_at_top,black_25%,transparent_70%)]" />
       <div className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-px animate-scan bg-gradient-to-r from-transparent via-ink-300/30 to-transparent" />
 
       <AppHeader route={route} />
@@ -45,7 +42,7 @@ export default function App() {
           title={t(`nav.${route}` as Key)}
           lead={t(`page.${route}.lead` as Key)}
           status={
-            <span className="flex items-center gap-2 font-mono text-[10px] tracking-[0.25em] text-ink-500 uppercase">
+            <span className="flex items-center gap-2 font-mono text-[10px] tracking-[.035em] text-ink-500 uppercase">
               <span className={`h-1.5 w-1.5 rounded-full ${online ? 'animate-pulse bg-ink-200' : 'bg-ink-600'}`} />
               {online ? t('hero.status') : t('pwa.offline')}
             </span>

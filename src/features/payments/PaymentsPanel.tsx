@@ -9,6 +9,7 @@ import { short, spanFrom, timeAgo, usd } from '../../lib/format'
 import { useIsMobile } from '../../lib/useMediaQuery'
 import { PaymentGraph } from './PaymentGraph'
 import { facilitatorLabel, type PaymentsState } from './usePayments'
+import { chip } from '../../components/ui'
 
 export function PaymentsPanel({ state }: { state: PaymentsState }) {
   const { t, tag } = useT()
@@ -42,7 +43,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
         <div role="radiogroup" aria-label={t('pay.chain')} className="flex items-center gap-1">
           {PAYMENT_CHAIN_KEYS.map((c) => (
             <button key={c} role="radio" aria-checked={chain === c} onClick={() => setChain(c)}
-              className={`rounded border px-2 py-0.5 font-mono text-[10px] tracking-wider transition ${chain === c ? 'border-ink-500 text-ink-100' : 'border-ink-800 text-ink-400 hover:text-ink-100'}`}
+              className={chip(chain === c)}
               title={errors[c] ?? CHAINS[c].label}>
               {CHAINS[c].short}{errors[c] ? ' !' : ''}
             </button>
@@ -75,7 +76,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
           )}
         </div>
         <div className="border-t border-ink-800 md:border-t-0 md:border-l">
-          <div className="border-b border-ink-800 px-4 py-2 font-mono text-[10px] tracking-[0.25em] text-ink-500 uppercase">{t('pay.topSenders')}</div>
+          <div className="border-b border-ink-800 px-4 py-2 font-mono text-[10px] tracking-[.035em] text-ink-500 uppercase">{t('pay.topSenders')}</div>
           <ul className="border-b border-ink-800 px-4 py-2 font-mono text-[11px]">
             {top.length === 0 && <li className="py-2 text-ink-500">{t('pay.waiting')}</li>}
             {top.map(([senderKey, n]) => {
@@ -93,7 +94,7 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
               )
             })}
           </ul>
-          <div className="px-4 py-2 font-mono text-[10px] tracking-[0.25em] text-ink-500 uppercase">{t('pay.recent')}</div>
+          <div className="px-4 py-2 font-mono text-[10px] tracking-[.035em] text-ink-500 uppercase">{t('pay.recent')}</div>
           <ul className="font-mono text-[11px]">
             {/* See RegistryLog: an exit animation here would double the row count on a
                 page change until it finished. */}

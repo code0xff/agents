@@ -1,7 +1,8 @@
 # Design system
 
 ## Tone
-Monotone, refined, futuristic. Dark by default. No color accents — hierarchy comes from luminance,
+Monotone, refined, futuristic. Follows the 1gateway site (`~/1gateway/src/landing/input.css`, the
+NightBrowser tokens): neutral greys, opaque surfaces, Pretendard with JetBrains Mono for data. No color accents — hierarchy comes from luminance,
 weight, and motion.
 
 ## Theming
@@ -21,15 +22,10 @@ secondary text `ink-400`, disabled `ink-500`. Status (success/failure) is expres
 luminance, and motion — not color.
 
 ## Typography
-One family for the whole interface: JetBrains Mono. A proportional face was used for panel titles,
-card names and descriptions, and inside otherwise monospaced panels those few elements read as a
-different product. Hierarchy comes from size, weight and luminance rather than a second family.
-
-Prose set in a monospaced face needs more room per line, so descriptions run at 11-12px with 1.7
-leading rather than the usual 12-13px. Labels stay mono, uppercase, wide tracking.
-
-CJK has no glyphs in JetBrains Mono and falls back to the system stack, so Korean, Japanese and
-Chinese render proportionally. That is expected and was already true of every label.
+Pretendard for interface text (titles, descriptions, controls), JetBrains Mono for numbers,
+addresses, hashes and small uppercase labels (11px, `tracking-[.035em]`). Both are self-hosted from
+`src/assets/fonts/` (OFL) so they resolve under the Pages `base` path. Body is 14px / 1.5 with
+tabular numerals. Page titles are sans, medium weight, tight tracking (`-.04em`), not uppercase.
 
 ## Contrast
 Measured against the panel ground, not eyeballed. The scale is not symmetric between themes, so dark
@@ -37,10 +33,10 @@ is the binding case.
 
 | Token | Dark | Light |
 |---|---|---|
-| `ink-300` | 7.4:1 | 9.5:1 |
-| `ink-400` | 4.9:1 | 6.3:1 |
-| `ink-500` | 3.1:1 | 3.4:1 |
-| `ink-600` | 1.4:1 | 2.0:1 |
+| `ink-300` | 9.7:1 | 8.8:1 |
+| `ink-400` | 7.0:1 | 5.7:1 |
+| `ink-500` | 4.2:1 | 3.7:1 |
+| `ink-600` | 1.9:1 | 2.1:1 |
 
 `ink-400` is the floor for anything meant to be read, including 9px captions, which get no large-text
 exemption. `ink-500` is for text a reader may skip, such as a relative timestamp in a dense row.
@@ -49,7 +45,9 @@ exemption. `ink-500` is for text a reader may skip, such as a relative timestamp
 invisible.
 
 ## Background
-`.bg-grid` subtle grid. Slow parallax via motion `useScroll`.
+`ink-950` with a faint static `.bg-grid` (masked to the top of the page) and the slow horizontal
+scan line (`animate-scan`). The grid has no scroll parallax; it was dropped with the move to the
+1gateway style.
 
 ## Motion principles
 Motion is for arrival and change, never for whether something is legible. See "Motion and

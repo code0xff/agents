@@ -31,7 +31,7 @@ export function Signal({ label, value, format, trend, trendLabel, series, live =
     <div className="group relative flex min-w-0 flex-col gap-2 px-4 py-4 sm:px-5 sm:py-5">
       <Corner />
       <div className="flex items-center gap-2">
-        <span className="truncate font-mono text-[9px] tracking-[0.2em] text-ink-500 uppercase sm:text-[10px]">{label}</span>
+        <span className="truncate font-mono text-[9px] tracking-[.035em] text-ink-500 uppercase sm:text-[10px]">{label}</span>
         {live && <span className="h-1 w-1 shrink-0 animate-pulse rounded-full bg-ink-200" />}
       </div>
 

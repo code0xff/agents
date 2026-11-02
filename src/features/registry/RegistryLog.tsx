@@ -9,6 +9,7 @@ import { useIsMobile } from '../../lib/useMediaQuery'
 import type { RegistryState } from './useRegistry'
 import { AgentModal } from './AgentModal'
 import type { RegistryEvent } from './types'
+import { chip, primaryBtn } from '../../components/ui'
 
 /**
  * Ethereum was dropped: it holds 68k agents cumulatively but produced one registration in six
@@ -73,14 +74,14 @@ export function RegistryLog({ state }: { state: RegistryState }) {
         <div className="flex items-center gap-2">
           {newCount > 0 && (
             <button onClick={() => paged.setPage(1)}
-              className="rounded-full border border-ink-600 px-2 py-0.5 font-mono text-[10px] text-ink-200 hover:bg-ink-800">
+              className={primaryBtn}>
               {t('page.newItems', { n: newCount })}
             </button>
           )}
           <div role="radiogroup" aria-label={t('reg.chain')} className="flex items-center gap-1">
             {ALL.map((c) => (
               <button key={c} role="radio" aria-checked={chain === c} onClick={() => setChain(c)}
-                className={`rounded border px-2 py-0.5 font-mono text-[10px] tracking-wider transition ${chain === c ? 'border-ink-500 text-ink-100' : 'border-ink-800 text-ink-400 hover:text-ink-100'}`}
+                className={chip(chain === c)}
                 title={errors[c] ?? CHAINS[c].label}>
                 {CHAINS[c].short}{errors[c] ? ' !' : ''}
               </button>

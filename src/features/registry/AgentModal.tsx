@@ -7,6 +7,7 @@ import { useT } from '../../i18n'
 import { short, timeAgo } from '../../lib/format'
 import { fetchAgentMeta, type MetaFetch } from './meta'
 import type { RegistryEvent } from './types'
+import { iconBtn } from '../../components/ui'
 
 /**
  * Rendered into `document.body`. The panel that owns the log carries `backdrop-blur`, and a
@@ -74,14 +75,14 @@ function Dialog({ event, onClose }: { event: RegistryEvent; onClose: () => void 
                 onError={(e) => { e.currentTarget.style.display = 'none' }} />
             )}
             <div className="min-w-0">
-              <p className="font-mono text-[10px] tracking-[0.2em] text-ink-500 uppercase">
+              <p className="font-mono text-[10px] tracking-[.035em] text-ink-500 uppercase">
                 {cfg.short} · #{event.agentId.toString()} · {timeAgo(event.ts)}
               </p>
-              <h2 className="truncate text-sm font-medium tracking-[0.02em] text-ink-50">{title}</h2>
+              <h2 className="truncate text-[14px] font-medium text-ink-50">{title}</h2>
             </div>
           </div>
           <button ref={closeRef} type="button" onClick={onClose} aria-label={t('agent.close')}
-            className="grid h-7 w-7 shrink-0 place-items-center rounded border border-ink-800 text-ink-400 transition hover:border-ink-600 hover:text-ink-100 focus-visible:border-ink-500 focus-visible:outline-none">
+            className={iconBtn}>
             <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden>
               <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
             </svg>
@@ -147,7 +148,7 @@ function sourceLabel(uri: string) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-2">
-      <h3 className="font-mono text-[10px] tracking-[0.2em] text-ink-500 uppercase">{title}</h3>
+      <h3 className="font-mono text-[10px] tracking-[.035em] text-ink-500 uppercase">{title}</h3>
       {children}
     </section>
   )
