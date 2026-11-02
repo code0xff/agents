@@ -23,7 +23,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node scripts/snapshot.mjs
+      # One unreachable source must not discard the others: record the exit code, commit
+      # what was collected, and fail the job only after the commit (last step).
+      - name: Collect snapshots
+        id: collect
+        run: |
+          set +e
+          node scripts/snapshot.mjs
+          echo "code=$?" >> "$GITHUB_OUTPUT"
       - name: Commit snapshots
         id: commit
         run: |
@@ -39,11 +46,17 @@ jobs:
           git pull --rebase origin dev
           git push
           echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Fail on a source error
+        if: steps.collect.outputs.code != '0'
+        run: |
+          echo "::error::snapshot.mjs exited ${{ steps.collect.outputs.code }}; see the Collect snapshots log for the failing source"
+          exit 1
 
   # A GITHUB_TOKEN push does not trigger the push-based deploy, so call it here.
   deploy:
     needs: snapshot
-    if: needs.snapshot.outputs.changed == 'true'
+    # always(): a partial failure still commits fresh sources, and those should ship.
+    if: always() && needs.snapshot.outputs.changed == 'true'
     permissions:
       contents: read
       pages: write

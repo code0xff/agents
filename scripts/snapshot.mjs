@@ -83,7 +83,8 @@ const jobs = [
   ['agentscan', agentscan],
 ]
 // Any failed source is a failure: a green run with one stale snapshot hides the problem.
-// Sources that did succeed keep their freshly written files.
+// Sources that did succeed keep their freshly written files, and the workflow commits them
+// before failing the run (.github/workflows/snapshot.yml).
 let failed = 0
 for (const [n, fn] of jobs) { try { await fn() } catch (e) { failed++; console.error('FAIL', n, e?.message ?? e) } }
 if (failed) { console.error(`${failed} of ${jobs.length} sources failed`); process.exit(1) }

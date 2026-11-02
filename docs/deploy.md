@@ -17,6 +17,9 @@
   start the push-based deploy. `deploy.yml` therefore also accepts `workflow_call`, and the snapshot
   job invokes it directly when the data changed. `deploy.yml` checks out `ref: dev` rather than the
   triggering SHA so the just-made snapshot commit is included.
+- A source that fails (agentscan timing out has been the cause so far) does not discard the others:
+  the job commits and deploys whatever was collected, then fails on its last step so the run still
+  shows red. The failed source keeps its previous file, and the page shows that file's age.
 - A scheduled workflow only runs from the default branch, and GitHub registers a workflow when the file
   lands on that branch. If a schedule never fires, push a change to the workflow file to re-register it.
 - The footer shows the short commit the bundle was built from. If it does not match the tip of `dev`,
