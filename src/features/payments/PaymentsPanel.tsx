@@ -104,16 +104,24 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
                   <motion.li key={p.key} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}
                     className="border-t border-ink-800/60">
                     {/* Every row is a real settlement, so it opens on the explorer. */}
+                    {/* Two lines: the parties get a line of their own, so the recipient is never
+                        cut off by the facilitator badge. */}
                     <a href={`${CHAINS[p.chain].explorer}/tx/${p.tx}`} target="_blank" rel="noreferrer noopener"
                       title={t('pay.viewTx')}
-                      className="flex items-center gap-2 px-4 py-1.5 transition-colors hover:bg-ink-800/40">
-                      <span className="w-6 shrink-0 text-ink-500">{timeAgo(p.ts)}</span>
-                      <span className="shrink-0 text-ink-100 tabular-nums">{usd(p.usdc, 4, tag)}</span>
-                      <span className="hidden truncate text-ink-500 sm:inline md:hidden lg:inline">{short(p.payer, 3)}→{short(p.payTo, 3)}</span>
-                      <span className="ml-auto">
-                        <Badge dim={!named} title={p.facilitatorName ?? t('pay.unlabeledHelp')}>
-                          {facilitatorLabel(p)}
-                        </Badge>
+                      className="block px-4 py-2 transition-colors hover:bg-ink-800/40">
+                      <span className="flex items-center gap-2">
+                        <span className="w-6 shrink-0 text-ink-500">{timeAgo(p.ts)}</span>
+                        <span className="shrink-0 text-ink-100 tabular-nums">{usd(p.usdc, 4, tag)}</span>
+                        <span className="ml-auto">
+                          <Badge dim={!named} caps={named} title={p.facilitatorName ?? t('pay.unlabeledHelp')}>
+                            {facilitatorLabel(p)}
+                          </Badge>
+                        </span>
+                      </span>
+                      <span className="mt-0.5 flex items-center gap-1.5 pl-8 text-ink-400">
+                        <span className="sr-only">{t('pay.legend.payer')}</span>{short(p.payer, 4)}
+                        <span aria-hidden className="text-ink-500">→</span>
+                        <span className="sr-only">{t('pay.legend.service')}</span>{short(p.payTo, 4)}
                       </span>
                     </a>
                   </motion.li>

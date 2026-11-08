@@ -32,9 +32,10 @@ export function LiveDot({ active = true }: { active?: boolean }) {
   )
 }
 
-export function Badge({ children, dim = false, title }: { children: ReactNode; dim?: boolean; title?: string }) {
+/** `caps` uppercases a label; pass false for an address, whose case is part of how it reads. */
+export function Badge({ children, dim = false, caps = true, title }: { children: ReactNode; dim?: boolean; caps?: boolean; title?: string }) {
   return (
-    <span title={title} className={`shrink-0 rounded-lg border px-2 py-0.5 font-mono text-[11px] tracking-[.02em] whitespace-nowrap uppercase ${dim ? 'border-ink-800 text-ink-500' : 'border-ink-700 text-ink-300'}`}>
+    <span title={title} className={`shrink-0 rounded-lg border px-2 py-0.5 font-mono text-[11px] tracking-[.02em] whitespace-nowrap ${caps ? 'uppercase' : ''} ${dim ? 'border-ink-800 text-ink-500' : 'border-ink-700 text-ink-300'}`}>
       {children}
     </span>
   )

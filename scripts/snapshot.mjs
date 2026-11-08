@@ -2,6 +2,7 @@
 // Usage: node scripts/snapshot.mjs  -> public/snapshots/*.json
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { appendHistory, compact, market } from './bazaar-market.mjs'
 
 const OUT = 'public/snapshots'
 const STATE = 'data/snapshot-state' // full key list for diffing (committed, not deployed)
@@ -48,24 +49,43 @@ async function write(name, items, extra = {}) {
   console.log(name, items.length, 'items,', added24h, 'new in 24h')
 }
 
-// 1) Bazaar-style sources (x402 discovery/resources, paginated by 100)
-async function bazaar(name, base) {
-  const items = []; let offset = 0, total = Infinity
+// 1) Bazaar-style sources (x402 discovery/resources). `withMarket` also builds the #/bazaar
+//    aggregates from the same pass, so the catalog is read once.
+async function bazaar(name, base, { limit = 100, withMarket = false } = {}) {
+  const items = [], rows = []; let offset = 0, total = Infinity, reported = null
   while (offset < total) {
-    const j = await getJson(`${base}?limit=100&offset=${offset}`)
+    const j = await getJson(`${base}?limit=${limit}&offset=${offset}`)
     total = j.pagination?.total ?? (j.items?.length ?? 0)
+    reported ??= total
     for (const it of j.items ?? []) {
       const a = it.accepts?.[0] ?? {}
       let host = it.resource; try { host = new URL(it.resource).host } catch {}
       items.push({ key: it.resource, name: host, url: it.resource, type: it.type, network: a.network, payTo: a.payTo?.toLowerCase(), price: a.amount ?? a.maxAmountRequired, asset: a.asset, updated: it.lastUpdated })
+      if (withMarket) { const r = compact(it); if (r) rows.push(r) }
     }
     if (!j.items?.length) break
-    offset += 100
+    offset += limit
   }
   const networks = {}; for (const i of items) networks[i.network] = (networks[i.network] ?? 0) + 1
   const payTo = {}; for (const i of items) if (i.payTo) payTo[i.payTo] = i.name
   await fs.writeFile(path.join(OUT, `${name}.payto.json`), JSON.stringify(payTo))
   await write(name, items, { networks })
+  if (withMarket) await writeMarket(rows, items.length, reported)
+}
+
+// Fail closed: a read that came back well short of the reported total is not published as the
+// market, since every share and ranking would be computed over an unknown subset. The catalog
+// moves while it is paged, so a small drift is tolerated.
+async function writeMarket(rows, read, reported) {
+  if (!reported || read < reported * 0.98) throw new Error(`bazaar market: read ${read} of ${reported} reported entries`)
+  const histFile = path.join('data', 'bazaar-history.json')
+  let hist = []; try { hist = JSON.parse(await fs.readFile(histFile, 'utf8')) } catch {}
+  const now = new Date().toISOString()
+  const draft = market(rows, reported, now, [])
+  const history = appendHistory(hist, draft)
+  await fs.writeFile(histFile, JSON.stringify(history))
+  await fs.writeFile(path.join(OUT, 'bazaar-market.json'), JSON.stringify({ ...draft, history }))
+  console.log('bazaar-market', draft.totals.endpoints, 'endpoints,', draft.totals.sellers, 'sellers')
 }
 
 // 2) agentscan newest agents
@@ -78,13 +98,16 @@ async function agentscan() {
 }
 
 const jobs = [
-  ['bazaar-cdp', () => bazaar('bazaar-cdp', 'https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources')],
+  ['bazaar-cdp', () => bazaar('bazaar-cdp', 'https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources', { limit: 1000, withMarket: true })],
   ['bazaar-payai', () => bazaar('bazaar-payai', 'https://facilitator.payai.network/discovery/resources')],
   ['agentscan', agentscan],
 ]
 // Any failed source is a failure: a green run with one stale snapshot hides the problem.
 // Sources that did succeed keep their freshly written files, and the workflow commits them
 // before failing the run (.github/workflows/snapshot.yml).
+// Optional names on the command line run only those sources: node scripts/snapshot.mjs bazaar-cdp
+const only = process.argv.slice(2)
+const run = only.length ? jobs.filter(([n]) => only.includes(n)) : jobs
 let failed = 0
-for (const [n, fn] of jobs) { try { await fn() } catch (e) { failed++; console.error('FAIL', n, e?.message ?? e) } }
-if (failed) { console.error(`${failed} of ${jobs.length} sources failed`); process.exit(1) }
+for (const [n, fn] of run) { try { await fn() } catch (e) { failed++; console.error('FAIL', n, e?.message ?? e) } }
+if (failed) { console.error(`${failed} of ${run.length} sources failed`); process.exit(1) }

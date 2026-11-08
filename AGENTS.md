@@ -45,10 +45,11 @@ Vite 8 · React 19 · TypeScript · Tailwind v4 · motion · D3 · viem · TanSt
 | `docs/features/marketplaces.md` | Feature 1: marketplace directory + extra data collection |
 | `docs/features/registry.md` | Feature 2: ERC-8004 agent registration event log |
 | `docs/features/payments.md` | Feature 3: facilitator-centric x402 payment flow graph |
+| `docs/features/bazaar.md` | Feature 4: CDP Bazaar market view (sellers, prices, demand) |
 | `docs/features/*.md` "Implementation" section | Current implementation status and next steps per feature |
 | `scripts/snapshot.mjs` | CI snapshot collector (CORS-blocked sources → `public/snapshots/`) |
 | `docs/review-2026-09.md` | Code audit findings and what was fixed or deferred |
-| `docs/research/` | Pre-implementation research per feature (required). registry / payments / marketplaces done |
+| `docs/research/` | Pre-implementation research per feature (required). registry / payments / marketplaces / bazaar done |
 
 ## License
 Apache 2.0. New source files do not carry per-file headers; `LICENSE` at the root covers the project.

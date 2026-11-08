@@ -14,6 +14,7 @@ import type { Key } from './i18n/en'
 import { spanFrom } from './lib/format'
 import { usePwa } from './lib/usePwa'
 import { useHashRoute, type Route } from './router'
+import { BazaarPanel } from './features/bazaar/BazaarPanel'
 
 const REGISTRY_CHAINS: readonly ChainKey[] = ['base', 'bnb']
 
@@ -80,6 +81,7 @@ function Page({ route, payments, registry, perMin, observedSpan }: {
   switch (route) {
     case 'payments': return <PaymentsPanel state={payments} />
     case 'registry': return <RegistryLog state={registry} />
+    case 'bazaar': return <BazaarPanel />
     case 'marketplaces': return <MarketplacesPanel />
     default: return <OverviewPanel observedPerMin={perMin} observedSpan={observedSpan} />
   }

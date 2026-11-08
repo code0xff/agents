@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export const ROUTES = ['overview', 'payments', 'registry', 'marketplaces'] as const
+export const ROUTES = ['overview', 'payments', 'registry', 'bazaar', 'marketplaces'] as const
 export type Route = (typeof ROUTES)[number]
 
 const DEFAULT: Route = 'overview'

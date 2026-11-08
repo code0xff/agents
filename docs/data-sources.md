@@ -30,7 +30,7 @@ Verified 2026-09-05. Evidence in `docs/research/`.
 ## Public APIs — CORS blocked → CI snapshots (`public/snapshots/`, `scripts/snapshot.mjs`, every 6h)
 | Source | Snapshot |
 |---|---|
-| `https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources` | `bazaar-cdp.json` |
+| `https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources` | `bazaar-cdp.json`, `bazaar-market.json` (aggregates for `#/bazaar`, see `docs/features/bazaar.md`) |
 | `https://facilitator.payai.network/discovery/resources` | `bazaar-payai.json` |
 | `https://agentscan.info/api/{agents,stats}` | `agentscan.json` (page_size max 100) |
 
