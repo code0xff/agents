@@ -46,6 +46,8 @@ const BANDS = [
   ['free', (v) => v === 0], ['lt0001', (v) => v <= 0.001], ['lt001', (v) => v <= 0.01],
   ['lt01', (v) => v <= 0.1], ['lt1', (v) => v <= 1], ['gte1', () => true],
 ]
+const CURVE_RANKS = [1, 2, 3, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000]
+const DEMAND = [['c0', 0, 1], ['c1', 1, 10], ['c10', 10, 100], ['c100', 100, 1000], ['c1k', 1000, 10000], ['c10k', 10000, Infinity]]
 const band = (usd) => (usd == null ? 'unpriced' : BANDS.find(([, f]) => f(usd))[0])
 const num = (v) => (typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : null)
 const median = (xs) => {
@@ -124,6 +126,16 @@ export function market(rows, reported, now, history) {
     networks: Object.entries(networks).map(([id, v]) => ({ id, ...v })).sort((a, b) => b.endpoints - a.endpoints),
     categories: Object.entries(cats).map(([key, v]) => ({ key, ...v })).sort((a, b) => b.calls - a.calls),
     sellers: sellerRows.slice(0, 100),
+    // Cumulative share of calls held by the top N sellers: the concentration curve.
+    curve: totalCalls ? CURVE_RANKS.filter((n) => n < sellerRows.length).concat(sellerRows.length).map((n) => {
+      let c = 0; for (let i = 0; i < n; i++) c += sellerRows[i].calls
+      return { rank: n, share: c / totalCalls }
+    }) : [],
+    // How many endpoints fall in each order of magnitude of 30-day calls: the long tail.
+    demand: DEMAND.map(([key, lo, hi]) => {
+      const inBand = eps.filter((r) => calls(r) >= lo && calls(r) < hi)
+      return { key, endpoints: inBand.length, calls: inBand.reduce((s, r) => s + calls(r), 0) }
+    }),
     topEndpoints: eps.filter((r) => calls(r) > 0).sort((a, b) => calls(b) - calls(a)).slice(0, 50)
       .map(({ resource, method, name, host, usd, calls, payers, lastCalledAt, cat }) => ({ resource, method, name, host, usd, calls, payers, lastCalledAt, cat })),
     history,

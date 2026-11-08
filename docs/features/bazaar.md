@@ -7,12 +7,15 @@ Research: `docs/research/bazaar.md`.
 marketplace snapshot and, from the same pass, `scripts/bazaar-market.mjs` builds
 `public/snapshots/bazaar-market.json` (~30 KB): totals, price bands (endpoints and calls),
 networks, keyword category estimate, top 100 sellers by host, top 50 endpoints by 30-day calls,
-and a daily history. History is also kept in `data/bazaar-history.json` (committed, 365 days).
+and a daily history. Also `curve` (cumulative call share of the top N sellers) and `demand`
+(endpoints per order of magnitude of 30-day calls). History is also kept in `data/bazaar-history.json` (committed, 365 days).
 
 The market file is not written when the read falls more than 2% short of `pagination.total`.
 
 ## UI (`src/features/bazaar/`)
 - `useMarket.ts`: fetch + shape normalisation.
+- `Charts.tsx`: seller concentration curve (log rank), demand long tail, price × demand scatter
+  of the top sellers (log/log, size = endpoints). Single series, ink scale only, hover readouts.
 - `BazaarPanel.tsx`: headline stats and top-10 concentration; price × demand (endpoint share
   against call share per band); networks; categories (labelled as an estimate); sellers table and
   top endpoints, both paginated; daily trend; reading notes.

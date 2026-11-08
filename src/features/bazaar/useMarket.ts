@@ -13,6 +13,8 @@ export interface Market {
   categories: { key: string; endpoints: number; calls: number }[]
   sellers: { host: string; endpoints: number; calls: number; maxPayers: number; medianUsd: number | null; networks: string[] }[]
   topEndpoints: { resource: string; method: string; name: string | null; host: string; usd: number | null; calls: number; payers: number | null; lastCalledAt: string | null; cat: string }[]
+  curve: { rank: number; share: number }[]
+  demand: { key: string; endpoints: number; calls: number }[]
   history: { date: string; endpoints: number; sellers: number; calls30d: number; withCalls: number }[]
 }
 
@@ -36,7 +38,7 @@ function normalize(raw: unknown): Market {
     },
     bands: Object.fromEntries(BAND_KEYS.map((k) => [k, { endpoints: n(b[k]?.endpoints), calls: n(b[k]?.calls), withCalls: n(b[k]?.withCalls) }])) as Record<BandKey, Band>,
     networks: arr(d.networks), categories: arr(d.categories), sellers: arr(d.sellers),
-    topEndpoints: arr(d.topEndpoints), history: arr(d.history),
+    topEndpoints: arr(d.topEndpoints), curve: arr(d.curve), demand: arr(d.demand), history: arr(d.history),
   }
 }
 

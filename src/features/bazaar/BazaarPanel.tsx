@@ -7,6 +7,7 @@ import type { Key } from '../../i18n/en'
 import { compact, num, timeAgo, usd } from '../../lib/format'
 import { useIsMobile } from '../../lib/useMediaQuery'
 import { Sparkline } from '../marketplaces/Sparkline'
+import { ConcentrationCurve, DemandTail, PriceDemandScatter } from './Charts'
 import { BAND_KEYS, useMarket, type Market } from './useMarket'
 
 const price = (v: number | null, tag: string) => (v == null ? '—' : v === 0 ? usd(0, 0, tag) : usd(v, v < 0.01 ? 4 : 3, tag))
@@ -43,6 +44,11 @@ export function BazaarPanel() {
       </Panel>
 
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+        <ConcentrationCurve m={m} />
+        <DemandTail m={m} />
+      </div>
+
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
         <PriceDemand m={m} />
         <div className="flex flex-col gap-4 sm:gap-6">
           <Split title={t('bz.networks')} note={t('bz.networksNote')}
@@ -52,6 +58,7 @@ export function BazaarPanel() {
         </div>
       </div>
 
+      <PriceDemandScatter m={m} />
       <Sellers m={m} />
       <TopEndpoints m={m} />
       <Trend m={m} />
@@ -74,7 +81,7 @@ function PriceDemand({ m }: { m: Market }) {
     <Panel title={t('bz.price')} eyebrow={t('bz.priceEyebrow')}>
       <div className="flex flex-col gap-3 px-4 py-4 sm:px-5">
         <div className="flex gap-4 font-mono text-[10px] tracking-[.035em] text-ink-400 uppercase">
-          <span className="flex items-center gap-1.5"><i className="inline-block h-2 w-3 rounded-sm bg-ink-700" />{t('bz.legend.endpoints')}</span>
+          <span className="flex items-center gap-1.5"><i className="inline-block h-2 w-3 rounded-sm bg-ink-500" />{t('bz.legend.endpoints')}</span>
           <span className="flex items-center gap-1.5"><i className="inline-block h-2 w-3 rounded-sm bg-ink-200" />{t('bz.legend.calls')}</span>
         </div>
         <ul className="flex flex-col gap-3">
@@ -83,7 +90,7 @@ function PriceDemand({ m }: { m: Market }) {
             return (
               <li key={k} className="grid grid-cols-[5.5rem_minmax(0,1fr)_3.25rem] items-center gap-x-3 gap-y-1">
                 <span className="row-span-2 font-mono text-[11px] text-ink-200">{t(`bz.band.${k}` as Key)}</span>
-                <Bar pct={a} tone="bg-ink-700" delay={i * 0.05} />
+                <Bar pct={a} tone="bg-ink-500" delay={i * 0.05} />
                 <span className="text-right font-mono text-[11px] text-ink-400 tabular-nums">{a.toFixed(1)}%</span>
                 <Bar pct={c} tone="bg-ink-200" delay={i * 0.05 + 0.03} />
                 <span className="text-right font-mono text-[11px] text-ink-100 tabular-nums">{c.toFixed(1)}%</span>
