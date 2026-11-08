@@ -48,11 +48,12 @@ export function BazaarPanel() {
         <DemandTail m={m} />
       </div>
 
-      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+      {/* Three columns of similar height; stacking two splits beside the price bars left a gap. */}
+      <div className="grid gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
         <PriceDemand m={m} />
-        <div className="flex flex-col gap-4 sm:gap-6">
-          <Split title={t('bz.networks')} note={t('bz.networksNote')}
-            rows={m.networks.slice(0, 8).map((r) => ({ name: r.label, value: r.endpoints }))} />
+        <Split title={t('bz.networks')} note={t('bz.networksNote')}
+          rows={m.networks.slice(0, 8).map((r) => ({ name: r.label, value: r.endpoints }))} />
+        <div className="md:col-span-2 xl:col-span-1">
           <Split title={t('bz.categories')} note={t('bz.categoriesNote')}
             rows={m.categories.map((r) => ({ name: t(`bz.cat.${r.key}` as Key), value: r.calls }))} />
         </div>
@@ -78,7 +79,7 @@ function PriceDemand({ m }: { m: Market }) {
   const ep = m.totals.endpoints || 1, calls = m.totals.calls30d || 1
   const rows = BAND_KEYS.filter((k) => m.bands[k].endpoints > 0)
   return (
-    <Panel title={t('bz.price')} eyebrow={t('bz.priceEyebrow')}>
+    <Panel title={t('bz.price')} eyebrow={t('bz.priceEyebrow')} className="h-full">
       <div className="flex flex-col gap-3 px-4 py-4 sm:px-5">
         <div className="flex gap-4 font-mono text-[10px] tracking-[.035em] text-ink-400 uppercase">
           <span className="flex items-center gap-1.5"><i className="inline-block h-2 w-3 rounded-sm bg-ink-500" />{t('bz.legend.endpoints')}</span>
@@ -88,7 +89,7 @@ function PriceDemand({ m }: { m: Market }) {
           {rows.map((k, i) => {
             const b = m.bands[k], a = (b.endpoints / ep) * 100, c = (b.calls / calls) * 100
             return (
-              <li key={k} className="grid grid-cols-[5.5rem_minmax(0,1fr)_3.25rem] items-center gap-x-3 gap-y-1">
+              <li key={k} className="grid grid-cols-[4.75rem_minmax(0,1fr)_3rem] items-center gap-x-3 gap-y-1">
                 <span className="row-span-2 font-mono text-[11px] text-ink-200">{t(`bz.band.${k}` as Key)}</span>
                 <Bar pct={a} tone="bg-ink-500" delay={i * 0.05} />
                 <span className="text-right font-mono text-[11px] text-ink-400 tabular-nums">{a.toFixed(1)}%</span>
@@ -118,7 +119,7 @@ function Split({ title, note, rows }: { title: string; note: string; rows: { nam
   const { tag } = useT()
   const max = rows[0]?.value || 1
   return (
-    <Panel title={title}>
+    <Panel title={title} className="h-full">
       <div className="flex flex-col gap-2 px-4 py-4 sm:px-5">
         <ul className="flex flex-col gap-1.5">
           {rows.map((r) => (
