@@ -1,3 +1,4 @@
+import { hrefFor } from '../../router'
 import { motion } from 'motion/react'
 import { Badge, Panel } from '../../components/Panel'
 import marketplaces from '../../data/marketplaces.json'
@@ -63,6 +64,14 @@ function Card({ m, i, ae, ocai, t, tag }: {
           </div>
         )}
       </div>
+      {m.id === 'cdp-bazaar' && (
+        // The card itself links out, and anchors cannot nest, so the in-app view is a button.
+        <button type="button"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.location.hash = hrefFor('bazaar') }}
+          className="self-start rounded-lg border border-ink-700 px-2.5 py-1 font-mono text-[11px] text-ink-200 transition-colors hover:border-ink-500 hover:text-ink-50">
+          {t('mp.openBazaar')} →
+        </button>
+      )}
       {m.feed === 'snapshot' && snap.data && snap.data.items.length > 0 && (
         <ul className="border-t border-ink-800 pt-2 font-mono text-[10px] text-ink-500">
           {uniqueBy(snap.data.items, (it) => it.name).slice(0, 3).map((it, k) => (

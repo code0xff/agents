@@ -31,6 +31,7 @@ export const ja: Dict = {
   'mp.metric.mechTx': 'Mech トランザクション',
   'mp.metric.probed': '検査したエージェント',
   'mp.metric.x402All': 'x402 決済、全 facilitator',
+  'mp.openBazaar': 'マーケット分析を見る',
 
   'mp.kind.x402disc': 'x402 サービスディスカバリー',
   'mp.kind.registry': 'オンチェーンエージェントレジストリ',

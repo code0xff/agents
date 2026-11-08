@@ -31,6 +31,7 @@ export const ko: Dict = {
   'mp.metric.mechTx': 'Mech 트랜잭션',
   'mp.metric.probed': '점검한 에이전트',
   'mp.metric.x402All': 'x402 결제, 전체 facilitator',
+  'mp.openBazaar': '시장 분석 보기',
 
   'mp.kind.x402disc': 'x402 서비스 디스커버리',
   'mp.kind.registry': '온체인 에이전트 레지스트리',

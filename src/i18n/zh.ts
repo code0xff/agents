@@ -31,6 +31,7 @@ export const zh: Dict = {
   'mp.metric.mechTx': 'Mech 交易',
   'mp.metric.probed': '已探测代理',
   'mp.metric.x402All': 'x402 支付，全部 facilitator',
+  'mp.openBazaar': '查看市场分析',
 
   'mp.kind.x402disc': 'x402 服务发现',
   'mp.kind.registry': '链上代理注册表',

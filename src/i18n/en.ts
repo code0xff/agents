@@ -29,6 +29,7 @@ export const en = {
   'mp.metric.mechTx': 'Mech transactions',
   'mp.metric.probed': 'Agents probed',
   'mp.metric.x402All': 'x402 payments, all facilitators',
+  'mp.openBazaar': 'Open the market view',
 
   'mp.kind.x402disc': 'x402 service discovery',
   'mp.kind.registry': 'On-chain agent registry',

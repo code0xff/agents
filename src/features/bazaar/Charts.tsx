@@ -144,7 +144,8 @@ export function PriceDemandScatter({ m }: { m: Market }) {
   const x = d3.scaleLog(d3.extent(pts, (s) => s.medianUsd!) as [number, number], [P.l, Math.max(P.l + 1, w - P.r)]).nice()
   const y = d3.scaleLog(d3.extent(pts, (s) => s.calls) as [number, number], [H - P.b, P.t]).nice()
   const r = d3.scaleSqrt([0, d3.max(pts, (s) => s.endpoints) || 1], [4, 14])
-  const xt = x.ticks().filter((v) => [1, 3].includes(+v.toExponential()[0]) || x.ticks().length < 6)
+  // 1-3-10 steps fit from ~480px; narrower screens keep only the decades so labels do not collide.
+  const xt = x.ticks().filter((v) => (w >= 480 ? [1, 3] : [1]).includes(+v.toExponential()[0]) || x.ticks().length < 6)
   const yt = y.ticks().filter((v) => +v.toExponential()[0] === 1)
   const h = pts.find((s) => s.host === hover)
   // Draw large bubbles first so small ones stay on top and reachable.
