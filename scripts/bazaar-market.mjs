@@ -19,7 +19,7 @@ const NET_LABEL = {
   'eip155:8453': 'Base', 'eip155:84532': 'Base Sepolia', 'eip155:137': 'Polygon', 'eip155:56': 'BNB',
   'eip155:42161': 'Arbitrum', 'eip155:42220': 'Celo', 'eip155:196': 'X Layer', 'eip155:8217': 'Kaia',
   'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp': 'Solana', 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1': 'Solana Devnet',
-  'xrpl:0': 'XRPL', 'eip155:1': 'Ethereum', 'eip155:10': 'Optimism', 'eip155:143': 'Monad', 'eip155:5042': 'Arc', 'eip155:43114': 'Avalanche',
+  'xrpl:0': 'XRPL', 'eip155:1': 'Ethereum', 'eip155:10': 'Optimism', 'eip155:143': 'Monad', 'eip155:5042': 'Arc', 'eip155:480': 'World Chain', 'eip155:43114': 'Avalanche',
 }
 const netId = (n) => NET_ALIAS[String(n ?? '').toLowerCase()] ?? String(n ?? 'unknown')
 
