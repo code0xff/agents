@@ -166,7 +166,7 @@ export function PriceDemandScatter({ m }: { m: Market }) {
               {xt.map((v) => (
                 <g key={v}>
                   <line x1={x(v)} x2={x(v)} y1={P.t} y2={H - P.b} stroke="var(--ink-800)" />
-                  <text x={x(v)} y={H - 12} textAnchor="middle" className={axis}>{usd(v, v < 0.01 ? 4 : 2, tag)}</text>
+                  <text x={x(v)} y={H - 12} textAnchor={x(v) > w - P.r - 24 ? 'end' : 'middle'} className={axis}>{usd(v, v < 0.01 ? 4 : 2, tag)}</text>
                 </g>
               ))}
               {ordered.map((s, i) => (
