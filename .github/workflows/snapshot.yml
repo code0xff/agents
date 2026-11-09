@@ -19,10 +19,10 @@ jobs:
     outputs:
       changed: ${{ steps.commit.outputs.changed }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
       # One unreachable source must not discard the others: record the exit code, commit
       # what was collected, and fail the job only after the commit (last step).
       - name: Collect snapshots
