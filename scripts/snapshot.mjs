@@ -90,7 +90,7 @@ async function writeMarket(rows, read, reported) {
 
 // 2) agentscan newest agents
 async function agentscan() {
-  const j = await getJson('https://agentscan.info/api/agents?page=1&page_size=100')
+  const j = await getJson('https://agentscan.info/api/agents?page=1&page_size=100', 2)
   const stats = await getJson('https://agentscan.info/api/stats').catch(() => null)
   const items = (j.items ?? []).map((a) => ({ key: `${a.network_id}:${a.token_id}`, name: a.name || `#${a.token_id}`, network: a.network_name, address: a.address, description: (a.description ?? '').slice(0, 160), updated: a.created_at }))
   // stats may be null; consumers must show "unavailable" rather than treat the page size as a total.
@@ -100,14 +100,26 @@ async function agentscan() {
 const jobs = [
   ['bazaar-cdp', () => bazaar('bazaar-cdp', 'https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources', { limit: 1000, withMarket: true })],
   ['bazaar-payai', () => bazaar('bazaar-payai', 'https://facilitator.payai.network/discovery/resources')],
-  ['agentscan', agentscan],
+  ['agentscan', agentscan, { staleAfterH: 48 }],
 ]
-// Any failed source is a failure: a green run with one stale snapshot hides the problem.
+// A failed source fails the run, so a stale snapshot never hides behind a green run. The one
+// exception is a source marked `staleAfterH`: agentscan's API often hangs for minutes, so a
+// miss there only warns (keeping the previous file) until that file is older than the limit.
 // Sources that did succeed keep their freshly written files, and the workflow commits them
 // before failing the run (.github/workflows/snapshot.yml).
 // Optional names on the command line run only those sources: node scripts/snapshot.mjs bazaar-cdp
 const only = process.argv.slice(2)
 const run = only.length ? jobs.filter(([n]) => only.includes(n)) : jobs
+async function ageHours(name) {
+  try { return (Date.now() - Date.parse(JSON.parse(await fs.readFile(path.join(OUT, `${name}.json`), 'utf8')).generatedAt)) / 3.6e6 } catch { return Infinity }
+}
 let failed = 0
-for (const [n, fn] of run) { try { await fn() } catch (e) { failed++; console.error('FAIL', n, e?.message ?? e) } }
+for (const [n, fn, opt] of run) {
+  try { await fn() } catch (e) {
+    const msg = e?.message ?? e
+    const age = opt?.staleAfterH ? await ageHours(n) : Infinity
+    if (age < opt?.staleAfterH) { console.log(`::warning::${n} skipped (${msg}); keeping the snapshot from ${age.toFixed(1)}h ago`); continue }
+    failed++; console.error('FAIL', n, msg)
+  }
+}
 if (failed) { console.error(`${failed} of ${run.length} sources failed`); process.exit(1) }

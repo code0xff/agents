@@ -20,6 +20,9 @@
 - A source that fails (agentscan timing out has been the cause so far) does not discard the others:
   the job commits and deploys whatever was collected, then fails on its last step so the run still
   shows red. The failed source keeps its previous file, and the page shows that file's age.
+- agentscan is marked `staleAfterH: 48` in `scripts/snapshot.mjs`: its API often hangs for minutes,
+  so a miss only adds a `::warning::` annotation while its last snapshot is under 48 hours old. Past
+  that, it fails the run like any other source.
 - A scheduled workflow only runs from the default branch, and GitHub registers a workflow when the file
   lands on that branch. If a schedule never fires, push a change to the workflow file to re-register it.
 - The footer shows the short commit the bundle was built from. If it does not match the tip of `dev`,
