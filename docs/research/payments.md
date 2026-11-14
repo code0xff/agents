@@ -67,3 +67,19 @@ receiving nodes).
 - Full-block fetch load: 5 blocks/10s ≈ 2.5MB/10s. Consider a polling-interval option for mobile.
 - Solana payments (~26% of the total) are out of scope (EVM only).
 - Verify whether the `upto` scheme (Daydreams) uses a different contract path.
+
+### 2026-11-14: Arc (Circle, chain 5042)
+- USDC is Arc's gas token; its ERC-20 face is the system contract
+  `0x3600000000000000000000000000000000000000` (symbol USDC, 6 decimals) and it implements EIP-3009,
+  so the same `AuthorizationUsed` log read works unchanged.
+- Volume: 440 settlements over 54,000 blocks (~7.5h at ~0.5s/block), about one a minute.
+- A 40-transaction sample: 39 decode as bare `transferWithAuthorization` (33 with the `bytes
+  signature` form `0xcf092995`, 6 with v/r/s `0xe3ee160e`), one went through a router contract.
+  Amounts $0.002–$0.0085, sent by five EOAs to two payTo addresses (one took 33). This is x402
+  traffic, concentrated in a few services.
+- None of the five senders appears in `facilitators.json` (no Arc entries upstream) or carries an
+  explorer label, so Arc facilitators show as addresses.
+- Circle's RPC refuses bursts of `eth_getTransactionByHash` with HTTP 429: eight in parallel lost
+  ~40%. Arc fetches one transaction a second and retries a refused one once after the pause
+  (`txBatch`, `txGapMs` in `PAYMENT_CHAINS`); in-app, all 34 settlements in a 15-minute backfill
+  decoded.

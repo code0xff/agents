@@ -8,7 +8,7 @@ Verified 2026-09-05. Evidence in `docs/research/`.
 | Base (8453) | `https://mainnet.base.org` | 2k per call, 10k window | ERC-8004 registration logs, x402 payment block scan (primary) |
 | BNB (56) | `https://bsc-rpc.publicnode.com` | 5k | ERC-8004 registration logs |
 | Polygon (137) | `https://polygon-bor-rpc.publicnode.com` (fallback `https://polygon.drpc.org`) | 2k | x402 payment settlements |
-| Arc (5042) | `https://rpc.mainnet.arc.io` | 9k, 1s between chunks | ERC-8004 registration logs |
+| Arc (5042) | `https://rpc.mainnet.arc.io` | 9k, 1s between chunks | ERC-8004 registration logs, x402 settlements (USDC `0x3600…0000`) |
 
 ### ERC-8004 (same address on every mainnet)
 - IdentityRegistry `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432`

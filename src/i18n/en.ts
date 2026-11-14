@@ -104,7 +104,7 @@ export const en = {
   'nav.registry': 'Registry',
   'nav.marketplaces': 'Marketplaces',
   'page.overview.lead': 'Totals, momentum and where the activity concentrates.',
-  'page.payments.lead': 'Every USDC settlement a facilitator submits on Base and Polygon, as it lands.',
+  'page.payments.lead': 'Every USDC settlement a facilitator submits on Base, Polygon and Arc, as it lands.',
   'page.registry.lead': 'Agents registering on Base, BNB and Arc, as it happens.',
   'page.marketplaces.lead': 'Where agents and paid services are listed, and what each one exposes.',
   'reg.allFailed': 'All chains failed to respond',

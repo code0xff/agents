@@ -106,7 +106,7 @@ export const zh: Dict = {
   'nav.registry': '注册表',
   'nav.marketplaces': '市场',
   'page.overview.lead': '总量、趋势，以及活动集中的位置。',
-  'page.payments.lead': '实时呈现 facilitator 在 Base 与 Polygon 上提交的每一笔 USDC 结算。',
+  'page.payments.lead': '实时呈现 facilitator 在 Base、Polygon 与 Arc 上提交的每一笔 USDC 结算。',
   'page.registry.lead': '实时呈现在 Base、BNB 与 Arc 上注册的代理。',
   'page.marketplaces.lead': '代理与付费服务的登记之处，以及各自公开的数据。',
   'reg.allFailed': '所有链均无响应',

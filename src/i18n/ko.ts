@@ -106,7 +106,7 @@ export const ko: Dict = {
   'nav.registry': '레지스트리',
   'nav.marketplaces': '마켓플레이스',
   'page.overview.lead': '총량과 추세, 그리고 활동의 분포.',
-  'page.payments.lead': 'Base와 Polygon에서 facilitator가 제출하는 USDC 정산을 실시간으로 확인.',
+  'page.payments.lead': 'Base, Polygon, Arc에서 facilitator가 제출하는 USDC 정산을 실시간으로 확인.',
   'page.registry.lead': 'Base, BNB, Arc에 등록되는 에이전트를 실시간으로 확인.',
   'page.marketplaces.lead': '에이전트와 유료 서비스가 등록되는 곳, 그리고 각각이 공개하는 데이터.',
   'reg.allFailed': '모든 체인이 응답하지 않음',

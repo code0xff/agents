@@ -20,7 +20,8 @@ const ABI = parseAbi([
 const AUTHORIZATION_USED = parseAbiItem('event AuthorizationUsed(address indexed authorizer, bytes32 indexed nonce)')
 
 /** Facilitator names per chain; the same operator uses different addresses on each. */
-const FACILITATOR_BY_ADDR: Record<PaymentChainKey, Record<string, string>> = { base: {}, polygon: {} }
+// Arc has no published facilitator addresses yet, so its senders show as addresses only.
+const FACILITATOR_BY_ADDR: Record<PaymentChainKey, Record<string, string>> = { base: {}, polygon: {}, arc: {} }
 for (const f of facilitators) {
   for (const a of f.networks.base ?? []) FACILITATOR_BY_ADDR.base[a.toLowerCase()] = f.name
   for (const a of (f.networks as { polygon?: string[] }).polygon ?? []) FACILITATOR_BY_ADDR.polygon[a.toLowerCase()] = f.name
@@ -106,10 +107,18 @@ async function scanRange(
 
   const found: Payment[] = []
   const hashes = [...byHash.keys()]
-  for (let i = 0; i < hashes.length; i += TX_CHUNK) {
+  const step = cfg.txBatch ?? TX_CHUNK
+  for (let i = 0; i < hashes.length; i += step) {
     if (aborted()) break
-    const batch = hashes.slice(i, i + TX_CHUNK)
-    const txs = await Promise.all(batch.map((h) => client.getTransaction({ hash: h }).catch(() => null)))
+    if (i > 0 && cfg.txGapMs) await new Promise((r) => setTimeout(r, cfg.txGapMs))
+    const batch = hashes.slice(i, i + step)
+    const get = (h: Hex) => client.getTransaction({ hash: h }).catch(() => null)
+    let txs = await Promise.all(batch.map(get))
+    // A rate-limited endpoint refuses some reads outright; ask once more after its pause.
+    if (cfg.txGapMs && txs.some((t) => !t)) {
+      await new Promise((r) => setTimeout(r, cfg.txGapMs))
+      txs = await Promise.all(batch.map((h, k) => txs[k] ?? get(h)))
+    }
     for (const tx of txs) {
       if (!tx) continue
       let decoded

@@ -65,7 +65,7 @@ export const CHAINS: Record<ChainKey, ChainConfig> = {
 
 export const IDENTITY_REGISTRY = '0x8004A169FB4a3325136EB29fA0ceB6D2e539a432' as const
 
-export type PaymentChainKey = 'base' | 'polygon'
+export type PaymentChainKey = 'base' | 'polygon' | 'arc'
 
 interface PaymentChain {
   key: PaymentChainKey
@@ -77,11 +77,18 @@ interface PaymentChain {
   backfill: bigint
   /** Upper bound for a single catch-up, so a backgrounded tab cannot ask for an open range. */
   maxCatchup: bigint
+  /** Transactions fetched at once, and the pause between batches, for rate-limited endpoints. */
+  txBatch?: number
+  txGapMs?: number
 }
 
 export const PAYMENT_CHAINS: Record<PaymentChainKey, PaymentChain> = {
   base: { key: 'base', usdc: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', blockSeconds: 2, backfill: 150n, maxCatchup: 600n },
   polygon: { key: 'polygon', usdc: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', blockSeconds: 2, backfill: 40n, maxCatchup: 200n },
+  // USDC is Arc's gas token; its ERC-20 face sits at a fixed system address and supports EIP-3009.
+  // About one settlement a minute (0.5s blocks), so the backfill reaches back 15 minutes, and
+  // transactions are fetched one a second because Circle's RPC refuses bursts.
+  arc: { key: 'arc', usdc: '0x3600000000000000000000000000000000000000', blockSeconds: 0.5, backfill: 1_800n, maxCatchup: 9_000n, txBatch: 1, txGapMs: 1_000 },
 }
 
 export const PAYMENT_CHAIN_KEYS = Object.keys(PAYMENT_CHAINS) as PaymentChainKey[]

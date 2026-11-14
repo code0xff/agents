@@ -34,6 +34,9 @@ the target node pulses. A recent-payments list sits beside the graph.
   roughly 443 MB per hour of open tab, to keep a handful of transactions. The log-first scan measured
   0.8 KB/s over a minute, and about 6 MB per hour for the whole dashboard including the registry. Facilitator labels from `facilitators.json`; unlabeled senders with
   3+ payments become `Unlabeled xxxx` nodes.
+- Arc added 2026-11-14: about one settlement a minute, 15-minute backfill (1,800 blocks), one
+  transaction fetched per second because Circle's RPC 429s bursts. Facilitators are unnamed there.
+  See `docs/research/payments.md`.
 - `PaymentGraph.tsx`: D3 force on a canvas 1.9x the panel, viewed through a camera. Nodes are bounded
   to an ellipse rather than the canvas rectangle, and the forces are tuned so the cluster settles well
   inside that bound (max normalised radius around 0.8, nothing resting on it). A bound only shapes the
