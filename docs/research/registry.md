@@ -127,3 +127,19 @@ each endpoint carries its own chunk size; a refusal naming a range limit shrinks
 chunk and retries; any other failure (429, archive-token, timeout) cools the endpoint down for 60s
 and moves the chunk to the next one. A read fails only when every endpoint fails the same chunk.
 Verified with two refusing endpoints (base.org 429, 1rpc 50-block) placed ahead of publicnode.
+
+### 2026-11-14: Arc (Circle, chain 5042)
+Registrations on Arc had become frequent. Measured from a desktop with an Origin header:
+- The IdentityRegistry singleton `0x8004A169…a432` is deployed (proxy bytecode at the address).
+- `https://rpc.mainnet.arc.io` (Circle, from docs.arc.io): CORS echoes the origin; `eth_getLogs`
+  answers up to 9,999 blocks and refuses 10,000 with `-32012 "requested range too large"`.
+- It rate-limits bursts (`"rate limit exceeded"`): parallel calls, and even sequential chunk pairs
+  without a pause, are refused. Pairs one second apart all answered. `Rpc.gapMs` carries that pause
+  and `readLogChunks` waits it before every chunk after the first.
+- Blocks are ~0.507s apart (100,000-block span). Registered events over the last ~24h came to
+  about 40, in bursts (0–7 per 10,000 blocks).
+- `arc.drpc.org`: CORS `*`, but the free plan refuses ranges of 1,000 blocks or more. Not used.
+- Explorer: `https://explorer.arc.io` (`/address/…`, `/tx/…`).
+
+Config: chunk 9,000, gap 1s, window 27,000 blocks (≈3.75h, three chunks, ~6 registrations).
+Checked in the app: the first load read Arc with every call answering 200 and listed 6 registrations.

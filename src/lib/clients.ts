@@ -20,7 +20,7 @@ export function getClient(key: ChainKey): PublicClient {
 /** How long an endpoint is skipped after refusing a log read for any reason but range. */
 const COOLDOWN_MS = 60_000
 
-interface Endpoint { url: string; chunk: bigint; client: PublicClient; until: number }
+interface Endpoint { url: string; chunk: bigint; gapMs: number; client: PublicClient; until: number }
 
 const endpoints = new Map<ChainKey, Endpoint[]>()
 
@@ -29,7 +29,7 @@ function endpointsFor(key: ChainKey): Endpoint[] {
   if (!list) {
     const cfg = CHAINS[key]
     list = cfg.rpcs.map((r) => ({
-      url: r.url, chunk: r.logChunk, until: 0,
+      url: r.url, chunk: r.logChunk, gapMs: r.gapMs ?? 0, until: 0,
       // No retry here: a refusal moves to the next endpoint instead of asking this one again.
       client: createPublicClient({ chain: cfg.chain, transport: http(r.url, { timeout: 15_000, retryCount: 0 }) }),
     }))
@@ -63,6 +63,7 @@ export async function readLogChunks<T>(
 ): Promise<void> {
   const list = endpointsFor(key)
   let lo = from
+  let first = true
   while (lo <= to) {
     const now = Date.now()
     const ready = list.filter((e) => e.until <= now)
@@ -72,6 +73,8 @@ export async function readLogChunks<T>(
     let done = false
     for (const ep of order) {
       const hi = lo + ep.chunk > to ? to : lo + ep.chunk
+      if (!first && ep.gapMs) await new Promise((r) => setTimeout(r, ep.gapMs))
+      first = false
       try {
         const result = await read(ep.client, lo, hi)
         onChunk(result, hi)

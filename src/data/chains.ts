@@ -1,12 +1,14 @@
-import { base, bsc, polygon, type Chain } from 'viem/chains'
+import { arc, base, bsc, polygon, type Chain } from 'viem/chains'
 
-export type ChainKey = 'base' | 'bnb' | 'polygon'
+export type ChainKey = 'base' | 'bnb' | 'polygon' | 'arc'
 
 /** One public endpoint and the widest eth_getLogs range (`toBlock - fromBlock`) it answers. */
 export interface Rpc {
   url: string
   /** Measured, and measured again whenever a chain stops answering. See `docs/research/registry.md`. */
   logChunk: bigint
+  /** Pause before each chunk after the first, for endpoints that rate-limit back-to-back reads. */
+  gapMs?: number
 }
 
 export interface ChainConfig {
@@ -50,6 +52,14 @@ export const CHAINS: Record<ChainKey, ChainConfig> = {
       { url: 'https://polygon.drpc.org', logChunk: 2_000n },
     ],
     logWindow: 2_000n, explorer: 'https://polygonscan.com',
+  },
+  arc: {
+    key: 'arc', label: 'Arc', short: 'ARC', chain: arc,
+    // Circle's endpoint answers up to 10,000 blocks but rate-limits back-to-back getLogs, so chunks
+    // are spaced. Blocks are ~0.5s: 27,000 blocks is about 3.75h, ~6 registrations at the measured
+    // rate. dRPC's free plan refuses ranges over ~100 blocks, so it is not a useful fallback.
+    rpcs: [{ url: env.VITE_RPC_ARC ?? 'https://rpc.mainnet.arc.io', logChunk: 9_000n, gapMs: 1_000 }],
+    logWindow: 27_000n, explorer: 'https://explorer.arc.io',
   },
 }
 

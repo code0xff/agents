@@ -16,7 +16,7 @@ import { usePwa } from './lib/usePwa'
 import { useHashRoute, type Route } from './router'
 import { BazaarPanel } from './features/bazaar/BazaarPanel'
 
-const REGISTRY_CHAINS: readonly ChainKey[] = ['base', 'bnb']
+const REGISTRY_CHAINS: readonly ChainKey[] = ['base', 'bnb', 'arc']
 
 export default function App() {
   const { t } = useT()

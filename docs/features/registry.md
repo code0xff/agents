@@ -31,3 +31,5 @@ relative time.
   - `https://` hosts are attempted on demand and mostly refuse the browser. The card then states that
     plainly and still shows the on-chain identity with a link to the file.
 - Ethereum registrations are infrequent; expect a handful per 10k blocks (~33h).
+- Chains shown: Base, BNB, Arc (added 2026-11-14; Circle's RPC needs a 1s gap between chunks, see
+  `docs/research/registry.md`).

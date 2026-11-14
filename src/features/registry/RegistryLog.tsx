@@ -15,7 +15,7 @@ import { chip, primaryBtn } from '../../components/ui'
  * Ethereum was dropped: it holds 68k agents cumulatively but produced one registration in six
  * hours, so the panel was almost always empty there. Polygon carries none at all.
  */
-const ALL: ChainKey[] = ['base', 'bnb']
+const ALL: ChainKey[] = ['base', 'bnb', 'arc']
 
 function fallbackLabel(e: RegistryEvent, t: Translate) {
   if (!e.uri) return t('reg.noUri')
