@@ -30,7 +30,8 @@ export function PaymentsPanel({ state }: { state: PaymentsState }) {
     for (const p of payments) { const k = `${p.chain}:${p.facilitator}`; c[k] = (c[k] ?? 0) + 1 }
     return Object.entries(c).sort((a, b) => b[1] - a[1]).slice(0, 6)
   }, [payments])
-  const paged = usePagination(payments, isMobile ? 6 : 10, chain)
+  // Rows are two lines since the recipient got its own line; five keep the column level with the map.
+  const paged = usePagination(payments, 5, chain)
   const span = spanFrom(payments[payments.length - 1]?.ts)
   const find = (senderKey: string) => {
     const [chain, addr] = senderKey.split(':')
