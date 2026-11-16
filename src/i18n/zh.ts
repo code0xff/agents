@@ -67,6 +67,11 @@ export const zh: Dict = {
   'reg.ipfsMeta': 'ipfs 元数据',
   'reg.noDescription': '没有内联描述。',
   'reg.metadataLink': '元数据',
+  'reg.col.time': '时间',
+  'reg.col.event': '事件',
+  'reg.col.id': '代理 ID',
+  'reg.col.agent': '代理',
+  'reg.col.owner': '所有者',
 
   'pay.eyebrow': 'x402 结算，USDC EIP-3009',
   'pay.title': '支付流向',

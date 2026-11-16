@@ -65,6 +65,11 @@ export const en = {
   'reg.ipfsMeta': 'ipfs metadata',
   'reg.noDescription': 'No inline description.',
   'reg.metadataLink': 'metadata',
+  'reg.col.time': 'Time',
+  'reg.col.event': 'Event',
+  'reg.col.id': 'Agent ID',
+  'reg.col.agent': 'Agent',
+  'reg.col.owner': 'Owner',
 
   'pay.eyebrow': 'x402 settlements, USDC EIP-3009',
   'pay.title': 'Payment flow',

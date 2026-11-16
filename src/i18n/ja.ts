@@ -67,6 +67,11 @@ export const ja: Dict = {
   'reg.ipfsMeta': 'ipfs メタデータ',
   'reg.noDescription': 'インライン説明なし。',
   'reg.metadataLink': 'メタデータ',
+  'reg.col.time': '時刻',
+  'reg.col.event': 'イベント',
+  'reg.col.id': 'エージェント ID',
+  'reg.col.agent': 'エージェント',
+  'reg.col.owner': '所有者',
 
   'pay.eyebrow': 'x402 決済、USDC EIP-3009',
   'pay.title': '決済フロー',

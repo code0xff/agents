@@ -24,6 +24,9 @@ function fallbackLabel(e: RegistryEvent, t: Translate) {
   return t('reg.unnamed')
 }
 
+/** Shared by the header and every row so the columns line up. Mobile keeps the stacked layout. */
+const COLS = 'sm:grid sm:grid-cols-[3rem_5.5rem_6.5rem_minmax(0,1fr)_8.5rem] sm:items-center sm:gap-x-4'
+
 function Row({ e, t, onOpen }: { e: RegistryEvent; t: Translate; onOpen: () => void }) {
   return (
     <motion.li
@@ -34,18 +37,18 @@ function Row({ e, t, onOpen }: { e: RegistryEvent; t: Translate; onOpen: () => v
       className="border-b border-ink-800/60 font-mono text-xs hover:bg-ink-800/30"
     >
       <button type="button" onClick={onOpen} className="w-full cursor-pointer px-4 py-2.5 text-left sm:px-5">
-        {/* Mobile stacks the row in two lines; from sm up it is a single line. */}
-        <span className="flex flex-wrap items-center gap-x-2 gap-y-1 sm:flex-nowrap sm:gap-3">
-          <span className="w-7 shrink-0 text-ink-500 tabular-nums">{timeAgo(e.ts)}</span>
+        {/* Mobile stacks the row in two lines; from sm up it is a table row under the header. */}
+        <span className={`flex flex-wrap items-center gap-x-2 gap-y-1 ${COLS}`}>
+          <span className="w-7 shrink-0 text-ink-500 tabular-nums sm:w-auto">{timeAgo(e.ts)}</span>
           <span className={`shrink-0 ${e.kind === 'registered' ? 'text-ink-100' : 'text-ink-400'}`}>
             {e.kind === 'registered' ? t('reg.register') : t('reg.seturi')}
           </span>
-          <span className="shrink-0 text-ink-500">#{e.agentId.toString()}</span>
-          {e.x402 && <Badge dim>x402</Badge>}
-          <span className="ml-auto shrink-0 text-ink-500">{short(e.actor)}</span>
-          <span className="w-full min-w-0 basis-full truncate text-ink-200 sm:order-none sm:w-auto sm:basis-auto sm:flex-1">
-            {e.name ?? <span className="text-ink-500">{fallbackLabel(e, t)}</span>}
+          <span className="shrink-0 text-ink-400 tabular-nums">#{e.agentId.toString()}</span>
+          <span className="order-last flex w-full min-w-0 basis-full items-center gap-2 sm:order-none sm:w-auto sm:basis-auto">
+            <span className="min-w-0 truncate text-ink-200">{e.name ?? <span className="text-ink-500">{fallbackLabel(e, t)}</span>}</span>
+            {e.x402 && <Badge dim>x402</Badge>}
           </span>
+          <span className="ml-auto shrink-0 text-ink-500 sm:ml-0 sm:text-right">{short(e.actor)}</span>
         </span>
       </button>
     </motion.li>
@@ -93,6 +96,10 @@ export function RegistryLog({ state }: { state: RegistryState }) {
           <LiveDot active={!loading && !allFailed && !errors[chain]} />
         </div>
       }>
+      <div aria-hidden className={`hidden border-b border-ink-800 px-4 py-2 font-mono text-[10px] tracking-[.035em] text-ink-500 uppercase sm:px-5 ${COLS}`}>
+        <span>{t('reg.col.time')}</span><span>{t('reg.col.event')}</span><span>{t('reg.col.id')}</span>
+        <span>{t('reg.col.agent')}</span><span className="text-right">{t('reg.col.owner')}</span>
+      </div>
       <ul>
         {loading && <li className="px-5 py-8 text-center font-mono text-xs text-ink-500">{t('reg.scanning')}</li>}
         {allFailed && (

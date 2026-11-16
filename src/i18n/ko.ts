@@ -67,6 +67,11 @@ export const ko: Dict = {
   'reg.ipfsMeta': 'ipfs 메타데이터',
   'reg.noDescription': '인라인 설명 없음.',
   'reg.metadataLink': '메타데이터',
+  'reg.col.time': '시간',
+  'reg.col.event': '이벤트',
+  'reg.col.id': '에이전트 ID',
+  'reg.col.agent': '에이전트',
+  'reg.col.owner': '소유자',
 
   'pay.eyebrow': 'x402 정산, USDC EIP-3009',
   'pay.title': '결제 흐름',
