@@ -100,11 +100,12 @@ async function agentscan() {
 const jobs = [
   ['bazaar-cdp', () => bazaar('bazaar-cdp', 'https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources', { limit: 1000, withMarket: true })],
   ['bazaar-payai', () => bazaar('bazaar-payai', 'https://facilitator.payai.network/discovery/resources')],
-  ['agentscan', agentscan, { staleAfterH: 48 }],
+  ['agentscan', agentscan, { staleAfterH: 168 }],
 ]
 // A failed source fails the run, so a stale snapshot never hides behind a green run. The one
 // exception is a source marked `staleAfterH`: agentscan's API often hangs for minutes, so a
-// miss there only warns (keeping the previous file) until that file is older than the limit.
+// miss there only warns (keeping the previous file) until that file is older than the limit. The
+// limit is a week: its outages have run for days, and the UI shows the snapshot's age anyway.
 // Sources that did succeed keep their freshly written files, and the workflow commits them
 // before failing the run (.github/workflows/snapshot.yml).
 // Optional names on the command line run only those sources: node scripts/snapshot.mjs bazaar-cdp
